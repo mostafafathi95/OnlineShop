@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertCategorySchema, insertProductSchema, insertAddressSchema } from "@shared/schema";
+import { insertCategorySchema, insertProductSchema, insertAddressSchema, insertReviewSchema, insertCouponSchema } from "@shared/schema";
 import { z } from "zod";
 
 // Auth middleware
@@ -486,6 +486,174 @@ export async function registerRoutes(
       res.json(user);
     } catch (error) {
       res.status(500).json({ error: "Failed to update user role" });
+    }
+  });
+
+  // ==================== Reviews Routes ====================
+  
+  app.get("/api/products/:productId/reviews", async (req, res) => {
+    try {
+      const reviews = await storage.getProductReviews(parseInt(req.params.productId));
+      res.json(reviews);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch reviews" });
+    }
+  });
+
+  app.post("/api/reviews", requireAuth, async (req, res) => {
+    try {
+      const data = insertReviewSchema.parse({
+        ...req.body,
+        userId: (req.user as any).id,
+      });
+      const review = await storage.createReview(data);
+      res.json(review);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: error.errors });
+      }
+      res.status(500).json({ error: "Failed to create review" });
+    }
+  });
+
+  app.patch("/api/reviews/:id", requireAuth, async (req, res) => {
+    try {
+      const review = await storage.updateReview(parseInt(req.params.id), req.body);
+      res.json(review);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update review" });
+    }
+  });
+
+  app.delete("/api/reviews/:id", requireAuth, async (req, res) => {
+    try {
+      await storage.deleteReview(parseInt(req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete review" });
+    }
+  });
+
+  app.post("/api/reviews/:id/helpful", async (req, res) => {
+    try {
+      const { helpful, unhelpful } = req.body;
+      await storage.updateReviewHelpfulness(parseInt(req.params.id), helpful, unhelpful);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update helpfulness" });
+    }
+  });
+
+  // ==================== Wishlist Routes ====================
+  
+  app.get("/api/wishlist", requireAuth, async (req, res) => {
+    try {
+      const wishlist = await storage.getUserWishlist((req.user as any).id);
+      res.json(wishlist);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch wishlist" });
+    }
+  });
+
+  app.post("/api/wishlist", requireAuth, async (req, res) => {
+    try {
+      const { productId } = req.body;
+      const item = await storage.addToWishlist((req.user as any).id, productId);
+      res.json(item);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to add to wishlist" });
+    }
+  });
+
+  app.delete("/api/wishlist/:productId", requireAuth, async (req, res) => {
+    try {
+      await storage.removeFromWishlist((req.user as any).id, parseInt(req.params.productId));
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to remove from wishlist" });
+    }
+  });
+
+  // ==================== Coupons Routes ====================
+  
+  app.get("/api/coupons/validate/:code", async (req, res) => {
+    try {
+      const coupon = await storage.getCouponByCode(req.params.code);
+      if (!coupon) {
+        return res.status(404).json({ error: "Coupon not found or expired" });
+      }
+      res.json(coupon);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to validate coupon" });
+    }
+  });
+
+  app.get("/api/admin/coupons", requireAdmin, async (req, res) => {
+    try {
+      const coupons = await storage.getAllCoupons({ active: true });
+      res.json(coupons);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch coupons" });
+    }
+  });
+
+  app.post("/api/admin/coupons", requireAdmin, async (req, res) => {
+    try {
+      const data = insertCouponSchema.parse(req.body);
+      const coupon = await storage.createCoupon(data);
+      res.json(coupon);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: error.errors });
+      }
+      res.status(500).json({ error: "Failed to create coupon" });
+    }
+  });
+
+  app.patch("/api/admin/coupons/:id", requireAdmin, async (req, res) => {
+    try {
+      const coupon = await storage.updateCoupon(parseInt(req.params.id), req.body);
+      res.json(coupon);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update coupon" });
+    }
+  });
+
+  app.delete("/api/admin/coupons/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteCoupon(parseInt(req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete coupon" });
+    }
+  });
+
+  // ==================== Admin Review Management ====================
+  
+  app.get("/api/admin/reviews", requireAdmin, async (req, res) => {
+    try {
+      const reviews = await storage.getAllReviews?.() || [];
+      res.json(reviews);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch reviews" });
+    }
+  });
+
+  app.patch("/api/admin/reviews/:id/approve", requireAdmin, async (req, res) => {
+    try {
+      const review = await storage.updateReview(parseInt(req.params.id), { isApproved: true });
+      res.json(review);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to approve review" });
+    }
+  });
+
+  app.delete("/api/admin/reviews/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteReview(parseInt(req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete review" });
     }
   });
 

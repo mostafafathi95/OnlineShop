@@ -615,6 +615,10 @@ export class DatabaseStorage implements IStorage {
       totalRevenue: Number(revenue.total) || 0,
     };
   }
+
+  async getAllReviews(): Promise<Review[]> {
+    return db.select().from(reviews).orderBy(desc(reviews.createdAt));
+  }
 }
 
 export const storage = new DatabaseStorage();
