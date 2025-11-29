@@ -2,6 +2,8 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
+import { logger } from "./utils/logger";
+import { authManager } from "./utils/advanced-auth";
 
 const app = express();
 const httpServer = createServer(app);
@@ -9,6 +11,8 @@ const httpServer = createServer(app);
 declare module "http" {
   interface IncomingMessage {
     rawBody: unknown;
+    userId?: number;
+    sessionId?: string;
   }
 }
 
@@ -22,20 +26,16 @@ app.use(
 
 app.use(express.urlencoded({ extended: false }));
 
+// Legacy log function (for compatibility)
 export function log(message: string, source = "express") {
-  const formattedTime = new Date().toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  });
-
-  console.log(`${formattedTime} [${source}] ${message}`);
+  logger.info(source, message);
 }
 
+// Professional request logging middleware
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
+  const ip = req.ip || req.socket.remoteAddress || "unknown";
   let capturedJsonResponse: Record<string, any> | undefined = undefined;
 
   const originalResJson = res.json;
@@ -47,17 +47,39 @@ app.use((req, res, next) => {
   res.on("finish", () => {
     const duration = Date.now() - start;
     if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-
-      log(logLine);
+      const userId = (req as any).userId;
+      
+      logger.api("HTTP", `${req.method} ${path}`, {
+        statusCode: res.statusCode,
+        duration,
+        userId,
+        ip,
+        path,
+      });
     }
   });
 
   next();
 });
+
+// Auth middleware with advanced tracking
+app.use((req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.slice(7);
+    const decoded = authManager.verifyToken(token);
+    if (decoded) {
+      (req as any).userId = decoded.userId;
+      (req as any).sessionId = decoded.sessionId;
+    }
+  }
+  next();
+});
+
+// Periodic session cleanup
+setInterval(() => {
+  authManager.cleanupInactiveSessions(30);
+}, 5 * 60 * 1000); // Every 5 minutes
 
 (async () => {
   await registerRoutes(httpServer, app);
