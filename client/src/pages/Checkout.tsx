@@ -555,10 +555,56 @@ export default function Checkout() {
                   ))}
                 </div>
                 <Separator />
+                <div className="space-y-2">
+                  <Label htmlFor="coupon-final">کد کوپن (اختیاری)</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="coupon-final"
+                      placeholder="کد کوپن را وارد کنید"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                      disabled={!!appliedCoupon}
+                      data-testid="input-coupon-summary"
+                    />
+                    <Button
+                      onClick={() => validateCouponMutation.mutate(couponCode)}
+                      disabled={!couponCode || !!appliedCoupon || validateCouponMutation.isPending}
+                      variant="outline"
+                      size="sm"
+                      data-testid="button-apply-coupon-summary"
+                    >
+                      <Ticket className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  {appliedCoupon && (
+                    <div className="flex items-center justify-between bg-green-500/10 p-2 rounded">
+                      <Badge variant="outline" className="text-green-700">{appliedCoupon.code}</Badge>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6"
+                        onClick={() => {
+                          setAppliedCoupon(null);
+                          setCouponCode("");
+                        }}
+                        data-testid="button-remove-coupon-summary"
+                      >
+                        حذف
+                      </Button>
+                    </div>
+                  )}
+                </div>
+                <Separator />
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">جمع محصولات</span>
                   <span>{formatPrice(subtotal)} تومان</span>
                 </div>
+                {discount > 0 && (
+                  <div className="flex justify-between text-green-600">
+                    <span className="text-muted-foreground">تخفیف</span>
+                    <span>-{formatPrice(discount)} تومان</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">هزینه ارسال</span>
                   <span>
