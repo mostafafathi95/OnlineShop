@@ -659,3 +659,71 @@ export async function registerRoutes(
 
   return httpServer;
 }
+
+  // ==================== Payment Routes ====================
+  
+  app.get("/api/payment/initiate", requireAuth, async (req, res) => {
+    try {
+      const { orderId, gateway } = req.query;
+      if (!orderId || !gateway) {
+        return res.status(400).json({ error: "Missing parameters" });
+      }
+      
+      const order = await storage.getOrder(parseInt(orderId as string));
+      if (!order || order.userId !== (req.user as any).id) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+      
+      const callbackUrl = `${process.env.APP_URL || "http://localhost:5000"}/api/payment/callback`;
+      
+      // Mock payment initiation - redirect to payment gateway
+      const paymentData = {
+        merchant_id: "MOCK_MERCHANT",
+        amount: Math.round(order.totalAmount * 100),
+        description: `سفارش #${order.id}`,
+        callback_url: callbackUrl,
+        metadata: { orderId: order.id.toString() }
+      };
+      
+      // In production, integrate with actual gateway APIs
+      // For now, create mock payment record and redirect to success
+      res.redirect(`/api/payment/success?orderId=${orderId}&status=success`);
+    } catch (error) {
+      res.status(500).json({ error: "Payment initiation failed" });
+    }
+  });
+
+  app.get("/api/payment/callback", async (req, res) => {
+    try {
+      const { orderId, status } = req.query;
+      if (!orderId) {
+        return res.status(400).json({ error: "Missing orderId" });
+      }
+      
+      if (status === "success") {
+        await storage.updateOrder(parseInt(orderId as string), {
+          paymentStatus: "completed"
+        });
+        res.redirect(`/account/orders/${orderId}?payment=success`);
+      } else {
+        await storage.updateOrder(parseInt(orderId as string), {
+          paymentStatus: "failed"
+        });
+        res.redirect(`/checkout?payment=failed&orderId=${orderId}`);
+      }
+    } catch (error) {
+      res.status(500).json({ error: "Payment callback failed" });
+    }
+  });
+
+  app.get("/api/payment/success", requireAuth, async (req, res) => {
+    try {
+      const { orderId } = req.query;
+      res.redirect(`/account/orders/${orderId}`);
+    } catch (error) {
+      res.status(500).json({ error: "Failed" });
+    }
+  });
+
+  return httpServer;
+}

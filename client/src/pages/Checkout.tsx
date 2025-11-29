@@ -23,11 +23,21 @@ const steps = [
   { id: 3, name: "تایید", icon: Check },
 ];
 
+const paymentGateways = [
+  { id: "zarinpal", name: "زرین‌پال", color: "#28a745" },
+  { id: "bank_melli", name: "بانک ملت", color: "#003399" },
+  { id: "parsian", name: "بانک پارسیان", color: "#E32119" },
+  { id: "pasargad", name: "بانک پاسارگاد", color: "#003d82" },
+  { id: "saman", name: "بانک سامان", color: "#007D7D" },
+  { id: "mellat", name: "بانک ملت (درگاه۲)", color: "#0066cc" },
+];
+
 export default function Checkout() {
   const [, setLocation] = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedAddress, setSelectedAddress] = useState<number | null>(null);
   const [paymentMethod, setPaymentMethod] = useState("online");
+  const [paymentGateway, setPaymentGateway] = useState("zarinpal");
   const [notes, setNotes] = useState("");
   const [showNewAddress, setShowNewAddress] = useState(false);
   const [couponCode, setCouponCode] = useState("");
@@ -92,6 +102,7 @@ export default function Checkout() {
     mutationFn: async (data: {
       addressId: number;
       paymentMethod: string;
+      paymentGateway?: string;
       notes: string;
       items: { productId: number; quantity: number }[];
       couponCode?: string;
@@ -100,8 +111,12 @@ export default function Checkout() {
     },
     onSuccess: (order: any) => {
       clearCart();
-      toast({ title: "سفارش شما با موفقیت ثبت شد" });
-      setLocation(`/account/orders/${order.id}`);
+      if (paymentMethod === "online") {
+        window.location.href = `/api/payment/initiate?orderId=${order.id}&gateway=${paymentGateway}`;
+      } else {
+        toast({ title: "سفارش شما با موفقیت ثبت شد" });
+        setLocation(`/account/orders/${order.id}`);
+      }
     },
     onError: () => {
       toast({
@@ -184,14 +199,25 @@ export default function Checkout() {
       return;
     }
 
+    if (paymentMethod === "online" && !paymentGateway) {
+      toast({
+        title: "درگاه پرداخت انتخاب نشده",
+        description: "لطفا یک درگاه پرداخت انتخاب کنید.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     createOrderMutation.mutate({
       addressId: selectedAddress,
       paymentMethod,
+      paymentGateway: paymentMethod === "online" ? paymentGateway : undefined,
       notes,
       items: items.map((item) => ({
         productId: item.id,
         quantity: item.quantity,
       })),
+      couponCode: appliedCoupon?.code,
     });
   };
 
@@ -386,7 +412,7 @@ export default function Checkout() {
                     روش پرداخت
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-4">
                   <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
                     <div
                       className={`flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer ${
@@ -401,7 +427,7 @@ export default function Checkout() {
                         <Label htmlFor="online" className="font-medium cursor-pointer">
                           پرداخت آنلاین
                         </Label>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-muted-foreground">درگاه پرداخت اینترنتی</p>
                           پرداخت امن از طریق درگاه بانکی
                         </p>
                       </div>
