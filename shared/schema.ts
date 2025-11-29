@@ -296,6 +296,24 @@ export const sliders = pgTable("sliders", {
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [index("idx_slider_slug").on(table.slug), index("idx_slider_active").on(table.isActive), index("idx_slider_dates").on(table.startDate), index("idx_slider_dates_end").on(table.endDate)]);
 
+// Banners table
+export const banners = pgTable("banners", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  title: varchar("title", { length: 255 }).notNull(),
+  subtitle: varchar("subtitle", { length: 255 }),
+  badgeText: varchar("badge_text", { length: 100 }),
+  description: text("description"),
+  link: varchar("link"),
+  backgroundColor: varchar("background_color").notNull(),
+  textColor: varchar("text_color").default("#ffffff"),
+  imageUrl: varchar("image_url"),
+  icon: varchar("icon", { length: 50 }),
+  isActive: boolean("is_active").default(true),
+  sortOrder: integer("sort_order").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [index("idx_banner_active").on(table.isActive)]);
+
 // Search Analytics table
 export const searchAnalytics = pgTable("search_analytics", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
@@ -554,6 +572,7 @@ export const insertSettingSchema = createInsertSchema(settings).omit({ id: true,
 export const insertQuestionSchema = createInsertSchema(questions).omit({ id: true, createdAt: true });
 export const insertAnswerSchema = createInsertSchema(answers).omit({ id: true, createdAt: true });
 export const insertSliderSchema = createInsertSchema(sliders).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertBannerSchema = createInsertSchema(banners).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertSearchAnalyticsSchema = createInsertSchema(searchAnalytics).omit({ id: true, createdAt: true });
 
 // Types
@@ -604,6 +623,8 @@ export type InsertAnswer = z.infer<typeof insertAnswerSchema>;
 export type Answer = typeof answers.$inferSelect;
 export type InsertSlider = z.infer<typeof insertSliderSchema>;
 export type Slider = typeof sliders.$inferSelect;
+export type InsertBanner = z.infer<typeof insertBannerSchema>;
+export type Banner = typeof banners.$inferSelect;
 export type InsertSearchAnalytics = z.infer<typeof insertSearchAnalyticsSchema>;
 export type SearchAnalytics = typeof searchAnalytics.$inferSelect;
 

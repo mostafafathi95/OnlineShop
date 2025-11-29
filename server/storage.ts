@@ -25,6 +25,7 @@ import {
   questions,
   answers,
   sliders,
+  banners,
   searchAnalytics,
   type User,
   type UpsertUser,
@@ -73,6 +74,8 @@ import {
   type InsertAnswer,
   type Slider,
   type InsertSlider,
+  type Banner,
+  type InsertBanner,
   type SearchAnalytics,
   type InsertSearchAnalytics,
 } from "@shared/schema";
