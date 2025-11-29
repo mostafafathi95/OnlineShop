@@ -9,8 +9,9 @@ import Layout from "@/components/layout/Layout";
 import ProductGrid from "@/components/products/ProductGrid";
 import { RecentlyViewed } from "@/components/discovery/RecentlyViewed";
 import { SocialProof } from "@/components/discovery/SocialProof";
+import { Carousel } from "@/components/Carousel";
 import { useQuery } from "@tanstack/react-query";
-import type { Product, Category } from "@shared/schema";
+import type { Product, Category, Slider } from "@shared/schema";
 
 const features = [
   {
@@ -87,6 +88,10 @@ export default function Landing() {
     queryKey: ["/api/categories"],
   });
 
+  const { data: sliders = [] } = useQuery<Slider[]>({
+    queryKey: ["/api/sliders/active"],
+  });
+
   return (
     <Layout>
       {/* HERO SECTION - Premium */}
@@ -147,36 +152,42 @@ export default function Landing() {
               </div>
             </div>
 
-            {/* Deals Cards */}
-            <div className="space-y-4 animate-slide-up">
-              {deals.map((deal, idx) => (
-                <Card key={idx} className={`${deal.color} text-white overflow-hidden hover-elevate group`}>
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm opacity-90">{deal.label}</p>
-                        <p className="text-2xl font-bold">{deal.value}</p>
+            {/* Carousel or Deals */}
+            {sliders && sliders.length > 0 ? (
+              <div className="animate-slide-up">
+                <Carousel slides={sliders} autoPlay={true} autoPlayInterval={5000} />
+              </div>
+            ) : (
+              <div className="space-y-4 animate-slide-up">
+                {deals.map((deal, idx) => (
+                  <Card key={idx} className={`${deal.color} text-white overflow-hidden hover-elevate group`}>
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm opacity-90">{deal.label}</p>
+                          <p className="text-2xl font-bold">{deal.value}</p>
+                        </div>
+                        <TrendingUp className="h-12 w-12 opacity-20 group-hover:opacity-40 transition-opacity" />
                       </div>
-                      <TrendingUp className="h-12 w-12 opacity-20 group-hover:opacity-40 transition-opacity" />
-                    </div>
+                    </CardContent>
+                  </Card>
+                ))}
+                
+                {/* Featured Product Preview */}
+                <Card className="overflow-hidden hover-elevate">
+                  <img 
+                    src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop"
+                    alt="محصول ویژه"
+                    className="w-full h-40 object-cover"
+                  />
+                  <CardContent className="p-4">
+                    <p className="text-sm text-primary font-semibold">محصول برتر ماه</p>
+                    <h3 className="font-bold mt-1">لپ‌تاپ Pro</h3>
+                    <p className="text-lg font-bold text-primary mt-2">۵۰۰K تومان</p>
                   </CardContent>
                 </Card>
-              ))}
-              
-              {/* Featured Product Preview */}
-              <Card className="overflow-hidden hover-elevate">
-                <img 
-                  src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop"
-                  alt="محصول ویژه"
-                  className="w-full h-40 object-cover"
-                />
-                <CardContent className="p-4">
-                  <p className="text-sm text-primary font-semibold">محصول برتر ماه</p>
-                  <h3 className="font-bold mt-1">لپ‌تاپ Pro</h3>
-                  <p className="text-lg font-bold text-primary mt-2">۵۰۰K تومان</p>
-                </CardContent>
-              </Card>
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </section>

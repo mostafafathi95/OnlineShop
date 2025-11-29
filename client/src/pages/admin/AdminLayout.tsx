@@ -21,6 +21,7 @@ import {
   Zap,
   Wallet,
   HelpCircle,
+  Image,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -49,6 +50,7 @@ const navigation = [
   { name: "پرسش‌ها", href: "/admin/questions", icon: HelpCircle },
   { name: "پاسخ‌ها", href: "/admin/answers", icon: MessageSquare },
   { name: "کیف‌پول کاربران", href: "/admin/user-wallets", icon: Wallet },
+  { name: "اسلایدرها", href: "/admin/sliders", icon: Image },
   { name: "گزارشات", href: "/admin/reports", icon: TrendingUp },
   { name: "تنظیمات", href: "/admin/settings", icon: Settings },
 ];
