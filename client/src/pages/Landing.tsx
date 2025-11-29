@@ -36,29 +36,6 @@ const features = [
   },
 ];
 
-const testimonials = [
-  {
-    name: "علی محمدی",
-    role: "خریدار منظم",
-    content: "تجربه خریدی عالی، محصولات اصل و ارسال سریع!",
-    rating: 5,
-    avatar: "👨‍💼",
-  },
-  {
-    name: "فاطمه احمدی",
-    role: "خریدار راضی",
-    content: "خدمات پس از فروش بسیار خوب و پرسنل مودب",
-    rating: 5,
-    avatar: "👩‍💼",
-  },
-  {
-    name: "محمد رضا",
-    role: "خریدار قدیمی",
-    content: "سال‌هاست که خریداری می‌کنم، بهترین انتخاب",
-    rating: 5,
-    avatar: "👨‍🔧",
-  },
-];
 
 const deals = [
   { label: "تخفیف تابستان", value: "۴۰%", color: "bg-red-500" },
@@ -312,37 +289,6 @@ export default function Landing() {
             products={featuredProducts?.slice(0, 8) || []}
             isLoading={productsLoading}
           />
-        </div>
-      </section>
-
-      {/* TESTIMONIALS */}
-      <section className="py-16 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-2">نظرات خریداران</h2>
-            <p className="text-muted-foreground">هزاران خریدار راضی از سرویس ما</p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((testimonial, idx) => (
-              <Card key={idx} className="hover-elevate">
-                <CardContent className="p-6 space-y-4">
-                  <div className="flex items-center gap-1">
-                    {Array(testimonial.rating).fill(0).map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground">{testimonial.content}</p>
-                  <div className="flex items-center gap-3 pt-2 border-t">
-                    <div className="text-2xl">{testimonial.avatar}</div>
-                    <div>
-                      <p className="font-semibold text-sm">{testimonial.name}</p>
-                      <p className="text-xs text-muted-foreground">{testimonial.role}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
         </div>
       </section>
 
