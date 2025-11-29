@@ -24,6 +24,7 @@ import {
   settings,
   questions,
   answers,
+  sliders,
   type User,
   type UpsertUser,
   type Category,
@@ -69,6 +70,8 @@ import {
   type InsertQuestion,
   type Answer,
   type InsertAnswer,
+  type Slider,
+  type InsertSlider,
 } from "@shared/schema";
 
 export interface IStorage {

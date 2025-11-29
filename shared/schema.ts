@@ -539,6 +539,7 @@ export const insertUserRequestSchema = createInsertSchema(userRequests).omit({ i
 export const insertSettingSchema = createInsertSchema(settings).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertQuestionSchema = createInsertSchema(questions).omit({ id: true, createdAt: true });
 export const insertAnswerSchema = createInsertSchema(answers).omit({ id: true, createdAt: true });
+export const insertSliderSchema = createInsertSchema(sliders).omit({ id: true, createdAt: true, updatedAt: true });
 
 // Types
 export type UpsertUser = typeof users.$inferInsert;
@@ -586,6 +587,8 @@ export type InsertQuestion = z.infer<typeof insertQuestionSchema>;
 export type Question = typeof questions.$inferSelect;
 export type InsertAnswer = z.infer<typeof insertAnswerSchema>;
 export type Answer = typeof answers.$inferSelect;
+export type InsertSlider = z.infer<typeof insertSliderSchema>;
+export type Slider = typeof sliders.$inferSelect;
 
 // Extended types for frontend
 export type ProductWithCategory = Product & {
