@@ -296,6 +296,20 @@ export const sliders = pgTable("sliders", {
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [index("idx_slider_slug").on(table.slug), index("idx_slider_active").on(table.isActive), index("idx_slider_dates").on(table.startDate), index("idx_slider_dates_end").on(table.endDate)]);
 
+// Search Analytics table
+export const searchAnalytics = pgTable("search_analytics", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  query: varchar("query", { length: 500 }).notNull(),
+  userId: varchar("user_id").references(() => users.id, { onDelete: 'cascade' }),
+  resultsCount: integer("results_count").default(0),
+  clickedProductId: integer("clicked_product_id").references(() => products.id, { onDelete: 'set null' }),
+  isZeroResult: boolean("is_zero_result").default(false),
+  sessionId: varchar("session_id"),
+  userAgent: varchar("user_agent"),
+  ipAddress: varchar("ip_address"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [index("idx_search_query").on(table.query), index("idx_search_user").on(table.userId), index("idx_search_zero_result").on(table.isZeroResult)]);
+
 // Addresses table
 export const addresses = pgTable("addresses", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
@@ -540,6 +554,7 @@ export const insertSettingSchema = createInsertSchema(settings).omit({ id: true,
 export const insertQuestionSchema = createInsertSchema(questions).omit({ id: true, createdAt: true });
 export const insertAnswerSchema = createInsertSchema(answers).omit({ id: true, createdAt: true });
 export const insertSliderSchema = createInsertSchema(sliders).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertSearchAnalyticsSchema = createInsertSchema(searchAnalytics).omit({ id: true, createdAt: true });
 
 // Types
 export type UpsertUser = typeof users.$inferInsert;
@@ -589,6 +604,8 @@ export type InsertAnswer = z.infer<typeof insertAnswerSchema>;
 export type Answer = typeof answers.$inferSelect;
 export type InsertSlider = z.infer<typeof insertSliderSchema>;
 export type Slider = typeof sliders.$inferSelect;
+export type InsertSearchAnalytics = z.infer<typeof insertSearchAnalyticsSchema>;
+export type SearchAnalytics = typeof searchAnalytics.$inferSelect;
 
 // Extended types for frontend
 export type ProductWithCategory = Product & {

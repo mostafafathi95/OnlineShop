@@ -25,6 +25,7 @@ import {
   questions,
   answers,
   sliders,
+  searchAnalytics,
   type User,
   type UpsertUser,
   type Category,
@@ -72,6 +73,8 @@ import {
   type InsertAnswer,
   type Slider,
   type InsertSlider,
+  type SearchAnalytics,
+  type InsertSearchAnalytics,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -1124,6 +1127,47 @@ export class DatabaseStorage implements IStorage {
 
   async deleteSlider(id: number): Promise<void> {
     await db.delete(sliders).where(eq(sliders.id, id));
+  }
+
+  // Search Analytics
+  async searchProducts(query: string): Promise<Product[]> {
+    const searchTerm = `%${query.toLowerCase()}%`;
+    return db.select().from(products).where(
+      and(
+        eq(products.isActive, true),
+        sql`LOWER(${products.name}) LIKE ${searchTerm} OR LOWER(${products.description}) LIKE ${searchTerm}`
+      )
+    );
+  }
+
+  async getProductFilters(categoryId?: number): Promise<{ brands: any[], priceRange: any[] }> {
+    const where = categoryId ? eq(products.categoryId, categoryId) : undefined;
+    const prods = await db.select().from(products).where(where || eq(products.isActive, true));
+    
+    const brands = [...new Set(prods.map(p => p.name?.split(' ')[0]).filter(Boolean))];
+    const prices = prods.map(p => parseInt(p.price as any) || 0).sort((a, b) => a - b);
+    
+    return {
+      brands: brands.slice(0, 10),
+      priceRange: prices.length > 0 ? [prices[0], prices[prices.length - 1]] : [0, 0]
+    };
+  }
+
+  async trackSearch(analytics: InsertSearchAnalytics): Promise<SearchAnalytics> {
+    const [newAnalytic] = await db.insert(searchAnalytics).values(analytics).returning();
+    return newAnalytic;
+  }
+
+  async getPopularSearches(limit: number = 10): Promise<{ query: string, count: number }[]> {
+    const results = await db.select({
+      query: searchAnalytics.query,
+      count: sql<number>`COUNT(*)`
+    }).from(searchAnalytics).groupBy(searchAnalytics.query).orderBy(sql`COUNT(*) DESC`).limit(limit);
+    return results;
+  }
+
+  async getZeroResultSearches(limit: number = 5): Promise<SearchAnalytics[]> {
+    return db.select().from(searchAnalytics).where(eq(searchAnalytics.isZeroResult, true)).limit(limit);
   }
 }
 
