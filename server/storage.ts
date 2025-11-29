@@ -12,6 +12,18 @@ import {
   reviews,
   wishlist,
   coupons,
+  articles,
+  news,
+  pages,
+  brands,
+  productAttributes,
+  shippingMethods,
+  creditPoints,
+  userWallets,
+  userRequests,
+  settings,
+  questions,
+  answers,
   type User,
   type UpsertUser,
   type Category,
@@ -33,6 +45,30 @@ import {
   type Coupon,
   type InsertCoupon,
   type WishlistItem,
+  type Article,
+  type InsertArticle,
+  type News,
+  type InsertNews,
+  type Page,
+  type InsertPage,
+  type Brand,
+  type InsertBrand,
+  type ProductAttribute,
+  type InsertProductAttribute,
+  type ShippingMethod,
+  type InsertShippingMethod,
+  type CreditPoint,
+  type InsertCreditPoint,
+  type UserWallet,
+  type InsertUserWallet,
+  type UserRequest,
+  type InsertUserRequest,
+  type Setting,
+  type InsertSetting,
+  type Question,
+  type InsertQuestion,
+  type Answer,
+  type InsertAnswer,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -120,6 +156,90 @@ export interface IStorage {
   getComparison(sessionId: string): Promise<any[]>;
   addToComparison(sessionId: string, product1Id: number, product2Id: number): Promise<any>;
   removeFromComparison(sessionId: string, product1Id: number, product2Id: number): Promise<void>;
+
+  // Articles
+  getAllArticles(options?: { published?: boolean; limit?: number }): Promise<Article[]>;
+  getArticleById(id: number): Promise<Article | undefined>;
+  getArticleBySlug(slug: string): Promise<Article | undefined>;
+  createArticle(article: InsertArticle): Promise<Article>;
+  updateArticle(id: number, data: Partial<InsertArticle>): Promise<Article | undefined>;
+  deleteArticle(id: number): Promise<void>;
+
+  // News
+  getAllNews(options?: { published?: boolean; limit?: number }): Promise<News[]>;
+  getNewsById(id: number): Promise<News | undefined>;
+  getNewsBySlug(slug: string): Promise<News | undefined>;
+  createNews(news: InsertNews): Promise<News>;
+  updateNews(id: number, data: Partial<InsertNews>): Promise<News | undefined>;
+  deleteNews(id: number): Promise<void>;
+
+  // Pages
+  getAllPages(options?: { published?: boolean }): Promise<Page[]>;
+  getPageById(id: number): Promise<Page | undefined>;
+  getPageBySlug(slug: string): Promise<Page | undefined>;
+  createPage(page: InsertPage): Promise<Page>;
+  updatePage(id: number, data: Partial<InsertPage>): Promise<Page | undefined>;
+  deletePage(id: number): Promise<void>;
+
+  // Brands
+  getAllBrands(options?: { active?: boolean }): Promise<Brand[]>;
+  getBrandById(id: number): Promise<Brand | undefined>;
+  getBrandBySlug(slug: string): Promise<Brand | undefined>;
+  createBrand(brand: InsertBrand): Promise<Brand>;
+  updateBrand(id: number, data: Partial<InsertBrand>): Promise<Brand | undefined>;
+  deleteBrand(id: number): Promise<void>;
+
+  // Product Attributes
+  getProductAttributes(productId: number): Promise<ProductAttribute[]>;
+  createProductAttribute(attr: InsertProductAttribute): Promise<ProductAttribute>;
+  updateProductAttribute(id: number, data: Partial<InsertProductAttribute>): Promise<ProductAttribute | undefined>;
+  deleteProductAttribute(id: number): Promise<void>;
+
+  // Shipping Methods
+  getAllShippingMethods(options?: { active?: boolean }): Promise<ShippingMethod[]>;
+  getShippingMethodById(id: number): Promise<ShippingMethod | undefined>;
+  createShippingMethod(method: InsertShippingMethod): Promise<ShippingMethod>;
+  updateShippingMethod(id: number, data: Partial<InsertShippingMethod>): Promise<ShippingMethod | undefined>;
+  deleteShippingMethod(id: number): Promise<void>;
+
+  // Credit Points
+  getUserCreditPoints(userId: string): Promise<CreditPoint[]>;
+  getTotalCreditPoints(userId: string): Promise<number>;
+  addCreditPoints(creditPoint: InsertCreditPoint): Promise<CreditPoint>;
+  removeCreditPoints(id: number): Promise<void>;
+
+  // User Wallets
+  getUserWallet(userId: string): Promise<UserWallet | undefined>;
+  createUserWallet(wallet: InsertUserWallet): Promise<UserWallet>;
+  updateWalletBalance(userId: string, balance: string): Promise<UserWallet | undefined>;
+
+  // User Requests
+  getUserRequests(userId: string): Promise<UserRequest[]>;
+  getAllUserRequests(options?: { status?: string }): Promise<UserRequest[]>;
+  getUserRequestById(id: number): Promise<UserRequest | undefined>;
+  createUserRequest(request: InsertUserRequest): Promise<UserRequest>;
+  updateUserRequest(id: number, data: Partial<InsertUserRequest>): Promise<UserRequest | undefined>;
+  deleteUserRequest(id: number): Promise<void>;
+
+  // Settings
+  getAllSettings(): Promise<Setting[]>;
+  getSettingByKey(key: string): Promise<Setting | undefined>;
+  createSetting(setting: InsertSetting): Promise<Setting>;
+  updateSetting(key: string, value: string): Promise<Setting | undefined>;
+
+  // Questions
+  getProductQuestions(productId: number): Promise<Question[]>;
+  getQuestionById(id: number): Promise<Question | undefined>;
+  createQuestion(question: InsertQuestion): Promise<Question>;
+  updateQuestion(id: number, data: Partial<InsertQuestion>): Promise<Question | undefined>;
+  deleteQuestion(id: number): Promise<void>;
+
+  // Answers
+  getQuestionAnswers(questionId: number): Promise<Answer[]>;
+  getAnswerById(id: number): Promise<Answer | undefined>;
+  createAnswer(answer: InsertAnswer): Promise<Answer>;
+  updateAnswer(id: number, data: Partial<InsertAnswer>): Promise<Answer | undefined>;
+  deleteAnswer(id: number): Promise<void>;
 
   // Stats
   getStats(): Promise<{
@@ -641,6 +761,326 @@ export class DatabaseStorage implements IStorage {
 
   async removeFromComparison(sessionId: string, product1Id: number, product2Id: number): Promise<void> {
     await db.delete(wishlist).where(and(eq(wishlist.userId, sessionId), eq(wishlist.productId, product1Id)));
+  }
+
+  // Articles
+  async getAllArticles(options?: { published?: boolean; limit?: number }): Promise<Article[]> {
+    let query = db.select().from(articles);
+    if (options?.published) {
+      query = query.where(eq(articles.isPublished, true)) as any;
+    }
+    if (options?.limit) {
+      query = query.limit(options.limit) as any;
+    }
+    return (query.orderBy(desc(articles.createdAt)) as any);
+  }
+
+  async getArticleById(id: number): Promise<Article | undefined> {
+    const [article] = await db.select().from(articles).where(eq(articles.id, id));
+    return article;
+  }
+
+  async getArticleBySlug(slug: string): Promise<Article | undefined> {
+    const [article] = await db.select().from(articles).where(eq(articles.slug, slug));
+    return article;
+  }
+
+  async createArticle(article: InsertArticle): Promise<Article> {
+    const [newArticle] = await db.insert(articles).values(article).returning();
+    return newArticle;
+  }
+
+  async updateArticle(id: number, data: Partial<InsertArticle>): Promise<Article | undefined> {
+    const [updated] = await db.update(articles).set({ ...data, updatedAt: new Date() }).where(eq(articles.id, id)).returning();
+    return updated;
+  }
+
+  async deleteArticle(id: number): Promise<void> {
+    await db.delete(articles).where(eq(articles.id, id));
+  }
+
+  // News
+  async getAllNews(options?: { published?: boolean; limit?: number }): Promise<News[]> {
+    let query = db.select().from(news);
+    if (options?.published) {
+      query = query.where(eq(news.isPublished, true)) as any;
+    }
+    if (options?.limit) {
+      query = query.limit(options.limit) as any;
+    }
+    return (query.orderBy(desc(news.createdAt)) as any);
+  }
+
+  async getNewsById(id: number): Promise<News | undefined> {
+    const [newsItem] = await db.select().from(news).where(eq(news.id, id));
+    return newsItem;
+  }
+
+  async getNewsBySlug(slug: string): Promise<News | undefined> {
+    const [newsItem] = await db.select().from(news).where(eq(news.slug, slug));
+    return newsItem;
+  }
+
+  async createNews(newsItem: InsertNews): Promise<News> {
+    const [newNews] = await db.insert(news).values(newsItem).returning();
+    return newNews;
+  }
+
+  async updateNews(id: number, data: Partial<InsertNews>): Promise<News | undefined> {
+    const [updated] = await db.update(news).set({ ...data, updatedAt: new Date() }).where(eq(news.id, id)).returning();
+    return updated;
+  }
+
+  async deleteNews(id: number): Promise<void> {
+    await db.delete(news).where(eq(news.id, id));
+  }
+
+  // Pages
+  async getAllPages(options?: { published?: boolean }): Promise<Page[]> {
+    let query = db.select().from(pages);
+    if (options?.published) {
+      query = query.where(eq(pages.isPublished, true)) as any;
+    }
+    return (query.orderBy(asc(pages.title)) as any);
+  }
+
+  async getPageById(id: number): Promise<Page | undefined> {
+    const [page] = await db.select().from(pages).where(eq(pages.id, id));
+    return page;
+  }
+
+  async getPageBySlug(slug: string): Promise<Page | undefined> {
+    const [page] = await db.select().from(pages).where(eq(pages.slug, slug));
+    return page;
+  }
+
+  async createPage(page: InsertPage): Promise<Page> {
+    const [newPage] = await db.insert(pages).values(page).returning();
+    return newPage;
+  }
+
+  async updatePage(id: number, data: Partial<InsertPage>): Promise<Page | undefined> {
+    const [updated] = await db.update(pages).set({ ...data, updatedAt: new Date() }).where(eq(pages.id, id)).returning();
+    return updated;
+  }
+
+  async deletePage(id: number): Promise<void> {
+    await db.delete(pages).where(eq(pages.id, id));
+  }
+
+  // Brands
+  async getAllBrands(options?: { active?: boolean }): Promise<Brand[]> {
+    let query = db.select().from(brands);
+    if (options?.active) {
+      query = query.where(eq(brands.isActive, true)) as any;
+    }
+    return (query.orderBy(asc(brands.name)) as any);
+  }
+
+  async getBrandById(id: number): Promise<Brand | undefined> {
+    const [brand] = await db.select().from(brands).where(eq(brands.id, id));
+    return brand;
+  }
+
+  async getBrandBySlug(slug: string): Promise<Brand | undefined> {
+    const [brand] = await db.select().from(brands).where(eq(brands.slug, slug));
+    return brand;
+  }
+
+  async createBrand(brand: InsertBrand): Promise<Brand> {
+    const [newBrand] = await db.insert(brands).values(brand).returning();
+    return newBrand;
+  }
+
+  async updateBrand(id: number, data: Partial<InsertBrand>): Promise<Brand | undefined> {
+    const [updated] = await db.update(brands).set(data).where(eq(brands.id, id)).returning();
+    return updated;
+  }
+
+  async deleteBrand(id: number): Promise<void> {
+    await db.delete(brands).where(eq(brands.id, id));
+  }
+
+  // Product Attributes
+  async getProductAttributes(productId: number): Promise<ProductAttribute[]> {
+    return db.select().from(productAttributes).where(eq(productAttributes.productId, productId)).orderBy(asc(productAttributes.sortOrder));
+  }
+
+  async createProductAttribute(attr: InsertProductAttribute): Promise<ProductAttribute> {
+    const [newAttr] = await db.insert(productAttributes).values(attr).returning();
+    return newAttr;
+  }
+
+  async updateProductAttribute(id: number, data: Partial<InsertProductAttribute>): Promise<ProductAttribute | undefined> {
+    const [updated] = await db.update(productAttributes).set(data).where(eq(productAttributes.id, id)).returning();
+    return updated;
+  }
+
+  async deleteProductAttribute(id: number): Promise<void> {
+    await db.delete(productAttributes).where(eq(productAttributes.id, id));
+  }
+
+  // Shipping Methods
+  async getAllShippingMethods(options?: { active?: boolean }): Promise<ShippingMethod[]> {
+    let query = db.select().from(shippingMethods);
+    if (options?.active) {
+      query = query.where(eq(shippingMethods.isActive, true)) as any;
+    }
+    return (query as any);
+  }
+
+  async getShippingMethodById(id: number): Promise<ShippingMethod | undefined> {
+    const [method] = await db.select().from(shippingMethods).where(eq(shippingMethods.id, id));
+    return method;
+  }
+
+  async createShippingMethod(method: InsertShippingMethod): Promise<ShippingMethod> {
+    const [newMethod] = await db.insert(shippingMethods).values(method).returning();
+    return newMethod;
+  }
+
+  async updateShippingMethod(id: number, data: Partial<InsertShippingMethod>): Promise<ShippingMethod | undefined> {
+    const [updated] = await db.update(shippingMethods).set(data).where(eq(shippingMethods.id, id)).returning();
+    return updated;
+  }
+
+  async deleteShippingMethod(id: number): Promise<void> {
+    await db.delete(shippingMethods).where(eq(shippingMethods.id, id));
+  }
+
+  // Credit Points
+  async getUserCreditPoints(userId: string): Promise<CreditPoint[]> {
+    return db.select().from(creditPoints).where(eq(creditPoints.userId, userId)).orderBy(desc(creditPoints.createdAt));
+  }
+
+  async getTotalCreditPoints(userId: string): Promise<number> {
+    const [result] = await db.select({ total: sql<number>`coalesce(sum(${creditPoints.points}::numeric), 0)` }).from(creditPoints).where(eq(creditPoints.userId, userId));
+    return Number(result?.total) || 0;
+  }
+
+  async addCreditPoints(creditPoint: InsertCreditPoint): Promise<CreditPoint> {
+    const [newPoint] = await db.insert(creditPoints).values(creditPoint).returning();
+    return newPoint;
+  }
+
+  async removeCreditPoints(id: number): Promise<void> {
+    await db.delete(creditPoints).where(eq(creditPoints.id, id));
+  }
+
+  // User Wallets
+  async getUserWallet(userId: string): Promise<UserWallet | undefined> {
+    const [wallet] = await db.select().from(userWallets).where(eq(userWallets.userId, userId));
+    return wallet;
+  }
+
+  async createUserWallet(wallet: InsertUserWallet): Promise<UserWallet> {
+    const [newWallet] = await db.insert(userWallets).values(wallet).returning();
+    return newWallet;
+  }
+
+  async updateWalletBalance(userId: string, balance: string): Promise<UserWallet | undefined> {
+    const [updated] = await db.update(userWallets).set({ balance, updatedAt: new Date() }).where(eq(userWallets.userId, userId)).returning();
+    return updated;
+  }
+
+  // User Requests
+  async getUserRequests(userId: string): Promise<UserRequest[]> {
+    return db.select().from(userRequests).where(eq(userRequests.userId, userId)).orderBy(desc(userRequests.createdAt));
+  }
+
+  async getAllUserRequests(options?: { status?: string }): Promise<UserRequest[]> {
+    let query = db.select().from(userRequests);
+    if (options?.status) {
+      query = query.where(eq(userRequests.status, options.status as any)) as any;
+    }
+    return (query.orderBy(desc(userRequests.createdAt)) as any);
+  }
+
+  async getUserRequestById(id: number): Promise<UserRequest | undefined> {
+    const [request] = await db.select().from(userRequests).where(eq(userRequests.id, id));
+    return request;
+  }
+
+  async createUserRequest(request: InsertUserRequest): Promise<UserRequest> {
+    const [newRequest] = await db.insert(userRequests).values(request).returning();
+    return newRequest;
+  }
+
+  async updateUserRequest(id: number, data: Partial<InsertUserRequest>): Promise<UserRequest | undefined> {
+    const [updated] = await db.update(userRequests).set({ ...data, updatedAt: new Date() }).where(eq(userRequests.id, id)).returning();
+    return updated;
+  }
+
+  async deleteUserRequest(id: number): Promise<void> {
+    await db.delete(userRequests).where(eq(userRequests.id, id));
+  }
+
+  // Settings
+  async getAllSettings(): Promise<Setting[]> {
+    return db.select().from(settings);
+  }
+
+  async getSettingByKey(key: string): Promise<Setting | undefined> {
+    const [setting] = await db.select().from(settings).where(eq(settings.key, key));
+    return setting;
+  }
+
+  async createSetting(setting: InsertSetting): Promise<Setting> {
+    const [newSetting] = await db.insert(settings).values(setting).returning();
+    return newSetting;
+  }
+
+  async updateSetting(key: string, value: string): Promise<Setting | undefined> {
+    const [updated] = await db.update(settings).set({ value, updatedAt: new Date() }).where(eq(settings.key, key)).returning();
+    return updated;
+  }
+
+  // Questions
+  async getProductQuestions(productId: number): Promise<Question[]> {
+    return db.select().from(questions).where(eq(questions.productId, productId)).orderBy(desc(questions.createdAt));
+  }
+
+  async getQuestionById(id: number): Promise<Question | undefined> {
+    const [question] = await db.select().from(questions).where(eq(questions.id, id));
+    return question;
+  }
+
+  async createQuestion(question: InsertQuestion): Promise<Question> {
+    const [newQuestion] = await db.insert(questions).values(question).returning();
+    return newQuestion;
+  }
+
+  async updateQuestion(id: number, data: Partial<InsertQuestion>): Promise<Question | undefined> {
+    const [updated] = await db.update(questions).set(data).where(eq(questions.id, id)).returning();
+    return updated;
+  }
+
+  async deleteQuestion(id: number): Promise<void> {
+    await db.delete(questions).where(eq(questions.id, id));
+  }
+
+  // Answers
+  async getQuestionAnswers(questionId: number): Promise<Answer[]> {
+    return db.select().from(answers).where(eq(answers.questionId, questionId)).orderBy(asc(answers.createdAt));
+  }
+
+  async getAnswerById(id: number): Promise<Answer | undefined> {
+    const [answer] = await db.select().from(answers).where(eq(answers.id, id));
+    return answer;
+  }
+
+  async createAnswer(answer: InsertAnswer): Promise<Answer> {
+    const [newAnswer] = await db.insert(answers).values(answer).returning();
+    return newAnswer;
+  }
+
+  async updateAnswer(id: number, data: Partial<InsertAnswer>): Promise<Answer | undefined> {
+    const [updated] = await db.update(answers).set(data).where(eq(answers.id, id)).returning();
+    return updated;
+  }
+
+  async deleteAnswer(id: number): Promise<void> {
+    await db.delete(answers).where(eq(answers.id, id));
   }
 }
 
