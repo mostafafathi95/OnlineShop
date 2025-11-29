@@ -388,7 +388,7 @@ export default function Checkout() {
                   )}
                 </CardContent>
               </Card>
-            )}
+            </CheckoutStepContent>
 
             <CheckoutStepContent isActive={currentStep === 2}>
               <Card>
