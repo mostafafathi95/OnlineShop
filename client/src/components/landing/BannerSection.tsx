@@ -11,8 +11,9 @@ export function BannerSection() {
   if (isLoading || banners.length === 0) return null;
 
   return (
-    <section className="py-12">
+    <section className="py-16">
       <div className="container mx-auto px-4">
+        <h2 className="text-2xl font-bold mb-8 text-center">پیشنهادات ویژه</h2>
         <div className="grid md:grid-cols-3 gap-6">
           {banners.slice(0, 3).map((banner) => (
             <Link
@@ -20,18 +21,27 @@ export function BannerSection() {
               href={banner.link || "/products"}
               data-testid={`banner-${banner.id}`}
             >
-              <Card
-                className="overflow-hidden hover-elevate cursor-pointer h-full"
+              <div
+                className="relative overflow-hidden rounded-lg hover-elevate cursor-pointer h-64 transition-transform group"
                 style={{
-                  backgroundColor: banner.backgroundColor,
+                  backgroundColor: banner.backgroundColor || "#f5f5f5",
                 }}
               >
-                <CardContent className="p-6 h-full flex flex-col justify-between">
+                {banner.imageUrl && (
+                  <img
+                    src={banner.imageUrl}
+                    alt={banner.title}
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    data-testid={`banner-image-${banner.id}`}
+                  />
+                )}
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-all" />
+                <div className="relative p-6 h-full flex flex-col justify-between text-white">
                   <div>
-                    <div className="text-4xl mb-2">{banner.icon}</div>
+                    <div className="text-5xl mb-2">{banner.icon}</div>
                     {banner.badgeText && (
                       <p
-                        className="text-sm font-medium mb-2 opacity-90"
+                        className="text-xs font-bold uppercase tracking-wider mb-2 bg-white/20 px-3 py-1 rounded-full w-fit"
                         style={{ color: banner.textColor }}
                         data-testid={`banner-badge-${banner.id}`}
                       >
@@ -41,33 +51,24 @@ export function BannerSection() {
                   </div>
                   <div>
                     <h3
-                      className="text-2xl font-bold mb-1"
-                      style={{ color: banner.textColor }}
+                      className="text-2xl font-bold mb-2"
+                      style={{ color: banner.textColor || "white" }}
                       data-testid={`banner-title-${banner.id}`}
                     >
                       {banner.title}
                     </h3>
                     {banner.subtitle && (
                       <p
-                        className="text-sm opacity-90"
-                        style={{ color: banner.textColor }}
+                        className="text-sm font-semibold opacity-90"
+                        style={{ color: banner.textColor || "white" }}
                         data-testid={`banner-subtitle-${banner.id}`}
                       >
                         {banner.subtitle}
                       </p>
                     )}
-                    {banner.description && (
-                      <p
-                        className="text-xs mt-2 opacity-75"
-                        style={{ color: banner.textColor }}
-                        data-testid={`banner-description-${banner.id}`}
-                      >
-                        {banner.description}
-                      </p>
-                    )}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </Link>
           ))}
         </div>

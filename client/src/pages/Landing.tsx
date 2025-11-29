@@ -117,13 +117,44 @@ export default function Landing() {
               </div>
             </div>
 
-            <div className="space-y-4">
-              {sliders && sliders.length > 0 ? (
-                <div className="text-center">
-                  <p className="text-muted-foreground">اسلایدرهای تبلیغاتی</p>
-                </div>
-              ) : (
-                deals.map((deal, idx) => (
+            {sliders && sliders.length > 0 ? (
+              <div
+                className="relative w-full h-96 rounded-lg overflow-hidden group"
+                data-testid="slider-container"
+              >
+                {sliders.map((slide, idx) => (
+                  <div
+                    key={slide.id}
+                    className="absolute inset-0 transition-opacity duration-700"
+                    style={{ opacity: idx === 0 ? 1 : 0 }}
+                    data-testid={`slide-${idx}`}
+                  >
+                    <img
+                      src={slide.image}
+                      alt={slide.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/30" />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white space-y-4 p-4">
+                      <h2 className="text-3xl md:text-4xl font-bold">{slide.title}</h2>
+                      {slide.description && (
+                        <p className="text-lg max-w-xl">{slide.description}</p>
+                      )}
+                      {slide.link && (
+                        <Button asChild variant="secondary" size="lg">
+                          <a href={slide.link}>
+                            مشاهده بیشتر
+                            <ArrowLeft className="ml-2 h-4 w-4" />
+                          </a>
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {deals.map((deal, idx) => (
                   <Card key={idx} className={`${deal.color} text-white overflow-hidden hover-elevate`}>
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between">
@@ -135,9 +166,9 @@ export default function Landing() {
                       </div>
                     </CardContent>
                   </Card>
-                ))
-              )}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
