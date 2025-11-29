@@ -21,10 +21,17 @@ export const orderStatusEnum = pgEnum('order_status', [
   'processing', 
   'shipped',
   'delivered',
-  'cancelled'
+  'cancelled',
+  'returned',
+  'processing_return',
+  'refunded',
+  'on_hold'
 ]);
 
 export const userRoleEnum = pgEnum('user_role', ['user', 'admin']);
+
+export const questionStatusEnum = pgEnum('question_status', ['pending', 'answered', 'closed']);
+export const userRequestStatusEnum = pgEnum('user_request_status', ['pending', 'processing', 'completed', 'rejected']);
 
 // Session storage table - Required for Replit Auth
 export const sessions = pgTable(
@@ -143,6 +150,135 @@ export const productComparisons = pgTable("product_comparisons", {
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => [index("idx_comparison_session").on(table.sessionId)]);
 
+// Articles table
+export const articles = pgTable("articles", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  title: varchar("title", { length: 200 }).notNull(),
+  slug: varchar("slug", { length: 200 }).notNull().unique(),
+  content: text("content").notNull(),
+  excerpt: text("excerpt"),
+  image: varchar("image"),
+  category: varchar("category", { length: 50 }),
+  authorId: varchar("author_id").references(() => users.id),
+  isPublished: boolean("is_published").default(false),
+  viewCount: integer("view_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [index("idx_article_slug").on(table.slug), index("idx_article_published").on(table.isPublished)]);
+
+// News table
+export const news = pgTable("news", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  title: varchar("title", { length: 200 }).notNull(),
+  slug: varchar("slug", { length: 200 }).notNull().unique(),
+  content: text("content").notNull(),
+  image: varchar("image"),
+  isPublished: boolean("is_published").default(false),
+  viewCount: integer("view_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [index("idx_news_slug").on(table.slug), index("idx_news_published").on(table.isPublished)]);
+
+// Pages table
+export const pages = pgTable("pages", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  title: varchar("title", { length: 200 }).notNull(),
+  slug: varchar("slug", { length: 200 }).notNull().unique(),
+  content: text("content").notNull(),
+  seoDescription: text("seo_description"),
+  isPublished: boolean("is_published").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [index("idx_page_slug").on(table.slug)]);
+
+// Brands table
+export const brands = pgTable("brands", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  name: varchar("name", { length: 100 }).notNull(),
+  slug: varchar("slug", { length: 100 }).notNull().unique(),
+  logo: varchar("logo"),
+  description: text("description"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [index("idx_brand_slug").on(table.slug)]);
+
+// Product attributes table
+export const productAttributes = pgTable("product_attributes", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  productId: integer("product_id").references(() => products.id, { onDelete: 'cascade' }).notNull(),
+  name: varchar("name", { length: 100 }).notNull(),
+  value: varchar("value", { length: 200 }).notNull(),
+  sortOrder: integer("sort_order").default(0),
+}, (table) => [index("idx_attr_product").on(table.productId)]);
+
+// Shipping methods table
+export const shippingMethods = pgTable("shipping_methods", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  name: varchar("name", { length: 100 }).notNull(),
+  description: text("description"),
+  price: decimal("price", { precision: 12, scale: 0 }).notNull(),
+  estimatedDays: integer("estimated_days"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Credit points table
+export const creditPoints = pgTable("credit_points", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  userId: varchar("user_id").references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  points: decimal("points", { precision: 12, scale: 0 }).notNull(),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [index("idx_points_user").on(table.userId)]);
+
+// User wallets table
+export const userWallets = pgTable("user_wallets", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  userId: varchar("user_id").references(() => users.id, { onDelete: 'cascade' }).notNull().unique(),
+  balance: decimal("balance", { precision: 12, scale: 0 }).default("0"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User requests table
+export const userRequests = pgTable("user_requests", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  userId: varchar("user_id").references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  title: varchar("title", { length: 200 }).notNull(),
+  description: text("description"),
+  status: userRequestStatusEnum("status").default("pending"),
+  response: text("response"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [index("idx_request_user").on(table.userId), index("idx_request_status").on(table.status)]);
+
+// Settings table
+export const settings = pgTable("settings", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  key: varchar("key", { length: 100 }).notNull().unique(),
+  value: text("value"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Questions & Answers table
+export const questions = pgTable("questions", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  productId: integer("product_id").references(() => products.id, { onDelete: 'cascade' }).notNull(),
+  userId: varchar("user_id").references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  content: text("content").notNull(),
+  status: questionStatusEnum("status").default("pending"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [index("idx_question_product").on(table.productId), index("idx_question_user").on(table.userId)]);
+
+export const answers = pgTable("answers", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  questionId: integer("question_id").references(() => questions.id, { onDelete: 'cascade' }).notNull(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [index("idx_answer_question").on(table.questionId)]);
+
 // Addresses table
 export const addresses = pgTable("addresses", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
@@ -205,6 +341,70 @@ export const usersRelations = relations(users, ({ many }) => ({
   orders: many(orders),
   reviews: many(reviews),
   wishlist: many(wishlist),
+  creditPoints: many(creditPoints),
+  articles: many(articles),
+  questions: many(questions),
+  answers: many(answers),
+  userRequests: many(userRequests),
+  userWallet: many(userWallets),
+}));
+
+export const articlesRelations = relations(articles, ({ one }) => ({
+  author: one(users, {
+    fields: [articles.authorId],
+    references: [users.id],
+  }),
+}));
+
+export const questionsRelations = relations(questions, ({ one, many }) => ({
+  product: one(products, {
+    fields: [questions.productId],
+    references: [products.id],
+  }),
+  user: one(users, {
+    fields: [questions.userId],
+    references: [users.id],
+  }),
+  answers: many(answers),
+}));
+
+export const answersRelations = relations(answers, ({ one }) => ({
+  question: one(questions, {
+    fields: [answers.questionId],
+    references: [questions.id],
+  }),
+  user: one(users, {
+    fields: [answers.userId],
+    references: [users.id],
+  }),
+}));
+
+export const productAttributesRelations = relations(productAttributes, ({ one }) => ({
+  product: one(products, {
+    fields: [productAttributes.productId],
+    references: [products.id],
+  }),
+}));
+
+export const creditPointsRelations = relations(creditPoints, ({ one }) => ({
+  user: one(users, {
+    fields: [creditPoints.userId],
+    references: [users.id],
+  }),
+}));
+
+export const userWalletsRelations = relations(userWallets, ({ one }) => ({
+  user: one(users, {
+    fields: [userWallets.userId],
+    references: [users.id],
+  }),
+}));
+
+export const userRequestsRelations = relations(userRequests, ({ one }) => ({
+  user: one(users, {
+    fields: [userRequests.userId],
+    references: [users.id],
+  }),
 }));
 
 export const categoriesRelations = relations(categories, ({ one, many }) => ({
@@ -310,6 +510,18 @@ export const insertCartItemSchema = createInsertSchema(cartItems).omit({ id: tru
 export const insertCouponSchema = createInsertSchema(coupons).omit({ id: true, createdAt: true, currentUses: true });
 export const insertOrderSchema = createInsertSchema(orders).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertOrderItemSchema = createInsertSchema(orderItems).omit({ id: true });
+export const insertArticleSchema = createInsertSchema(articles).omit({ id: true, createdAt: true, updatedAt: true, viewCount: true });
+export const insertNewsSchema = createInsertSchema(news).omit({ id: true, createdAt: true, updatedAt: true, viewCount: true });
+export const insertPageSchema = createInsertSchema(pages).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertBrandSchema = createInsertSchema(brands).omit({ id: true, createdAt: true });
+export const insertProductAttributeSchema = createInsertSchema(productAttributes).omit({ id: true });
+export const insertShippingMethodSchema = createInsertSchema(shippingMethods).omit({ id: true, createdAt: true });
+export const insertCreditPointSchema = createInsertSchema(creditPoints).omit({ id: true, createdAt: true });
+export const insertUserWalletSchema = createInsertSchema(userWallets).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertUserRequestSchema = createInsertSchema(userRequests).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertSettingSchema = createInsertSchema(settings).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertQuestionSchema = createInsertSchema(questions).omit({ id: true, createdAt: true });
+export const insertAnswerSchema = createInsertSchema(answers).omit({ id: true, createdAt: true });
 
 // Types
 export type UpsertUser = typeof users.$inferInsert;
@@ -333,6 +545,30 @@ export type Order = typeof orders.$inferSelect;
 export type InsertOrderItem = z.infer<typeof insertOrderItemSchema>;
 export type OrderItem = typeof orderItems.$inferSelect;
 export type WishlistItem = typeof wishlist.$inferSelect;
+export type InsertArticle = z.infer<typeof insertArticleSchema>;
+export type Article = typeof articles.$inferSelect;
+export type InsertNews = z.infer<typeof insertNewsSchema>;
+export type News = typeof news.$inferSelect;
+export type InsertPage = z.infer<typeof insertPageSchema>;
+export type Page = typeof pages.$inferSelect;
+export type InsertBrand = z.infer<typeof insertBrandSchema>;
+export type Brand = typeof brands.$inferSelect;
+export type InsertProductAttribute = z.infer<typeof insertProductAttributeSchema>;
+export type ProductAttribute = typeof productAttributes.$inferSelect;
+export type InsertShippingMethod = z.infer<typeof insertShippingMethodSchema>;
+export type ShippingMethod = typeof shippingMethods.$inferSelect;
+export type InsertCreditPoint = z.infer<typeof insertCreditPointSchema>;
+export type CreditPoint = typeof creditPoints.$inferSelect;
+export type InsertUserWallet = z.infer<typeof insertUserWalletSchema>;
+export type UserWallet = typeof userWallets.$inferSelect;
+export type InsertUserRequest = z.infer<typeof insertUserRequestSchema>;
+export type UserRequest = typeof userRequests.$inferSelect;
+export type InsertSetting = z.infer<typeof insertSettingSchema>;
+export type Setting = typeof settings.$inferSelect;
+export type InsertQuestion = z.infer<typeof insertQuestionSchema>;
+export type Question = typeof questions.$inferSelect;
+export type InsertAnswer = z.infer<typeof insertAnswerSchema>;
+export type Answer = typeof answers.$inferSelect;
 
 // Extended types for frontend
 export type ProductWithCategory = Product & {
