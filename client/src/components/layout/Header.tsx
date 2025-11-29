@@ -124,7 +124,7 @@ export default function Header() {
               </nav>
             </div>
 
-            <div className="hidden md:flex flex-1 max-w-md mx-4">
+            <div className="flex-1 max-w-2xl mx-2 md:mx-4">
               <AdvancedSearchHeader />
             </div>
 

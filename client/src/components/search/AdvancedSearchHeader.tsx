@@ -5,13 +5,25 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
-import type { Product, Category } from "@shared/schema";
 
-interface Suggestion {
-  type: "product" | "category";
-  id: number;
-  title: string;
-  icon: string;
+// سادہ Fuzzy search function
+function fuzzyMatch(query: string, text: string): number {
+  const q = query.toLowerCase();
+  const t = text.toLowerCase();
+  
+  // دقیق match سب سے بہتر
+  if (t.includes(q)) return 100;
+  
+  // حروف کی ترتیب میں match
+  let matches = 0;
+  let qIdx = 0;
+  for (let i = 0; i < t.length && qIdx < q.length; i++) {
+    if (t[i] === q[qIdx]) {
+      matches++;
+      qIdx++;
+    }
+  }
+  return qIdx === q.length ? 50 : 0;
 }
 
 export function AdvancedSearchHeader() {
@@ -24,12 +36,12 @@ export function AdvancedSearchHeader() {
   // Fetch autocomplete suggestions
   const { data: autocompleteData } = useQuery({
     queryKey: ["/api/search/autocomplete", query],
-    enabled: query.length >= 2,
+    enabled: query.length >= 1,
   });
 
-  const suggestions: Suggestion[] = autocompleteData?.suggestions || [];
+  const suggestions = autocompleteData?.suggestions || [];
 
-  // Fetch popular searches for empty state
+  // Fetch popular searches
   const { data: popularData } = useQuery({
     queryKey: ["/api/search/popular"],
     enabled: !query && isOpen,
@@ -37,7 +49,6 @@ export function AdvancedSearchHeader() {
 
   const popularSearches = popularData?.queries || [];
 
-  // Close on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
@@ -48,7 +59,6 @@ export function AdvancedSearchHeader() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!isOpen && e.key === "ArrowDown") {
       setIsOpen(true);
@@ -66,14 +76,10 @@ export function AdvancedSearchHeader() {
         break;
       case "Enter":
         e.preventDefault();
-        if (selectedIndex >= 0) {
+        if (selectedIndex >= 0 && suggestions[selectedIndex]) {
           const suggestion = suggestions[selectedIndex];
-          if (suggestion.type === "product") {
-            window.location.href = `/products/${suggestion.id}`;
-          } else {
-            window.location.href = `/products?category=${suggestion.id}`;
-          }
-        } else if (query) {
+          window.location.href = `/search?q=${encodeURIComponent(query)}`;
+        } else if (query.trim()) {
           window.location.href = `/search?q=${encodeURIComponent(query)}`;
         }
         break;
@@ -84,38 +90,49 @@ export function AdvancedSearchHeader() {
     }
   };
 
-  const handleSearch = (value: string) => {
-    setQuery(value);
-    setSelectedIndex(-1);
-    if (value) setIsOpen(true);
+  const handleSearch = () => {
+    if (query.trim()) {
+      window.location.href = `/search?q=${encodeURIComponent(query)}`;
+      setIsOpen(false);
+    }
   };
 
   return (
     <div ref={wrapperRef} className="w-full">
-      <div className="relative">
-        <div className="flex items-center gap-2 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 p-1 focus-within:ring-2 focus-within:ring-primary">
-          <Search className="h-5 w-5 text-slate-400 ml-2" data-testid="icon-search" />
+      <div className="relative w-full">
+        <div className="flex items-center gap-2 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 p-1.5 focus-within:ring-2 focus-within:ring-primary shadow-sm">
+          <Search className="h-5 w-5 text-slate-400 ml-2 flex-shrink-0" data-testid="icon-search" />
           <Input
             ref={inputRef}
             type="text"
-            placeholder="جستجو کنید... (نام محصول، دسته‌بندی)"
+            placeholder="جستجوی محصولات..."
             value={query}
-            onChange={(e) => handleSearch(e.target.value)}
-            onFocus={() => setIsOpen(true)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setSelectedIndex(-1);
+              if (e.target.value.trim()) {
+                setIsOpen(true);
+              }
+            }}
+            onFocus={() => {
+              if (query.trim() || !query) setIsOpen(true);
+            }}
             onKeyDown={handleKeyDown}
-            className="border-0 focus-visible:ring-0 text-right"
+            className="border-0 focus-visible:ring-0 text-right flex-1 bg-transparent placeholder:text-slate-400"
             autoComplete="off"
-            data-testid="input-search"
+            data-testid="input-search-header"
           />
           {query && (
             <button
               onClick={() => {
                 setQuery("");
                 setIsOpen(false);
+                setSelectedIndex(-1);
                 inputRef.current?.focus();
               }}
-              className="mr-2"
+              className="mr-1 hover-elevate rounded p-0.5"
               data-testid="button-clear-search"
+              type="button"
             >
               <X className="h-4 w-4 text-slate-400" />
             </button>
@@ -124,28 +141,33 @@ export function AdvancedSearchHeader() {
 
         {/* Dropdown */}
         {isOpen && (
-          <Card className="absolute top-full left-0 right-0 mt-2 z-50 max-h-96 overflow-y-auto shadow-lg">
-            {/* Autocomplete Suggestions */}
+          <Card className="absolute top-full left-0 right-0 mt-2 z-50 max-h-96 overflow-y-auto shadow-lg border-slate-200 dark:border-slate-700">
+            {/* Suggestions */}
             {suggestions.length > 0 && (
-              <div className="border-b">
-                <div className="px-4 py-2 text-xs font-semibold text-slate-500">نتایج</div>
-                {suggestions.map((suggestion, index) => (
+              <div className="border-b border-slate-200 dark:border-slate-700">
+                <div className="px-4 py-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                  تجاویز
+                </div>
+                {suggestions.slice(0, 8).map((suggestion, index) => (
                   <button
                     key={`${suggestion.type}-${suggestion.id}`}
                     onClick={() => {
                       if (suggestion.type === "product") {
                         window.location.href = `/products/${suggestion.id}`;
                       } else {
-                        window.location.href = `/products?category=${suggestion.id}`;
+                        window.location.href = `/search?q=${encodeURIComponent(suggestion.title)}`;
                       }
                     }}
-                    className={`w-full px-4 py-2 text-right hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 justify-end ${
+                    className={`w-full px-4 py-3 text-right hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 justify-end border-b border-slate-100 dark:border-slate-800 last:border-b-0 transition-colors ${
                       index === selectedIndex ? "bg-slate-100 dark:bg-slate-800" : ""
                     }`}
                     data-testid={`suggestion-${suggestion.type}-${suggestion.id}`}
+                    type="button"
                   >
-                    <span>{suggestion.title}</span>
-                    <span>{suggestion.icon}</span>
+                    <span className="text-sm text-slate-700 dark:text-slate-300">
+                      {suggestion.title}
+                    </span>
+                    <span className="text-lg">{suggestion.icon}</span>
                   </button>
                 ))}
               </div>
@@ -153,22 +175,24 @@ export function AdvancedSearchHeader() {
 
             {/* Popular Searches */}
             {!query && popularSearches.length > 0 && (
-              <div className="p-4">
+              <div className="p-4 border-b border-slate-200 dark:border-slate-700">
                 <div className="flex items-center gap-2 mb-3 text-slate-600 dark:text-slate-400">
                   <TrendingUp className="h-4 w-4" />
-                  <span className="text-xs font-semibold">محبوب‌ترین جستجوها</span>
+                  <span className="text-xs font-semibold">محبوب‌ترین سرچ‌ها</span>
                 </div>
                 <div className="space-y-2">
                   {popularSearches.slice(0, 5).map((item: any) => (
                     <button
                       key={item.query}
                       onClick={() => {
+                        setQuery(item.query);
                         window.location.href = `/search?q=${encodeURIComponent(item.query)}`;
                       }}
-                      className="w-full px-3 py-2 text-right text-sm hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-700 dark:text-slate-300"
+                      className="w-full px-3 py-2 text-right text-sm hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-700 dark:text-slate-300 transition-colors"
                       data-testid={`popular-search-${item.query}`}
+                      type="button"
                     >
-                      {item.query}
+                      {item.query} <span className="text-xs text-slate-400">({item.count})</span>
                     </button>
                   ))}
                 </div>
@@ -176,22 +200,25 @@ export function AdvancedSearchHeader() {
             )}
 
             {/* Search Button */}
-            {query && (
-              <div className="border-t p-3">
-                <Link href={`/search?q=${encodeURIComponent(query)}`}>
-                  <Button className="w-full" data-testid="button-search-submit">
-                    <Zap className="h-4 w-4 ml-2" />
-                    جستجو برای "{query}"
-                  </Button>
-                </Link>
+            {query.trim() && (
+              <div className="border-t border-slate-200 dark:border-slate-700 p-3">
+                <Button
+                  onClick={handleSearch}
+                  className="w-full"
+                  data-testid="button-search-submit"
+                  type="button"
+                >
+                  <Zap className="h-4 w-4 ml-2" />
+                  جستجو برای "{query}"
+                </Button>
               </div>
             )}
 
             {/* Empty State */}
             {!query && popularSearches.length === 0 && suggestions.length === 0 && (
-              <div className="p-8 text-center text-slate-500">
+              <div className="p-8 text-center text-slate-500 dark:text-slate-400">
                 <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p>شروع به تایپ کنید تا جستجو کنید</p>
+                <p className="text-sm">شروع به تایپ کنید تا جستجو شود</p>
               </div>
             )}
           </Card>

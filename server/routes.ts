@@ -1432,7 +1432,7 @@ export async function registerRoutes(
 
   // ==================== SEARCH ROUTES ====================
 
-  // Advanced Search - Full-text search
+  // Advanced Search - Full-text search with fuzzy matching
   app.get("/api/search", async (req, res) => {
     try {
       const { q, category } = req.query;
@@ -1440,29 +1440,71 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Search query required" });
       }
 
-      const query = q as string;
-      const products = await storage.searchProducts(query);
+      const searchQuery = (q as string).toLowerCase();
+      const products = await storage.searchProducts(searchQuery);
+      
+      // Fuzzy match scoring
+      const scored = products.map(p => {
+        const nameMatch = p.name?.toLowerCase().includes(searchQuery) ? 100 : 
+                         calculateSimilarity(searchQuery, p.name || '') * 50;
+        const descMatch = (p.description || '').toLowerCase().includes(searchQuery) ? 50 :
+                         calculateSimilarity(searchQuery, p.description || '') * 25;
+        const score = nameMatch + descMatch;
+        return { ...p, score };
+      }).filter(p => p.score > 0).sort((a, b) => b.score - a.score);
       
       // Track search analytics
       if (req.user) {
         await storage.trackSearch({
-          query,
+          query: searchQuery,
           userId: (req.user as any).id,
-          resultsCount: products.length,
-          isZeroResult: products.length === 0,
+          resultsCount: scored.length,
+          isZeroResult: scored.length === 0,
           sessionId: req.sessionID,
         });
       }
 
       res.json({ 
-        query, 
-        resultsCount: products.length, 
-        results: products.filter(p => p.isActive) 
+        query: searchQuery, 
+        resultsCount: scored.length, 
+        results: scored.filter(p => p.isActive).map(({ score, ...p }) => p) 
       });
     } catch (error) {
       res.status(500).json({ error: "Search failed" });
     }
   });
+
+  // Similarity calculation function (Levenshtein distance)
+  function calculateSimilarity(str1: string, str2: string): number {
+    const len1 = str1.length;
+    const len2 = str2.length;
+    const matrix: number[][] = [];
+
+    for (let i = 0; i <= len2; i++) {
+      matrix[i] = [i];
+    }
+    for (let j = 0; j <= len1; j++) {
+      matrix[0][j] = j;
+    }
+
+    for (let i = 1; i <= len2; i++) {
+      for (let j = 1; j <= len1; j++) {
+        if (str2[i - 1] === str1[j - 1]) {
+          matrix[i][j] = matrix[i - 1][j - 1];
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1
+          );
+        }
+      }
+    }
+
+    const distance = matrix[len2][len1];
+    const maxLen = Math.max(len1, len2);
+    return Math.max(0, (maxLen - distance) / maxLen);
+  }
 
   // Autocomplete Suggestions
   app.get("/api/search/autocomplete", async (req, res) => {
