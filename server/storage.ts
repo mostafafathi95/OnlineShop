@@ -593,6 +593,11 @@ export class DatabaseStorage implements IStorage {
     return order;
   }
 
+  // Get all reviews (for admin)
+  getAllReviews(): Promise<Review[]> {
+    return db.select().from(reviews).orderBy(desc(reviews.createdAt));
+  }
+
   // Stats
   async getStats(): Promise<{
     totalProducts: number;

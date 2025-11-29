@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Check, CreditCard, MapPin, Package, ArrowRight, ArrowLeft, Plus } from "lucide-react";
+import { Check, CreditCard, MapPin, Package, ArrowRight, ArrowLeft, Plus, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,13 +8,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import Layout from "@/components/layout/Layout";
 import { useCartStore } from "@/stores/cartStore";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { Address } from "@shared/schema";
+import type { Address, Coupon } from "@shared/schema";
 
 const steps = [
   { id: 1, name: "آدرس", icon: MapPin },
@@ -29,6 +30,8 @@ export default function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState("online");
   const [notes, setNotes] = useState("");
   const [showNewAddress, setShowNewAddress] = useState(false);
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
   const [newAddress, setNewAddress] = useState({
     title: "",
     fullName: "",
@@ -68,12 +71,30 @@ export default function Checkout() {
     },
   });
 
+  const validateCouponMutation = useMutation({
+    mutationFn: async (code: string) => {
+      return apiRequest("GET", `/api/coupons/validate/${code}`);
+    },
+    onSuccess: (coupon: Coupon) => {
+      setAppliedCoupon(coupon);
+      toast({ title: "کوپن با موفقیت اعمال شد" });
+    },
+    onError: () => {
+      toast({
+        title: "کوپن نامعتبر",
+        description: "کوپن وارد شده معتبر نیست یا منقضی شده است.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const createOrderMutation = useMutation({
     mutationFn: async (data: {
       addressId: number;
       paymentMethod: string;
       notes: string;
       items: { productId: number; quantity: number }[];
+      couponCode?: string;
     }) => {
       return apiRequest("POST", "/api/orders", data);
     },
@@ -114,8 +135,17 @@ export default function Checkout() {
   };
 
   const subtotal = getTotal();
-  const shippingCost = subtotal > 500000 ? 0 : 50000;
-  const total = subtotal + shippingCost;
+  let discount = 0;
+  if (appliedCoupon) {
+    if (appliedCoupon.discountType === "percentage") {
+      discount = Math.floor((subtotal * Number(appliedCoupon.discountValue)) / 100);
+    } else {
+      discount = Number(appliedCoupon.discountValue);
+    }
+  }
+  const discountedSubtotal = subtotal - discount;
+  const shippingCost = discountedSubtotal > 500000 ? 0 : 50000;
+  const total = discountedSubtotal + shippingCost;
 
   if (items.length === 0) {
     return (

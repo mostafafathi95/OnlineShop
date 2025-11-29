@@ -27,6 +27,10 @@ import AdminProductForm from "@/pages/admin/ProductForm";
 import AdminCategories from "@/pages/admin/Categories";
 import AdminOrders from "@/pages/admin/Orders";
 import AdminUsers from "@/pages/admin/Users";
+import AdminCoupons from "@/pages/admin/Coupons";
+
+import AccountWishlist from "@/pages/account/Wishlist";
+import AccountReviews from "@/pages/account/Reviews";
 
 function Router() {
   return (
@@ -43,6 +47,8 @@ function Router() {
       <Route path="/account" component={AccountDashboard} />
       <Route path="/account/orders" component={AccountOrders} />
       <Route path="/account/orders/:id" component={AccountOrderDetail} />
+      <Route path="/account/wishlist" component={AccountWishlist} />
+      <Route path="/account/reviews" component={AccountReviews} />
       <Route path="/account/addresses" component={AccountAddresses} />
       <Route path="/account/profile" component={AccountProfile} />
 
@@ -52,6 +58,7 @@ function Router() {
       <Route path="/admin/categories" component={AdminCategories} />
       <Route path="/admin/orders" component={AdminOrders} />
       <Route path="/admin/users" component={AdminUsers} />
+      <Route path="/admin/coupons" component={AdminCoupons} />
 
       <Route component={NotFound} />
     </Switch>
