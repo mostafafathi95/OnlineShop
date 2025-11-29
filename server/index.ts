@@ -4,9 +4,13 @@ import { serveStatic } from "./static";
 import { createServer } from "http";
 import { logger } from "./utils/logger";
 import { authManager } from "./utils/advanced-auth";
+import path from "path";
 
 const app = express();
 const httpServer = createServer(app);
+
+// Serve uploads
+app.use('/uploads', express.static(path.join(process.cwd(), 'dist', 'uploads')));
 
 declare module "http" {
   interface IncomingMessage {
