@@ -1132,6 +1132,34 @@ export class DatabaseStorage implements IStorage {
     await db.delete(sliders).where(eq(sliders.id, id));
   }
 
+  // Banners
+  async getAllBanners(): Promise<Banner[]> {
+    return db.select().from(banners).where(eq(banners.isActive, true)).orderBy(asc(banners.sortOrder));
+  }
+
+  async getBannerById(id: number): Promise<Banner | undefined> {
+    const [banner] = await db.select().from(banners).where(eq(banners.id, id));
+    return banner;
+  }
+
+  async createBanner(banner: InsertBanner): Promise<Banner> {
+    const [newBanner] = await db.insert(banners).values(banner).returning();
+    return newBanner;
+  }
+
+  async updateBanner(id: number, data: Partial<InsertBanner>): Promise<Banner | undefined> {
+    const [updated] = await db.update(banners).set({ ...data, updatedAt: new Date() }).where(eq(banners.id, id)).returning();
+    return updated;
+  }
+
+  async deleteBanner(id: number): Promise<void> {
+    await db.delete(banners).where(eq(banners.id, id));
+  }
+
+  async getAllBannersAdmin(): Promise<Banner[]> {
+    return db.select().from(banners).orderBy(desc(banners.createdAt));
+  }
+
   // Search Analytics
   async searchProducts(query: string): Promise<Product[]> {
     const searchTerm = `%${query.toLowerCase()}%`;
