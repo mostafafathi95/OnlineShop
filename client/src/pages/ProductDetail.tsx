@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRoute, Link } from "wouter";
-import { ShoppingCart, Heart, Minus, Plus, Check, Truck, Shield, ArrowRight, Star } from "lucide-react";
+import { ShoppingCart, Heart, Minus, Plus, Check, Truck, Shield, ArrowRight, Star, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,7 +11,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import Layout from "@/components/layout/Layout";
 import ProductGrid from "@/components/products/ProductGrid";
+import VideoPlayer from "@/components/products/VideoPlayer";
+import SocialShare from "@/components/products/SocialShare";
+import StockCounter from "@/components/products/StockCounter";
+import ComparisonModal from "@/components/products/ComparisonModal";
+import RelatedProducts from "@/components/products/RelatedProducts";
 import { useCartStore } from "@/stores/cartStore";
+import { useComparisonStore } from "@/stores/comparisonStore";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -27,6 +33,7 @@ export default function ProductDetail() {
   const [reviewRating, setReviewRating] = useState(5);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const { addItem, openCart } = useCartStore();
+  const { items: compareItems, addItem: addToCompare, removeItem: removeFromCompare, isOpen: compareOpen, openComparison, closeComparison, hasItem: hasInComparison } = useComparisonStore();
   const { toast } = useToast();
   const { user, isAuthenticated } = useAuth();
 
@@ -195,6 +202,11 @@ export default function ProductDetail() {
 
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
           <div className="space-y-4">
+            {product.videoUrl && (
+              <div className="mb-6">
+                <VideoPlayer url={product.videoUrl} title={product.name} />
+              </div>
+            )}
             <div className="aspect-square rounded-lg overflow-hidden bg-muted">
               <img
                 src={images[selectedImage]}
@@ -269,16 +281,7 @@ export default function ProductDetail() {
 
             <div className="space-y-4">
               <div className="flex items-center gap-2">
-                {product.stock > 0 ? (
-                  <>
-                    <Check className="h-5 w-5 text-green-500" />
-                    <span className="text-green-600 dark:text-green-400">
-                      موجود در انبار ({product.stock} عدد)
-                    </span>
-                  </>
-                ) : (
-                  <Badge variant="secondary">ناموجود</Badge>
-                )}
+                <StockCounter stock={product.stock} />
               </div>
 
               <div className="flex items-center gap-4">
@@ -317,9 +320,39 @@ export default function ProductDetail() {
                   <ShoppingCart className="ml-2 h-5 w-5" />
                   افزودن به سبد خرید
                 </Button>
-                <Button variant="outline" size="lg" data-testid="button-add-to-wishlist">
-                  <Heart className="h-5 w-5" />
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  onClick={() => wishlistMutation.mutate()}
+                  data-testid="button-add-to-wishlist"
+                  className={isWishlisted ? "bg-red-50 dark:bg-red-950 border-red-200" : ""}
+                >
+                  <Heart className={`h-5 w-5 ${isWishlisted ? "fill-red-500 text-red-500" : ""}`} />
                 </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => {
+                    if (hasInComparison(product.id)) {
+                      removeFromCompare(product.id);
+                      toast({ title: "از مقایسه حذف شد" });
+                    } else {
+                      addToCompare(product);
+                      toast({ title: "به مقایسه اضافه شد" });
+                    }
+                  }}
+                  data-testid="button-add-to-comparison"
+                  className={hasInComparison(product.id) ? "bg-blue-50 dark:bg-blue-950 border-blue-200" : ""}
+                >
+                  <Copy className={`h-5 w-5 ${hasInComparison(product.id) ? "text-blue-500" : ""}`} />
+                </Button>
+              </div>
+
+              <div className="pt-4 border-t">
+                <SocialShare 
+                  title={product.name} 
+                  url={typeof window !== "undefined" ? window.location.href : ""}
+                />
               </div>
             </div>
 
@@ -403,6 +436,13 @@ export default function ProductDetail() {
           </div>
         )}
       </div>
+
+      <ComparisonModal
+        isOpen={compareOpen}
+        onOpenChange={(open) => open ? openComparison() : closeComparison()}
+        compareItems={compareItems}
+        onRemove={removeFromCompare}
+      />
     </Layout>
   );
 }

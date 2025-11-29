@@ -673,6 +673,59 @@ export async function registerRoutes(
     }
   });
 
+  // ==================== Comparison Routes ====================
+  
+  app.get("/api/compare", async (req, res) => {
+    try {
+      const sessionId = req.sessionID || "anonymous";
+      const items = await storage.getComparison(sessionId);
+      res.json(items);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch comparison" });
+    }
+  });
+
+  app.post("/api/compare", async (req, res) => {
+    try {
+      const { product1Id, product2Id } = req.body;
+      const sessionId = req.sessionID || "anonymous";
+      const result = await storage.addToComparison(sessionId, product1Id, product2Id);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to add to comparison" });
+    }
+  });
+
+  app.delete("/api/compare/:id", async (req, res) => {
+    try {
+      const sessionId = req.sessionID || "anonymous";
+      await storage.removeFromComparison(sessionId, parseInt(req.params.id), 0);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to remove from comparison" });
+    }
+  });
+
+  // ==================== Related Products ====================
+  
+  app.get("/api/related-products/:id", async (req, res) => {
+    try {
+      const product = await storage.getProductById(parseInt(req.params.id));
+      if (!product) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+      
+      const related = await storage.getAllProducts({
+        category: product.categoryId?.toString(),
+        limit: 8,
+      });
+      
+      res.json(related.filter(p => p.id !== product.id).slice(0, 4));
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch related products" });
+    }
+  });
+
   // Seed data endpoint
   app.post("/api/seed", async (req, res) => {
     try {
@@ -738,6 +791,7 @@ export async function registerRoutes(
             stock: 15,
             categoryId: createdCategories[0]?.id || 1,
             image: "https://via.placeholder.com/500x500?text=HP+Laptop",
+            videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
             isFeatured: true
           },
           {
@@ -752,6 +806,7 @@ export async function registerRoutes(
             stock: 50,
             categoryId: createdCategories[1]?.id || 2,
             image: "https://via.placeholder.com/500x500?text=T-Shirt",
+            videoUrl: "https://www.youtube.com/watch?v=jNQXAC9IVRw",
             isFeatured: true
           },
           {
@@ -808,6 +863,7 @@ export async function registerRoutes(
             stock: 40,
             categoryId: createdCategories[0]?.id || 1,
             image: "https://via.placeholder.com/500x500?text=Headphones",
+            videoUrl: "https://www.youtube.com/watch?v=3e7hIw5ZGlQ",
             isFeatured: true
           }
         ];
