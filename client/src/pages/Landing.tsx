@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Link } from "wouter";
 import { ArrowLeft, Truck, Shield, Clock, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,12 @@ const features = [
 ];
 
 export default function Landing() {
+  useEffect(() => {
+    document.title = "فروشگاه اینترنتی | محصولات با بهترین قیمت";
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) metaDesc.setAttribute('content', 'فروشگاه اینترنتی پیشرو با ارسال سریع و ضمانت اصالت کالا. خریدتان از ما کاملاً امن و قابل اعتماد است.');
+  }, []);
+
   const { data: featuredProducts, isLoading: productsLoading } = useQuery<Product[]>({
     queryKey: ["/api/products", { featured: true, limit: 8 }],
   });

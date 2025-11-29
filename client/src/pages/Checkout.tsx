@@ -56,6 +56,12 @@ export default function Checkout() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
 
+  useEffect(() => {
+    document.title = "تسویه حساب | فروشگاه اینترنتی";
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) metaDesc.setAttribute('content', 'تسویه حساب امن و سریع. انتخاب بین درگاه‌های پرداخت ایرانی معتبر و پرداخت در محل.');
+  }, []);
+
   const { data: addresses } = useQuery<Address[]>({
     queryKey: ["/api/addresses"],
     enabled: isAuthenticated,

@@ -16,6 +16,12 @@ import { useQuery } from "@tanstack/react-query";
 import type { Product, Category } from "@shared/schema";
 
 export default function Products() {
+  useEffect(() => {
+    document.title = "محصولات | فروشگاه اینترنتی";
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) metaDesc.setAttribute('content', 'مشاهده کاتالوگ کامل محصولات فروشگاه اینترنتی. انتخاب از میان هزاران محصول با تخفیف‌های ویژه.');
+  }, []);
+
   const searchParams = useSearch();
   const [, setLocation] = useLocation();
   const params = new URLSearchParams(searchParams);
