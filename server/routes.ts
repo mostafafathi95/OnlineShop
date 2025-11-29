@@ -669,5 +669,28 @@ export async function registerRoutes(
     }
   });
 
+  // Seed data endpoint
+  app.post("/api/seed", async (req, res) => {
+    try {
+      await storage.createUser({
+        fullName: "مدیر سیستم",
+        email: "admin@example.com",
+        password: "admin123",
+        role: "admin"
+      }).catch(() => {});
+
+      await storage.createUser({
+        fullName: "علی محمدی",
+        email: "test@example.com",
+        password: "test123",
+        role: "customer"
+      }).catch(() => {});
+
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Seed failed" });
+    }
+  });
+
   return httpServer;
 }
