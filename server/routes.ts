@@ -1,7 +1,12 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertCategorySchema, insertProductSchema, insertAddressSchema, insertReviewSchema, insertCouponSchema } from "@shared/schema";
+import { 
+  insertCategorySchema, insertProductSchema, insertAddressSchema, insertReviewSchema, insertCouponSchema,
+  insertArticleSchema, insertNewsSchema, insertPageSchema, insertBrandSchema, insertProductAttributeSchema,
+  insertShippingMethodSchema, insertCreditPointSchema, insertUserWalletSchema, insertUserRequestSchema,
+  insertSettingSchema, insertQuestionSchema, insertAnswerSchema
+} from "@shared/schema";
 import { z } from "zod";
 
 // Auth middleware
@@ -881,6 +886,488 @@ export async function registerRoutes(
       res.json({ success: true, message: "Seed data processed successfully" });
     } catch (error) {
       res.json({ success: true, message: "Seed attempted" });
+    }
+  });
+
+  // ==================== Articles Routes ====================
+  app.get("/api/articles", async (req, res) => {
+    try {
+      const articles = await storage.getAllArticles({ published: true, limit: 50 });
+      res.json(articles);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch articles" });
+    }
+  });
+
+  app.get("/api/articles/:id", async (req, res) => {
+    try {
+      const article = await storage.getArticleById(parseInt(req.params.id));
+      if (!article) return res.status(404).json({ error: "Article not found" });
+      res.json(article);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch article" });
+    }
+  });
+
+  app.post("/api/articles", requireAdmin, async (req, res) => {
+    try {
+      const data = insertArticleSchema.parse(req.body);
+      const article = await storage.createArticle(data);
+      res.json(article);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid article data" });
+    }
+  });
+
+  app.patch("/api/articles/:id", requireAdmin, async (req, res) => {
+    try {
+      const data = insertArticleSchema.partial().parse(req.body);
+      const article = await storage.updateArticle(parseInt(req.params.id), data);
+      res.json(article);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid article data" });
+    }
+  });
+
+  app.delete("/api/articles/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteArticle(parseInt(req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete article" });
+    }
+  });
+
+  // ==================== News Routes ====================
+  app.get("/api/news", async (req, res) => {
+    try {
+      const news = await storage.getAllNews({ published: true, limit: 20 });
+      res.json(news);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch news" });
+    }
+  });
+
+  app.get("/api/news/:id", async (req, res) => {
+    try {
+      const newsItem = await storage.getNewsById(parseInt(req.params.id));
+      if (!newsItem) return res.status(404).json({ error: "News not found" });
+      res.json(newsItem);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch news" });
+    }
+  });
+
+  app.post("/api/news", requireAdmin, async (req, res) => {
+    try {
+      const data = insertNewsSchema.parse(req.body);
+      const newsItem = await storage.createNews(data);
+      res.json(newsItem);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid news data" });
+    }
+  });
+
+  app.patch("/api/news/:id", requireAdmin, async (req, res) => {
+    try {
+      const data = insertNewsSchema.partial().parse(req.body);
+      const newsItem = await storage.updateNews(parseInt(req.params.id), data);
+      res.json(newsItem);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid news data" });
+    }
+  });
+
+  app.delete("/api/news/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteNews(parseInt(req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete news" });
+    }
+  });
+
+  // ==================== Pages Routes ====================
+  app.get("/api/pages", async (req, res) => {
+    try {
+      const pages = await storage.getAllPages({ published: true });
+      res.json(pages);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch pages" });
+    }
+  });
+
+  app.get("/api/pages/:slug", async (req, res) => {
+    try {
+      const page = await storage.getPageBySlug(req.params.slug);
+      if (!page) return res.status(404).json({ error: "Page not found" });
+      res.json(page);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch page" });
+    }
+  });
+
+  app.post("/api/pages", requireAdmin, async (req, res) => {
+    try {
+      const data = insertPageSchema.parse(req.body);
+      const page = await storage.createPage(data);
+      res.json(page);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid page data" });
+    }
+  });
+
+  app.patch("/api/pages/:id", requireAdmin, async (req, res) => {
+    try {
+      const data = insertPageSchema.partial().parse(req.body);
+      const page = await storage.updatePage(parseInt(req.params.id), data);
+      res.json(page);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid page data" });
+    }
+  });
+
+  app.delete("/api/pages/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deletePage(parseInt(req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete page" });
+    }
+  });
+
+  // ==================== Brands Routes ====================
+  app.get("/api/brands", async (req, res) => {
+    try {
+      const brands = await storage.getAllBrands({ active: true });
+      res.json(brands);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch brands" });
+    }
+  });
+
+  app.post("/api/brands", requireAdmin, async (req, res) => {
+    try {
+      const data = insertBrandSchema.parse(req.body);
+      const brand = await storage.createBrand(data);
+      res.json(brand);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid brand data" });
+    }
+  });
+
+  app.patch("/api/brands/:id", requireAdmin, async (req, res) => {
+    try {
+      const data = insertBrandSchema.partial().parse(req.body);
+      const brand = await storage.updateBrand(parseInt(req.params.id), data);
+      res.json(brand);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid brand data" });
+    }
+  });
+
+  app.delete("/api/brands/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteBrand(parseInt(req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete brand" });
+    }
+  });
+
+  // ==================== Product Attributes Routes ====================
+  app.get("/api/products/:productId/attributes", async (req, res) => {
+    try {
+      const attrs = await storage.getProductAttributes(parseInt(req.params.productId));
+      res.json(attrs);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch attributes" });
+    }
+  });
+
+  app.post("/api/product-attributes", requireAdmin, async (req, res) => {
+    try {
+      const data = insertProductAttributeSchema.parse(req.body);
+      const attr = await storage.createProductAttribute(data);
+      res.json(attr);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid attribute data" });
+    }
+  });
+
+  app.patch("/api/product-attributes/:id", requireAdmin, async (req, res) => {
+    try {
+      const data = insertProductAttributeSchema.partial().parse(req.body);
+      const attr = await storage.updateProductAttribute(parseInt(req.params.id), data);
+      res.json(attr);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid attribute data" });
+    }
+  });
+
+  app.delete("/api/product-attributes/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteProductAttribute(parseInt(req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete attribute" });
+    }
+  });
+
+  // ==================== Shipping Methods Routes ====================
+  app.get("/api/shipping-methods", async (req, res) => {
+    try {
+      const methods = await storage.getAllShippingMethods({ active: true });
+      res.json(methods);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch shipping methods" });
+    }
+  });
+
+  app.post("/api/shipping-methods", requireAdmin, async (req, res) => {
+    try {
+      const data = insertShippingMethodSchema.parse(req.body);
+      const method = await storage.createShippingMethod(data);
+      res.json(method);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid shipping method data" });
+    }
+  });
+
+  app.patch("/api/shipping-methods/:id", requireAdmin, async (req, res) => {
+    try {
+      const data = insertShippingMethodSchema.partial().parse(req.body);
+      const method = await storage.updateShippingMethod(parseInt(req.params.id), data);
+      res.json(method);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid shipping method data" });
+    }
+  });
+
+  app.delete("/api/shipping-methods/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteShippingMethod(parseInt(req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete shipping method" });
+    }
+  });
+
+  // ==================== Credit Points Routes ====================
+  app.get("/api/credit-points", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const points = await storage.getUserCreditPoints(userId);
+      const total = await storage.getTotalCreditPoints(userId);
+      res.json({ points, total });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch credit points" });
+    }
+  });
+
+  app.post("/api/credit-points", requireAdmin, async (req, res) => {
+    try {
+      const data = insertCreditPointSchema.parse(req.body);
+      const point = await storage.addCreditPoints(data);
+      res.json(point);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid credit point data" });
+    }
+  });
+
+  // ==================== User Wallets Routes ====================
+  app.get("/api/wallet", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      let wallet = await storage.getUserWallet(userId);
+      if (!wallet) {
+        wallet = await storage.createUserWallet({ userId, balance: "0" });
+      }
+      res.json(wallet);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch wallet" });
+    }
+  });
+
+  app.post("/api/wallet", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const data = insertUserWalletSchema.parse({ ...req.body, userId });
+      const wallet = await storage.createUserWallet(data);
+      res.json(wallet);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid wallet data" });
+    }
+  });
+
+  app.patch("/api/wallet/balance", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const { balance } = req.body;
+      const wallet = await storage.updateWalletBalance(userId, balance);
+      res.json(wallet);
+    } catch (error) {
+      res.status(400).json({ error: "Failed to update wallet balance" });
+    }
+  });
+
+  // ==================== User Requests Routes ====================
+  app.get("/api/user-requests", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const requests = await storage.getUserRequests(userId);
+      res.json(requests);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch user requests" });
+    }
+  });
+
+  app.get("/api/user-requests/admin/all", requireAdmin, async (req, res) => {
+    try {
+      const requests = await storage.getAllUserRequests();
+      res.json(requests);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch user requests" });
+    }
+  });
+
+  app.post("/api/user-requests", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const data = insertUserRequestSchema.parse({ ...req.body, userId });
+      const request = await storage.createUserRequest(data);
+      res.json(request);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid request data" });
+    }
+  });
+
+  app.patch("/api/user-requests/:id", requireAdmin, async (req, res) => {
+    try {
+      const data = insertUserRequestSchema.partial().parse(req.body);
+      const request = await storage.updateUserRequest(parseInt(req.params.id), data);
+      res.json(request);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid request data" });
+    }
+  });
+
+  app.delete("/api/user-requests/:id", requireAuth, async (req, res) => {
+    try {
+      await storage.deleteUserRequest(parseInt(req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete request" });
+    }
+  });
+
+  // ==================== Settings Routes ====================
+  app.get("/api/settings", requireAdmin, async (req, res) => {
+    try {
+      const settings = await storage.getAllSettings();
+      res.json(settings);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch settings" });
+    }
+  });
+
+  app.post("/api/settings", requireAdmin, async (req, res) => {
+    try {
+      const data = insertSettingSchema.parse(req.body);
+      const setting = await storage.createSetting(data);
+      res.json(setting);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid setting data" });
+    }
+  });
+
+  app.patch("/api/settings/:key", requireAdmin, async (req, res) => {
+    try {
+      const { value } = req.body;
+      const setting = await storage.updateSetting(req.params.key, value);
+      res.json(setting);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid setting data" });
+    }
+  });
+
+  // ==================== Questions Routes ====================
+  app.get("/api/products/:productId/questions", async (req, res) => {
+    try {
+      const questions = await storage.getProductQuestions(parseInt(req.params.productId));
+      res.json(questions);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch questions" });
+    }
+  });
+
+  app.post("/api/questions", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const data = insertQuestionSchema.parse({ ...req.body, userId });
+      const question = await storage.createQuestion(data);
+      res.json(question);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid question data" });
+    }
+  });
+
+  app.patch("/api/questions/:id", requireAdmin, async (req, res) => {
+    try {
+      const data = insertQuestionSchema.partial().parse(req.body);
+      const question = await storage.updateQuestion(parseInt(req.params.id), data);
+      res.json(question);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid question data" });
+    }
+  });
+
+  app.delete("/api/questions/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteQuestion(parseInt(req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete question" });
+    }
+  });
+
+  // ==================== Answers Routes ====================
+  app.get("/api/questions/:questionId/answers", async (req, res) => {
+    try {
+      const answers = await storage.getQuestionAnswers(parseInt(req.params.questionId));
+      res.json(answers);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch answers" });
+    }
+  });
+
+  app.post("/api/answers", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const data = insertAnswerSchema.parse({ ...req.body, userId });
+      const answer = await storage.createAnswer(data);
+      res.json(answer);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid answer data" });
+    }
+  });
+
+  app.patch("/api/answers/:id", requireAdmin, async (req, res) => {
+    try {
+      const data = insertAnswerSchema.partial().parse(req.body);
+      const answer = await storage.updateAnswer(parseInt(req.params.id), data);
+      res.json(answer);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid answer data" });
+    }
+  });
+
+  app.delete("/api/answers/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteAnswer(parseInt(req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete answer" });
     }
   });
 
