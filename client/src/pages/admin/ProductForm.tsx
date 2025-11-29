@@ -377,6 +377,29 @@ export default function ProductForm() {
 
             <Card>
               <CardHeader>
+                <CardTitle>ویدیو محصول</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="videoUrl">لینک ویدیو (YouTube یا MP4)</Label>
+                  <Input
+                    id="videoUrl"
+                    value={formData.videoUrl}
+                    onChange={(e) =>
+                      setFormData({ ...formData, videoUrl: e.target.value })
+                    }
+                    placeholder="https://www.youtube.com/watch?v=... یا https://example.com/video.mp4"
+                    dir="ltr"
+                  />
+                  <p className="text-xs text-muted-foreground mt-2">
+                    YouTube یا لینک مستقیم MP4
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
                 <CardTitle>دسته‌بندی</CardTitle>
               </CardHeader>
               <CardContent>

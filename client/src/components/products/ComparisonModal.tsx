@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { Link } from "wouter";
@@ -27,6 +27,7 @@ export default function ComparisonModal({
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>مقایسه محصولات</DialogTitle>
+            <DialogDescription>محصولی برای مقایسه انتخاب نشده است</DialogDescription>
           </DialogHeader>
           <div className="text-center py-8 text-muted-foreground">
             محصولی برای مقایسه انتخاب نشده است
@@ -41,6 +42,7 @@ export default function ComparisonModal({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>مقایسه محصولات ({compareItems.length})</DialogTitle>
+          <DialogDescription>مقایسه جزئیات محصولات برای انتخاب بهتر</DialogDescription>
         </DialogHeader>
 
         <div className="overflow-x-auto">

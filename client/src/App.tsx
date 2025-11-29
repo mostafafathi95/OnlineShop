@@ -9,6 +9,7 @@ import NotFound from "@/pages/not-found";
 import Landing from "@/pages/Landing";
 import Products from "@/pages/Products";
 import ProductDetail from "@/pages/ProductDetail";
+import ProductsCompare from "@/pages/ProductsCompare";
 import Cart from "@/pages/Cart";
 import Checkout from "@/pages/Checkout";
 import About from "@/pages/About";
@@ -46,6 +47,7 @@ function Router() {
       <Route path="/register" component={Register} />
       <Route path="/products" component={Products} />
       <Route path="/products/:slug" component={ProductDetail} />
+      <Route path="/products/compare" component={ProductsCompare} />
       <Route path="/cart" component={Cart} />
       <Route path="/checkout" component={Checkout} />
       <Route path="/about" component={About} />
