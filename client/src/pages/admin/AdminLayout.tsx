@@ -14,6 +14,13 @@ import {
   Moon,
   Ticket,
   MessageSquare,
+  Newspaper,
+  FileText,
+  Tag,
+  TrendingUp,
+  Zap,
+  Wallet,
+  HelpCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -31,6 +38,16 @@ const navigation = [
   { name: "کاربران", href: "/admin/users", icon: Users },
   { name: "کوپن‌ها", href: "/admin/coupons", icon: Ticket },
   { name: "نظرات", href: "/admin/reviews", icon: MessageSquare },
+  { name: "مقالات", href: "/admin/articles", icon: FileText },
+  { name: "اخبار", href: "/admin/news", icon: Newspaper },
+  { name: "صفحات", href: "/admin/pages", icon: FileText },
+  { name: "برندها", href: "/admin/brands", icon: Tag },
+  { name: "ویژگی‌های محصول", href: "/admin/product-attributes", icon: Zap },
+  { name: "روش‌های ارسال", href: "/admin/shipping-methods", icon: TrendingUp },
+  { name: "نقاط اعتباری", href: "/admin/credit-points", icon: Zap },
+  { name: "کیف‌پول", href: "/admin/wallet", icon: Wallet },
+  { name: "پرسش‌ها", href: "/admin/questions", icon: HelpCircle },
+  { name: "تنظیمات", href: "/admin/settings", icon: Settings },
 ];
 
 interface AdminLayoutProps {

@@ -30,6 +30,19 @@ import AdminOrders from "@/pages/admin/Orders";
 import AdminUsers from "@/pages/admin/Users";
 import AdminCoupons from "@/pages/admin/Coupons";
 import AdminReviews from "@/pages/admin/Reviews";
+import AdminArticles from "@/pages/admin/Articles";
+import AdminArticleForm from "@/pages/admin/ArticleForm";
+import AdminNews from "@/pages/admin/News";
+import AdminNewsForm from "@/pages/admin/NewsForm";
+import AdminPages from "@/pages/admin/Pages";
+import AdminPageForm from "@/pages/admin/PageForm";
+import AdminBrands from "@/pages/admin/Brands";
+import AdminBrandForm from "@/pages/admin/BrandForm";
+import AdminProductAttributes from "@/pages/admin/ProductAttributes";
+import AdminShippingMethods from "@/pages/admin/ShippingMethods";
+import AdminCreditPoints from "@/pages/admin/CreditPoints";
+import AdminSettings from "@/pages/admin/Settings";
+import AdminQuestions from "@/pages/admin/Questions";
 
 import AccountWishlist from "@/pages/account/Wishlist";
 import AccountReviews from "@/pages/account/Reviews";
@@ -70,6 +83,19 @@ function Router() {
       <Route path="/admin/users" component={AdminUsers} />
       <Route path="/admin/coupons" component={AdminCoupons} />
       <Route path="/admin/reviews" component={AdminReviews} />
+      <Route path="/admin/articles" component={AdminArticles} />
+      <Route path="/admin/articles/:id" component={AdminArticleForm} />
+      <Route path="/admin/news" component={AdminNews} />
+      <Route path="/admin/news/:id" component={AdminNewsForm} />
+      <Route path="/admin/pages" component={AdminPages} />
+      <Route path="/admin/pages/:id" component={AdminPageForm} />
+      <Route path="/admin/brands" component={AdminBrands} />
+      <Route path="/admin/brands/:id" component={AdminBrandForm} />
+      <Route path="/admin/product-attributes" component={AdminProductAttributes} />
+      <Route path="/admin/shipping-methods" component={AdminShippingMethods} />
+      <Route path="/admin/credit-points" component={AdminCreditPoints} />
+      <Route path="/admin/settings" component={AdminSettings} />
+      <Route path="/admin/questions" component={AdminQuestions} />
 
       <Route component={NotFound} />
     </Switch>
