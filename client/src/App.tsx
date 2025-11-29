@@ -28,6 +28,7 @@ import AdminCategories from "@/pages/admin/Categories";
 import AdminOrders from "@/pages/admin/Orders";
 import AdminUsers from "@/pages/admin/Users";
 import AdminCoupons from "@/pages/admin/Coupons";
+import AdminReviews from "@/pages/admin/Reviews";
 
 import AccountWishlist from "@/pages/account/Wishlist";
 import AccountReviews from "@/pages/account/Reviews";
@@ -59,6 +60,7 @@ function Router() {
       <Route path="/admin/orders" component={AdminOrders} />
       <Route path="/admin/users" component={AdminUsers} />
       <Route path="/admin/coupons" component={AdminCoupons} />
+      <Route path="/admin/reviews" component={AdminReviews} />
 
       <Route component={NotFound} />
     </Switch>

@@ -428,8 +428,6 @@ export default function Checkout() {
                           پرداخت آنلاین
                         </Label>
                         <p className="text-sm text-muted-foreground">درگاه پرداخت اینترنتی</p>
-                          پرداخت امن از طریق درگاه بانکی
-                        </p>
                       </div>
                       <CreditCard className="h-8 w-8 text-muted-foreground" />
                     </div>

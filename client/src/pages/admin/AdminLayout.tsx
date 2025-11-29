@@ -13,6 +13,7 @@ import {
   Sun,
   Moon,
   Ticket,
+  MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -29,6 +30,7 @@ const navigation = [
   { name: "سفارشات", href: "/admin/orders", icon: ShoppingCart },
   { name: "کاربران", href: "/admin/users", icon: Users },
   { name: "کوپن‌ها", href: "/admin/coupons", icon: Ticket },
+  { name: "نظرات", href: "/admin/reviews", icon: MessageSquare },
 ];
 
 interface AdminLayoutProps {
