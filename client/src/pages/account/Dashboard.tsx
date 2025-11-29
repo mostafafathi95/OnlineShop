@@ -11,8 +11,12 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import type { Order } from "@shared/schema";
 
+import { Heart, MessageSquare } from "lucide-react";
+
 const menuItems = [
   { icon: Package, title: "سفارشات من", href: "/account/orders", description: "مشاهده و پیگیری سفارشات" },
+  { icon: Heart, title: "علاقه‌مندی‌ها", href: "/account/wishlist", description: "محصولات مورد علاقه" },
+  { icon: MessageSquare, title: "نظرات من", href: "/account/reviews", description: "نظرات ثبت شده" },
   { icon: MapPin, title: "آدرس‌ها", href: "/account/addresses", description: "مدیریت آدرس‌های تحویل" },
   { icon: User, title: "پروفایل", href: "/account/profile", description: "ویرایش اطلاعات کاربری" },
 ];
@@ -86,7 +90,7 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           {menuItems.map((item, index) => (
             <Link key={index} href={item.href}>
               <Card className="h-full hover-elevate cursor-pointer">
