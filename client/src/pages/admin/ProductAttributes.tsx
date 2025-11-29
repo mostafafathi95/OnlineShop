@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "wouter";
 import { Plus, Search, Edit, Trash2, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,7 +42,9 @@ export default function AdminProductAttributes() {
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4" />
             <Input placeholder="جستجو..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pr-10" />
           </div>
-          <Button data-testid="button-add-attribute"><Plus className="w-4 h-4 ml-2" /> ویژگی جدید</Button>
+          <Link href="/admin/product-attributes/new">
+            <Button data-testid="button-add-attribute"><Plus className="w-4 h-4 ml-2" /> ویژگی جدید</Button>
+          </Link>
         </div>
 
         {isLoading ? <Skeleton className="h-96" /> : (

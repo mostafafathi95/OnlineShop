@@ -43,6 +43,10 @@ import AdminShippingMethods from "@/pages/admin/ShippingMethods";
 import AdminCreditPoints from "@/pages/admin/CreditPoints";
 import AdminSettings from "@/pages/admin/Settings";
 import AdminQuestions from "@/pages/admin/Questions";
+import AdminAnswers from "@/pages/admin/Answers";
+import AdminUserWallets from "@/pages/admin/UserWallets";
+import ProductAttributesForm from "@/pages/admin/ProductAttributesForm";
+import ShippingMethodsForm from "@/pages/admin/ShippingMethodsForm";
 
 import AccountWishlist from "@/pages/account/Wishlist";
 import AccountReviews from "@/pages/account/Reviews";
@@ -96,6 +100,12 @@ function Router() {
       <Route path="/admin/credit-points" component={AdminCreditPoints} />
       <Route path="/admin/settings" component={AdminSettings} />
       <Route path="/admin/questions" component={AdminQuestions} />
+      <Route path="/admin/answers" component={AdminAnswers} />
+      <Route path="/admin/user-wallets" component={AdminUserWallets} />
+      <Route path="/admin/product-attributes/new" component={ProductAttributesForm} />
+      <Route path="/admin/product-attributes/:id" component={ProductAttributesForm} />
+      <Route path="/admin/shipping-methods/new" component={ShippingMethodsForm} />
+      <Route path="/admin/shipping-methods/:id" component={ShippingMethodsForm} />
 
       <Route component={NotFound} />
     </Switch>

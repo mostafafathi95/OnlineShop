@@ -47,6 +47,8 @@ const navigation = [
   { name: "نقاط اعتباری", href: "/admin/credit-points", icon: Zap },
   { name: "کیف‌پول", href: "/admin/wallet", icon: Wallet },
   { name: "پرسش‌ها", href: "/admin/questions", icon: HelpCircle },
+  { name: "پاسخ‌ها", href: "/admin/answers", icon: MessageSquare },
+  { name: "کیف‌پول کاربران", href: "/admin/user-wallets", icon: Wallet },
   { name: "تنظیمات", href: "/admin/settings", icon: Settings },
 ];
 
