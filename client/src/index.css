@@ -140,6 +140,16 @@
   }
 }
 
+/* Heart pulse for wishlist */
+@keyframes scale-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
 /* ==================== UTILITY CLASSES ==================== */
 
 .animate-cart-drop {
@@ -184,6 +194,10 @@
 
 .animate-confetti {
   animation: confetti-fall 2s ease-out forwards;
+}
+
+.animate-scale-pulse {
+  animation: scale-pulse 0.5s ease-in-out;
 }
 
 /* Transition Utilities */
