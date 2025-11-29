@@ -1,25 +1,34 @@
 import { useState } from "react";
 import { useRoute, Link } from "wouter";
-import { ShoppingCart, Heart, Minus, Plus, Check, Truck, Shield, ArrowRight } from "lucide-react";
+import { ShoppingCart, Heart, Minus, Plus, Check, Truck, Shield, ArrowRight, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import Layout from "@/components/layout/Layout";
 import ProductGrid from "@/components/products/ProductGrid";
 import { useCartStore } from "@/stores/cartStore";
 import { useToast } from "@/hooks/use-toast";
-import { useQuery } from "@tanstack/react-query";
-import type { Product, ProductWithCategory } from "@shared/schema";
+import { useAuth } from "@/hooks/useAuth";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import type { Product, ProductWithCategory, Review } from "@shared/schema";
 
 export default function ProductDetail() {
   const [, params] = useRoute("/products/:slug");
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [reviewTitle, setReviewTitle] = useState("");
+  const [reviewContent, setReviewContent] = useState("");
+  const [reviewRating, setReviewRating] = useState(5);
+  const [isWishlisted, setIsWishlisted] = useState(false);
   const { addItem, openCart } = useCartStore();
   const { toast } = useToast();
+  const { user, isAuthenticated } = useAuth();
 
   const { data: product, isLoading } = useQuery<ProductWithCategory>({
     queryKey: ["/api/products", params?.slug],
@@ -29,6 +38,47 @@ export default function ProductDetail() {
   const { data: relatedProducts } = useQuery<Product[]>({
     queryKey: ["/api/products", { category: product?.categoryId, limit: 4 }],
     enabled: !!product?.categoryId,
+  });
+
+  const { data: reviews } = useQuery<Review[]>({
+    queryKey: ["/api/products", product?.id, "reviews"],
+    enabled: !!product?.id,
+  });
+
+  const reviewMutation = useMutation({
+    mutationFn: async () => {
+      if (!product) return;
+      return apiRequest("POST", "/api/reviews", {
+        productId: product.id,
+        title: reviewTitle,
+        content: reviewContent,
+        rating: reviewRating,
+      });
+    },
+    onSuccess: () => {
+      if (product?.id) {
+        queryClient.invalidateQueries({ queryKey: ["/api/products", product.id, "reviews"] });
+        setReviewTitle("");
+        setReviewContent("");
+        setReviewRating(5);
+        toast({ title: "نظر شما ثبت شد" });
+      }
+    },
+  });
+
+  const wishlistMutation = useMutation({
+    mutationFn: async () => {
+      if (!product) return;
+      if (isWishlisted) {
+        return apiRequest("DELETE", `/api/wishlist/${product.id}`);
+      } else {
+        return apiRequest("POST", "/api/wishlist", { productId: product.id });
+      }
+    },
+    onSuccess: () => {
+      setIsWishlisted(!isWishlisted);
+      toast({ title: isWishlisted ? "از علاقه‌مندی‌ها حذف شد" : "به علاقه‌مندی‌ها اضافه شد" });
+    },
   });
 
   const formatPrice = (price: string | number) => {
@@ -53,6 +103,22 @@ export default function ProductDetail() {
       description: `${quantity} عدد ${product.name}`,
     });
     openCart();
+  };
+
+  const handleReviewSubmit = () => {
+    if (!isAuthenticated) {
+      window.location.href = "/api/login";
+      return;
+    }
+    if (!reviewTitle || !reviewContent) {
+      toast({
+        title: "خطا",
+        description: "عنوان و متن نظر الزامی است",
+        variant: "destructive",
+      });
+      return;
+    }
+    reviewMutation.mutate();
   };
 
   const discount = product?.comparePrice
