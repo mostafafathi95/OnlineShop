@@ -94,6 +94,45 @@ export const productImages = pgTable("product_images", {
   sortOrder: integer("sort_order").default(0),
 });
 
+// Reviews & Ratings table
+export const reviews = pgTable("reviews", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  productId: integer("product_id").references(() => products.id, { onDelete: 'cascade' }).notNull(),
+  userId: varchar("user_id").references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  rating: integer("rating").notNull(), // 1-5
+  title: varchar("title", { length: 100 }).notNull(),
+  content: text("content"),
+  helpful: integer("helpful").default(0),
+  unhelpful: integer("unhelpful").default(0),
+  isApproved: boolean("is_approved").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [index("idx_product_reviews").on(table.productId), index("idx_user_reviews").on(table.userId)]);
+
+// Wishlist table
+export const wishlist = pgTable("wishlist", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  userId: varchar("user_id").references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  productId: integer("product_id").references(() => products.id, { onDelete: 'cascade' }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [index("idx_user_wishlist").on(table.userId), index("idx_product_wishlist").on(table.productId)]);
+
+// Coupons table
+export const coupons = pgTable("coupons", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  code: varchar("code", { length: 50 }).notNull().unique(),
+  description: text("description"),
+  discountType: varchar("discount_type", { length: 20 }).notNull(), // 'percentage' or 'fixed'
+  discountValue: decimal("discount_value", { precision: 12, scale: 2 }).notNull(),
+  minOrderValue: decimal("min_order_value", { precision: 12, scale: 0 }),
+  maxUses: integer("max_uses"), // null = unlimited
+  currentUses: integer("current_uses").default(0),
+  startDate: timestamp("start_date"),
+  endDate: timestamp("end_date"),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [index("idx_active_coupons").on(table.isActive)]);
+
 // Addresses table
 export const addresses = pgTable("addresses", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
@@ -131,6 +170,7 @@ export const orders = pgTable("orders", {
   total: decimal("total", { precision: 12, scale: 0 }).notNull(),
   addressId: integer("address_id").references(() => addresses.id),
   shippingAddress: jsonb("shipping_address"),
+  couponCode: varchar("coupon_code", { length: 50 }),
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -153,6 +193,8 @@ export const usersRelations = relations(users, ({ many }) => ({
   addresses: many(addresses),
   cartItems: many(cartItems),
   orders: many(orders),
+  reviews: many(reviews),
+  wishlist: many(wishlist),
 }));
 
 export const categoriesRelations = relations(categories, ({ one, many }) => ({
@@ -173,11 +215,35 @@ export const productsRelations = relations(products, ({ one, many }) => ({
   images: many(productImages),
   cartItems: many(cartItems),
   orderItems: many(orderItems),
+  reviews: many(reviews),
+  wishlistItems: many(wishlist),
 }));
 
 export const productImagesRelations = relations(productImages, ({ one }) => ({
   product: one(products, {
     fields: [productImages.productId],
+    references: [products.id],
+  }),
+}));
+
+export const reviewsRelations = relations(reviews, ({ one }) => ({
+  product: one(products, {
+    fields: [reviews.productId],
+    references: [products.id],
+  }),
+  user: one(users, {
+    fields: [reviews.userId],
+    references: [users.id],
+  }),
+}));
+
+export const wishlistRelations = relations(wishlist, ({ one }) => ({
+  user: one(users, {
+    fields: [wishlist.userId],
+    references: [users.id],
+  }),
+  product: one(products, {
+    fields: [wishlist.productId],
     references: [products.id],
   }),
 }));
@@ -215,7 +281,7 @@ export const ordersRelations = relations(orders, ({ one, many }) => ({
 export const orderItemsRelations = relations(orderItems, ({ one }) => ({
   order: one(orders, {
     fields: [orderItems.orderId],
-    references: [orders.id],
+    references: [orderItems.id],
   }),
   product: one(products, {
     fields: [orderItems.productId],
@@ -228,8 +294,10 @@ export const insertUserSchema = createInsertSchema(users).omit({ createdAt: true
 export const insertCategorySchema = createInsertSchema(categories).omit({ id: true, createdAt: true });
 export const insertProductSchema = createInsertSchema(products).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertProductImageSchema = createInsertSchema(productImages).omit({ id: true });
+export const insertReviewSchema = createInsertSchema(reviews).omit({ id: true, createdAt: true, updatedAt: true, helpful: true, unhelpful: true });
 export const insertAddressSchema = createInsertSchema(addresses).omit({ id: true, createdAt: true });
 export const insertCartItemSchema = createInsertSchema(cartItems).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertCouponSchema = createInsertSchema(coupons).omit({ id: true, createdAt: true, currentUses: true });
 export const insertOrderSchema = createInsertSchema(orders).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertOrderItemSchema = createInsertSchema(orderItems).omit({ id: true });
 
@@ -242,14 +310,19 @@ export type InsertProduct = z.infer<typeof insertProductSchema>;
 export type Product = typeof products.$inferSelect;
 export type InsertProductImage = z.infer<typeof insertProductImageSchema>;
 export type ProductImage = typeof productImages.$inferSelect;
+export type InsertReview = z.infer<typeof insertReviewSchema>;
+export type Review = typeof reviews.$inferSelect;
 export type InsertAddress = z.infer<typeof insertAddressSchema>;
 export type Address = typeof addresses.$inferSelect;
 export type InsertCartItem = z.infer<typeof insertCartItemSchema>;
 export type CartItem = typeof cartItems.$inferSelect;
+export type InsertCoupon = z.infer<typeof insertCouponSchema>;
+export type Coupon = typeof coupons.$inferSelect;
 export type InsertOrder = z.infer<typeof insertOrderSchema>;
 export type Order = typeof orders.$inferSelect;
 export type InsertOrderItem = z.infer<typeof insertOrderItemSchema>;
 export type OrderItem = typeof orderItems.$inferSelect;
+export type WishlistItem = typeof wishlist.$inferSelect;
 
 // Extended types for frontend
 export type ProductWithCategory = Product & {

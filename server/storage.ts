@@ -9,6 +9,9 @@ import {
   cartItems,
   orders,
   orderItems,
+  reviews,
+  wishlist,
+  coupons,
   type User,
   type UpsertUser,
   type Category,
@@ -25,6 +28,11 @@ import {
   type InsertOrder,
   type OrderItem,
   type InsertOrderItem,
+  type Review,
+  type InsertReview,
+  type Coupon,
+  type InsertCoupon,
+  type WishlistItem,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -62,6 +70,28 @@ export interface IStorage {
   getProductImages(productId: number): Promise<ProductImage[]>;
   addProductImage(image: InsertProductImage): Promise<ProductImage>;
   deleteProductImage(id: number): Promise<void>;
+
+  // Reviews
+  getProductReviews(productId: number): Promise<Review[]>;
+  getUserReviews(userId: string): Promise<Review[]>;
+  createReview(review: InsertReview): Promise<Review>;
+  updateReview(id: number, data: Partial<InsertReview>): Promise<Review | undefined>;
+  deleteReview(id: number): Promise<void>;
+  updateReviewHelpfulness(id: number, helpful: number, unhelpful: number): Promise<void>;
+
+  // Wishlist
+  getUserWishlist(userId: string): Promise<(WishlistItem & { product: Product })[]>;
+  addToWishlist(userId: string, productId: number): Promise<WishlistItem>;
+  removeFromWishlist(userId: string, productId: number): Promise<void>;
+  isInWishlist(userId: string, productId: number): Promise<boolean>;
+
+  // Coupons
+  getAllCoupons(options?: { active?: boolean }): Promise<Coupon[]>;
+  getCouponByCode(code: string): Promise<Coupon | undefined>;
+  createCoupon(coupon: InsertCoupon): Promise<Coupon>;
+  updateCoupon(id: number, data: Partial<InsertCoupon>): Promise<Coupon | undefined>;
+  deleteCoupon(id: number): Promise<void>;
+  incrementCouponUses(code: string): Promise<void>;
 
   // Addresses
   getUserAddresses(userId: string): Promise<Address[]>;
@@ -266,6 +296,139 @@ export class DatabaseStorage implements IStorage {
 
   async deleteProductImage(id: number): Promise<void> {
     await db.delete(productImages).where(eq(productImages.id, id));
+  }
+
+  // Reviews
+  async getProductReviews(productId: number): Promise<Review[]> {
+    return db
+      .select()
+      .from(reviews)
+      .where(and(eq(reviews.productId, productId), eq(reviews.isApproved, true)))
+      .orderBy(desc(reviews.createdAt));
+  }
+
+  async getUserReviews(userId: string): Promise<Review[]> {
+    return db
+      .select()
+      .from(reviews)
+      .where(eq(reviews.userId, userId))
+      .orderBy(desc(reviews.createdAt));
+  }
+
+  async createReview(review: InsertReview): Promise<Review> {
+    const [newReview] = await db.insert(reviews).values(review).returning();
+    return newReview;
+  }
+
+  async updateReview(id: number, data: Partial<InsertReview>): Promise<Review | undefined> {
+    const [review] = await db
+      .update(reviews)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(reviews.id, id))
+      .returning();
+    return review;
+  }
+
+  async deleteReview(id: number): Promise<void> {
+    await db.delete(reviews).where(eq(reviews.id, id));
+  }
+
+  async updateReviewHelpfulness(id: number, helpful: number, unhelpful: number): Promise<void> {
+    await db
+      .update(reviews)
+      .set({ helpful, unhelpful })
+      .where(eq(reviews.id, id));
+  }
+
+  // Wishlist
+  async getUserWishlist(userId: string): Promise<(WishlistItem & { product: Product })[]> {
+    const items = await db
+      .select({
+        wishlistItem: wishlist,
+        product: products,
+      })
+      .from(wishlist)
+      .innerJoin(products, eq(wishlist.productId, products.id))
+      .where(eq(wishlist.userId, userId));
+
+    return items.map((item) => ({
+      ...item.wishlistItem,
+      product: item.product,
+    }));
+  }
+
+  async addToWishlist(userId: string, productId: number): Promise<WishlistItem> {
+    const [item] = await db
+      .insert(wishlist)
+      .values({ userId, productId })
+      .returning();
+    return item;
+  }
+
+  async removeFromWishlist(userId: string, productId: number): Promise<void> {
+    await db
+      .delete(wishlist)
+      .where(and(eq(wishlist.userId, userId), eq(wishlist.productId, productId)));
+  }
+
+  async isInWishlist(userId: string, productId: number): Promise<boolean> {
+    const [item] = await db
+      .select()
+      .from(wishlist)
+      .where(and(eq(wishlist.userId, userId), eq(wishlist.productId, productId)))
+      .limit(1);
+    return !!item;
+  }
+
+  // Coupons
+  async getAllCoupons(options?: { active?: boolean }): Promise<Coupon[]> {
+    let query = db.select().from(coupons);
+    if (options?.active) {
+      query = query.where(eq(coupons.isActive, true)) as any;
+    }
+    return query.orderBy(desc(coupons.createdAt)) as any;
+  }
+
+  async getCouponByCode(code: string): Promise<Coupon | undefined> {
+    const [coupon] = await db
+      .select()
+      .from(coupons)
+      .where(and(eq(coupons.code, code), eq(coupons.isActive, true)));
+    
+    if (!coupon) return undefined;
+
+    // Check if coupon is expired or max uses reached
+    const now = new Date();
+    if (coupon.startDate && coupon.startDate > now) return undefined;
+    if (coupon.endDate && coupon.endDate < now) return undefined;
+    if (coupon.maxUses && coupon.currentUses >= coupon.maxUses) return undefined;
+
+    return coupon;
+  }
+
+  async createCoupon(coupon: InsertCoupon): Promise<Coupon> {
+    const [newCoupon] = await db.insert(coupons).values(coupon).returning();
+    return newCoupon;
+  }
+
+  async updateCoupon(id: number, data: Partial<InsertCoupon>): Promise<Coupon | undefined> {
+    const [coupon] = await db
+      .update(coupons)
+      .set(data)
+      .where(eq(coupons.id, id))
+      .returning();
+    return coupon;
+  }
+
+  async deleteCoupon(id: number): Promise<void> {
+    await db.delete(coupons).where(eq(coupons.id, id));
+  }
+
+  async incrementCouponUses(code: string): Promise<void> {
+    await db
+      .update(coupons)
+      .set({ currentUses: sql`${coupons.currentUses} + 1` })
+      .where(eq(coupons.code, code));
   }
 
   // Addresses
