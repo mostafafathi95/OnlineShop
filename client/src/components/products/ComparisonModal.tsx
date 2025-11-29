@@ -46,77 +46,97 @@ export default function ComparisonModal({
         </DialogHeader>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <tbody>
-              <tr className="border-b">
-                <td className="py-4 px-4 font-medium">تصویر</td>
+          <div className="inline-block min-w-full">
+            {/* Header */}
+            <div className="grid gap-4 mb-4" style={{ gridTemplateColumns: `repeat(${compareItems.length + 1}, minmax(200px, 1fr))` }}>
+              <div className="font-bold">مشخصات</div>
+              {compareItems.map((product) => (
+                <div key={`header-${product.id}`} className="font-bold">
+                  {product.name}
+                </div>
+              ))}
+            </div>
+
+            {/* Image Row */}
+            <div className="border-b pb-4 mb-4">
+              <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${compareItems.length + 1}, minmax(200px, 1fr))` }}>
+                <div className="font-medium text-muted-foreground">تصویر</div>
                 {compareItems.map((product) => (
-                  <td key={product.id} className="py-4 px-4">
+                  <div key={`image-${product.id}`} className="h-24 rounded overflow-hidden bg-muted">
                     <img
                       src={product.image || "https://placehold.co/150"}
                       alt={product.name}
-                      className="w-24 h-24 object-cover rounded"
+                      className="w-full h-full object-cover"
                     />
-                  </td>
+                  </div>
                 ))}
-              </tr>
-              <tr className="border-b">
-                <td className="py-4 px-4 font-medium">نام</td>
+              </div>
+            </div>
+
+            {/* Price Row */}
+            <div className="border-b pb-4 mb-4">
+              <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${compareItems.length + 1}, minmax(200px, 1fr))` }}>
+                <div className="font-medium text-muted-foreground">قیمت</div>
                 {compareItems.map((product) => (
-                  <td key={product.id} className="py-4 px-4">
-                    <Link href={`/products/${product.slug}`} className="text-primary hover:underline">
-                      {product.name}
-                    </Link>
-                  </td>
-                ))}
-              </tr>
-              <tr className="border-b">
-                <td className="py-4 px-4 font-medium">قیمت</td>
-                {compareItems.map((product) => (
-                  <td key={product.id} className="py-4 px-4">
-                    <div className="font-bold text-lg">{formatPrice(product.price)} تومان</div>
+                  <div key={`price-${product.id}`}>
+                    <div className="font-bold text-lg text-primary">{formatPrice(product.price)} تومان</div>
                     {product.comparePrice && (
-                      <div className="text-muted-foreground line-through">
-                        {formatPrice(product.comparePrice)}
+                      <div className="text-muted-foreground line-through text-sm">
+                        {formatPrice(product.comparePrice)} تومان
                       </div>
                     )}
-                  </td>
+                  </div>
                 ))}
-              </tr>
-              <tr className="border-b">
-                <td className="py-4 px-4 font-medium">وزن</td>
+              </div>
+            </div>
+
+            {/* Weight Row */}
+            <div className="border-b pb-4 mb-4">
+              <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${compareItems.length + 1}, minmax(200px, 1fr))` }}>
+                <div className="font-medium text-muted-foreground">وزن</div>
                 {compareItems.map((product) => (
-                  <td key={product.id} className="py-4 px-4">
+                  <div key={`weight-${product.id}`}>
                     {product.weight ? `${product.weight} کیلوگرم` : "—"}
-                  </td>
+                  </div>
                 ))}
-              </tr>
-              <tr className="border-b">
-                <td className="py-4 px-4 font-medium">موجودی</td>
+              </div>
+            </div>
+
+            {/* Stock Row */}
+            <div className="border-b pb-4 mb-4">
+              <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${compareItems.length + 1}, minmax(200px, 1fr))` }}>
+                <div className="font-medium text-muted-foreground">موجودی</div>
                 {compareItems.map((product) => (
-                  <td key={product.id} className="py-4 px-4">
-                    {product.stock > 0 ? `${product.stock} عدد` : "ناموجود"}
-                  </td>
+                  <div key={`stock-${product.id}`}>
+                    {product.stock > 0 ? (
+                      <span className="text-green-600 dark:text-green-400 font-medium">{product.stock} عدد</span>
+                    ) : (
+                      <span className="text-red-600 dark:text-red-400 font-medium">ناموجود</span>
+                    )}
+                  </div>
                 ))}
-              </tr>
-              <tr>
-                <td className="py-4 px-4"></td>
-                {compareItems.map((product) => (
-                  <td key={product.id} className="py-4 px-4">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onRemove(product.id)}
-                      className="w-full"
-                    >
-                      <X className="h-4 w-4 ml-1" />
-                      حذف
-                    </Button>
-                  </td>
-                ))}
-              </tr>
-            </tbody>
-          </table>
+              </div>
+            </div>
+
+            {/* Action Row */}
+            <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${compareItems.length + 1}, minmax(200px, 1fr))` }}>
+              <div className="font-medium text-muted-foreground">عملیات</div>
+              {compareItems.map((product) => (
+                <div key={`action-${product.id}`}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onRemove(product.id)}
+                    className="w-full"
+                    data-testid={`button-remove-comparison-modal-${product.id}`}
+                  >
+                    <X className="h-4 w-4 ml-1" />
+                    حذف
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
