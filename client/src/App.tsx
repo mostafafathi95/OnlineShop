@@ -33,10 +33,15 @@ import AdminReviews from "@/pages/admin/Reviews";
 import AccountWishlist from "@/pages/account/Wishlist";
 import AccountReviews from "@/pages/account/Reviews";
 
+import Login from "@/pages/auth/Login";
+import Register from "@/pages/auth/Register";
+
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Landing} />
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
       <Route path="/products" component={Products} />
       <Route path="/products/:slug" component={ProductDetail} />
       <Route path="/cart" component={Cart} />
