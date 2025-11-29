@@ -20,11 +20,18 @@ export default function Login() {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: { email: string; password: string }) => {
-      return apiRequest("POST", "/api/login", credentials);
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(credentials),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "خطا در ورود");
+      return data;
     },
     onSuccess: (data: any) => {
       localStorage.setItem("auth", JSON.stringify(data));
-      setLocation("/");
+      setLocation(data.user?.role === "admin" ? "/admin" : "/");
     },
     onError: (err: any) => {
       setError(err.message || "خطا در ورود. لطفا مجددا تلاش کنید.");

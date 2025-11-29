@@ -26,7 +26,14 @@ export default function Register() {
 
   const registerMutation = useMutation({
     mutationFn: async (data: { fullName: string; email: string; password: string }) => {
-      return apiRequest("POST", "/api/register", data);
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const responseData = await res.json();
+      if (!res.ok) throw new Error(responseData.error || "خطا در ثبت‌نام");
+      return responseData;
     },
     onSuccess: (data: any) => {
       localStorage.setItem("auth", JSON.stringify(data));
