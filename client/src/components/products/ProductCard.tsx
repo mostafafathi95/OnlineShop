@@ -19,6 +19,8 @@ export default function ProductCard({ product }: ProductCardProps) {
     return Number(price).toLocaleString("fa-IR");
   };
 
+  const [isAnimating, setIsAnimating] = React.useState(false);
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -31,6 +33,10 @@ export default function ProductCard({ product }: ProductCardProps) {
       });
       return;
     }
+
+    // Trigger animation
+    setIsAnimating(true);
+    setTimeout(() => setIsAnimating(false), 600);
 
     addItem(product);
     toast({
@@ -54,11 +60,13 @@ export default function ProductCard({ product }: ProductCardProps) {
         className="group overflow-visible h-full hover-elevate cursor-pointer"
         data-testid={`card-product-${product.id}`}
       >
-        <div className="relative aspect-[4/5] overflow-hidden rounded-t-lg bg-muted">
+        <div className="relative aspect-[4/5] overflow-visible rounded-t-lg bg-muted">
           <img
             src={product.image || "https://placehold.co/400x500/e2e8f0/64748b?text=No+Image"}
             alt={product.name}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className={`h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 ${
+              isAnimating ? "animate-cart-drop" : ""
+            }`}
           />
           {discount > 0 && (
             <Badge
@@ -114,6 +122,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               variant="default"
               onClick={handleAddToCart}
               disabled={product.stock <= 0}
+              className={isAnimating ? "animate-cart-bounce" : ""}
               data-testid={`button-add-to-cart-${product.id}`}
             >
               <ShoppingCart className="h-4 w-4" />
