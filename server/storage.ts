@@ -116,6 +116,11 @@ export interface IStorage {
   createOrder(order: InsertOrder, items: InsertOrderItem[]): Promise<Order>;
   updateOrderStatus(id: number, status: string): Promise<Order | undefined>;
 
+  // Product Comparisons
+  getComparison(sessionId: string): Promise<any[]>;
+  addToComparison(sessionId: string, product1Id: number, product2Id: number): Promise<any>;
+  removeFromComparison(sessionId: string, product1Id: number, product2Id: number): Promise<void>;
+
   // Stats
   getStats(): Promise<{
     totalProducts: number;

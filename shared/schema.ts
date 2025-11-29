@@ -78,6 +78,7 @@ export const products = pgTable("products", {
   stock: integer("stock").default(0).notNull(),
   categoryId: integer("category_id").references(() => categories.id),
   image: varchar("image"),
+  videoUrl: varchar("video_url"),
   isActive: boolean("is_active").default(true).notNull(),
   isFeatured: boolean("is_featured").default(false).notNull(),
   weight: decimal("weight", { precision: 10, scale: 2 }),
@@ -132,6 +133,15 @@ export const coupons = pgTable("coupons", {
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => [index("idx_active_coupons").on(table.isActive)]);
+
+// Product comparisons table
+export const productComparisons = pgTable("product_comparisons", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  sessionId: varchar("session_id").notNull(),
+  product1Id: integer("product1_id").references(() => products.id, { onDelete: 'cascade' }).notNull(),
+  product2Id: integer("product2_id").references(() => products.id, { onDelete: 'cascade' }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [index("idx_comparison_session").on(table.sessionId)]);
 
 // Addresses table
 export const addresses = pgTable("addresses", {
