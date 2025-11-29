@@ -390,7 +390,7 @@ export default function Checkout() {
               </Card>
             )}
 
-            {currentStep === 2 && (
+            <CheckoutStepContent isActive={currentStep === 2}>
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -449,9 +449,9 @@ export default function Checkout() {
                   </div>
                 </CardContent>
               </Card>
-            )}
+            </CheckoutStepContent>
 
-            {currentStep === 3 && (
+            <CheckoutStepContent isActive={currentStep === 3}>
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -514,7 +514,7 @@ export default function Checkout() {
                   </div>
                 </CardContent>
               </Card>
-            )}
+            </CheckoutStepContent>
 
             <div className="flex justify-between mt-6">
               {currentStep > 1 ? (
