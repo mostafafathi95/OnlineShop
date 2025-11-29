@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;700;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -205,8 +207,6 @@
 }
 
 /* ==================== TYPOGRAPHY SYSTEM 2025 ==================== */
-
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;700;900&display=swap');
 
 /* Persian/Arabic Typography */
 [dir="rtl"] {
