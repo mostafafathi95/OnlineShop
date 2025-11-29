@@ -17,6 +17,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/components/layout/ThemeProvider";
 import { useCartStore } from "@/stores/cartStore";
 import CartDrawer from "@/components/cart/CartDrawer";
+import { AdvancedSearchHeader } from "@/components/search/AdvancedSearchHeader";
 
 const navigation = [
   { name: "خانه", href: "/" },
@@ -123,22 +124,9 @@ export default function Header() {
               </nav>
             </div>
 
-            <form
-              onSubmit={handleSearch}
-              className="hidden md:flex flex-1 max-w-md mx-4"
-            >
-              <div className="relative w-full">
-                <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="جستجوی محصولات..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pr-10 w-full"
-                  data-testid="input-search"
-                />
-              </div>
-            </form>
+            <div className="hidden md:flex flex-1 max-w-md mx-4">
+              <AdvancedSearchHeader />
+            </div>
 
             <div className="flex items-center gap-2">
               <Button
