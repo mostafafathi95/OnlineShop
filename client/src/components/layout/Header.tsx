@@ -23,6 +23,7 @@ const navigation = [
   { name: "محصولات", href: "/products" },
   { name: "درباره ما", href: "/about" },
   { name: "تماس با ما", href: "/contact" },
+  { name: "مدیریت", href: "/admin-access" },
 ];
 
 export default function Header() {
