@@ -12,6 +12,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Skeleton } from "@/components/ui/skeleton";
 import Layout from "@/components/layout/Layout";
 import ProductGrid from "@/components/products/ProductGrid";
+import { AdvancedSearch } from "@/components/discovery/AdvancedSearch";
+import { RecentlyViewed } from "@/components/discovery/RecentlyViewed";
 import { useQuery } from "@tanstack/react-query";
 import type { Product, Category } from "@shared/schema";
 
@@ -164,6 +166,15 @@ export default function Products() {
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <AdvancedSearch 
+            onSearch={(filters) => {
+              if (filters.query) setSearchQuery(filters.query);
+              if (filters.categories.length > 0) setSelectedCategory(filters.categories[0]);
+            }} 
+          />
+        </div>
+
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-2">محصولات</h1>
           <div className="flex flex-wrap items-center gap-2">
@@ -238,6 +249,10 @@ export default function Products() {
 
             <ProductGrid products={products || []} isLoading={productsLoading} />
           </div>
+        </div>
+
+        <div className="mt-12 pt-8 border-t">
+          <RecentlyViewed />
         </div>
       </div>
     </Layout>

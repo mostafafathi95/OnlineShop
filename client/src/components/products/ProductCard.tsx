@@ -1,10 +1,12 @@
 import { Link } from "wouter";
-import { ShoppingCart, Heart } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCartStore } from "@/stores/cartStore";
 import { useToast } from "@/hooks/use-toast";
+import { WishlistHeart } from "@/components/products/WishlistHeart";
 import type { Product } from "@shared/schema";
 
 interface ProductCardProps {
@@ -19,7 +21,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     return Number(price).toLocaleString("fa-IR");
   };
 
-  const [isAnimating, setIsAnimating] = React.useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -82,18 +84,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             </div>
           )}
           <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button
-              variant="secondary"
-              size="icon"
-              className="rounded-full"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-              }}
-              data-testid={`button-wishlist-${product.id}`}
-            >
-              <Heart className="h-4 w-4" />
-            </Button>
+            <WishlistHeart productId={product.id} size="md" />
           </div>
         </div>
         <CardContent className="p-4">

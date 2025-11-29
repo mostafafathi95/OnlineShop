@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Layout from "@/components/layout/Layout";
 import ProductGrid from "@/components/products/ProductGrid";
+import { RecentlyViewed } from "@/components/discovery/RecentlyViewed";
+import { SocialProof } from "@/components/discovery/SocialProof";
 import { useQuery } from "@tanstack/react-query";
 import type { Product, Category } from "@shared/schema";
 
@@ -169,6 +171,12 @@ export default function Landing() {
 
       <section className="py-16">
         <div className="container mx-auto px-4">
+          <RecentlyViewed />
+        </div>
+      </section>
+
+      <section className="py-16">
+        <div className="container mx-auto px-4">
           <Card className="bg-primary text-primary-foreground overflow-hidden">
             <CardContent className="p-8 md:p-12 text-center">
               <h2 className="text-2xl md:text-3xl font-bold mb-4">
@@ -196,6 +204,8 @@ export default function Landing() {
           </Card>
         </div>
       </section>
+
+      <SocialProof />
     </Layout>
   );
 }
