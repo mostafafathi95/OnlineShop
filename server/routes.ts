@@ -5,7 +5,7 @@ import {
   insertCategorySchema, insertProductSchema, insertAddressSchema, insertReviewSchema, insertCouponSchema,
   insertArticleSchema, insertNewsSchema, insertPageSchema, insertBrandSchema, insertProductAttributeSchema,
   insertShippingMethodSchema, insertCreditPointSchema, insertUserWalletSchema, insertUserRequestSchema,
-  insertSettingSchema, insertQuestionSchema, insertAnswerSchema
+  insertSettingSchema, insertQuestionSchema, insertAnswerSchema, insertSliderSchema
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -1368,6 +1368,65 @@ export async function registerRoutes(
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ error: "Failed to delete answer" });
+    }
+  });
+
+  // ==================== Sliders ====================
+  // Public Routes
+  app.get("/api/sliders", async (req, res) => {
+    try {
+      const sliders = await storage.getAllSliders();
+      res.json(sliders);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch sliders" });
+    }
+  });
+
+  app.get("/api/sliders/active", async (req, res) => {
+    try {
+      const sliders = await storage.getActiveSliders();
+      res.json(sliders);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch active sliders" });
+    }
+  });
+
+  // Admin Routes
+  app.get("/api/admin/sliders", requireAdmin, async (req, res) => {
+    try {
+      const sliders = await storage.getAllSliders();
+      res.json(sliders);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch sliders" });
+    }
+  });
+
+  app.post("/api/admin/sliders", requireAdmin, async (req, res) => {
+    try {
+      const data = insertSliderSchema.parse(req.body);
+      const slider = await storage.createSlider(data);
+      res.json(slider);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid slider data" });
+    }
+  });
+
+  app.patch("/api/admin/sliders/:id", requireAdmin, async (req, res) => {
+    try {
+      const data = insertSliderSchema.partial().parse(req.body);
+      const slider = await storage.updateSlider(parseInt(req.params.id), data);
+      res.json(slider);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid slider data" });
+    }
+  });
+
+  app.delete("/api/admin/sliders/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteSlider(parseInt(req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete slider" });
     }
   });
 

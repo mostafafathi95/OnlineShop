@@ -61,6 +61,9 @@ import Login from "@/pages/auth/Login";
 import Register from "@/pages/auth/Register";
 import AdminAccess from "@/pages/AdminAccess";
 
+import AdminSliders from "@/pages/admin/Sliders";
+import AdminSliderForm from "@/pages/admin/SliderForm";
+
 function Router() {
   return (
     <Switch>
@@ -117,6 +120,9 @@ function Router() {
       <Route path="/admin/shipping-methods/new" component={ShippingMethodsForm} />
       <Route path="/admin/shipping-methods/:id" component={ShippingMethodsForm} />
       <Route path="/admin/reports" component={AdminReports} />
+      <Route path="/admin/sliders" component={AdminSliders} />
+      <Route path="/admin/sliders/new" component={AdminSliderForm} />
+      <Route path="/admin/sliders/:id" component={AdminSliderForm} />
 
       <Route path="/:slug" component={StaticPage} />
       <Route component={NotFound} />
