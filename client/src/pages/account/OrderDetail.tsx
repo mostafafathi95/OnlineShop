@@ -257,3 +257,8 @@ export default function OrderDetail() {
     </Layout>
   );
 }
+
+// Note: This component displays order status tracking.
+// Status badges show: pending → processing → shipped → delivered
+// Users can cancel orders with pending/processing status
+// Payment status shows if transaction completed successfully

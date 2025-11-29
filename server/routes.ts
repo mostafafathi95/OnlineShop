@@ -196,6 +196,9 @@ export async function registerRoutes(
         if (!product) {
           return res.status(404).json({ error: "Product not found" });
         }
+        if (product.stock < item.quantity) {
+          return res.status(400).json({ error: `Not enough stock for ${product.name}. Available: ${product.stock}` });
+        }
         totalAmount += Number(product.price) * item.quantity;
         orderItems.push({ productId: item.productId, quantity: item.quantity });
       }
@@ -335,10 +338,29 @@ export async function registerRoutes(
   app.patch("/api/admin/orders/:id/status", requireAdmin, async (req, res) => {
     try {
       const { status } = req.body;
+      if (!["pending", "processing", "shipped", "delivered", "cancelled"].includes(status)) {
+        return res.status(400).json({ error: "Invalid status" });
+      }
       const order = await storage.updateOrder(parseInt(req.params.id), { status });
       res.json(order);
     } catch (error) {
       res.status(500).json({ error: "Failed to update order" });
+    }
+  });
+
+  app.patch("/api/orders/:id/cancel", requireAuth, async (req, res) => {
+    try {
+      const order = await storage.getOrder(parseInt(req.params.id));
+      if (!order || order.userId !== (req.user as any).id) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+      if (order.status !== "pending" && order.status !== "processing") {
+        return res.status(400).json({ error: "Cannot cancel order with status: " + order.status });
+      }
+      const updated = await storage.updateOrder(parseInt(req.params.id), { status: "cancelled" });
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to cancel order" });
     }
   });
 
@@ -565,9 +587,24 @@ export async function registerRoutes(
   app.get("/api/payment/success", requireAuth, async (req, res) => {
     try {
       const { orderId } = req.query;
+      if (orderId) {
+        await storage.updateOrder(parseInt(orderId as string), {
+          paymentStatus: "completed",
+          status: "processing"
+        });
+      }
       res.redirect(`/account/orders/${orderId}`);
     } catch (error) {
       res.status(500).json({ error: "Failed" });
+    }
+  });
+
+  app.get("/api/admin/stats", requireAdmin, async (req, res) => {
+    try {
+      const stats = await storage.getStats?.() || { totalProducts: 0, totalOrders: 0, totalUsers: 0, totalRevenue: 0 };
+      res.json(stats);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch stats" });
     }
   });
 
