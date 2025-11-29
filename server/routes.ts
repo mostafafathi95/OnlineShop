@@ -676,7 +676,7 @@ export async function registerRoutes(
   // Seed data endpoint
   app.post("/api/seed", async (req, res) => {
     try {
-      // Try to create users - ignore if they already exist
+      // Create users
       try {
         const adminUser = await storage.getUserByEmail("admin@example.com");
         if (!adminUser) {
@@ -701,7 +701,128 @@ export async function registerRoutes(
         }
       } catch (e) {}
 
-      res.json({ success: true, message: "Seed data processed" });
+      // Create categories
+      const categories = [
+        { name: "الکترونیکی", nameEn: "Electronics", slug: "electronics", description: "محصولات الکترونیکی و تکنولوژی" },
+        { name: "پوشاک", nameEn: "Fashion", slug: "fashion", description: "لباس و پوشاک برای تمام فصول" },
+        { name: "خانه و آشپزخانه", nameEn: "Home", slug: "home", description: "محصولات خانگی و آشپزخانه" },
+        { name: "کتاب", nameEn: "Books", slug: "books", description: "کتاب‌های الکترونیکی و فیزیکی" },
+        { name: "ورزش", nameEn: "Sports", slug: "sports", description: "تجهیزات و لوازم ورزشی" }
+      ];
+
+      const createdCategories: any[] = [];
+      for (const cat of categories) {
+        try {
+          const existing = await storage.getCategoryBySlug(cat.slug);
+          if (!existing) {
+            const created = await storage.createCategory(cat);
+            createdCategories.push(created);
+          } else {
+            createdCategories.push(existing);
+          }
+        } catch (e) {}
+      }
+
+      // Create products
+      if (createdCategories.length > 0) {
+        const products = [
+          {
+            name: "لپ‌تاپ اچ‌پی",
+            nameEn: "HP Laptop",
+            slug: "hp-laptop",
+            description: "لپ‌تاپ قدرتمند HP با پروسسور نسل جدید",
+            shortDescription: "لپ‌تاپ با قابلیت‌های عالی",
+            price: "25000000",
+            comparePrice: "28000000",
+            sku: "HP-001",
+            stock: 15,
+            categoryId: createdCategories[0]?.id || 1,
+            image: "https://via.placeholder.com/500x500?text=HP+Laptop",
+            isFeatured: true
+          },
+          {
+            name: "تیشرت فشن",
+            nameEn: "Fashion T-Shirt",
+            slug: "fashion-tshirt",
+            description: "تیشرت کتان راحت و شیک برای تمام سنین",
+            shortDescription: "تیشرت مریلی و شیک",
+            price: "350000",
+            comparePrice: "500000",
+            sku: "TSHIRT-001",
+            stock: 50,
+            categoryId: createdCategories[1]?.id || 2,
+            image: "https://via.placeholder.com/500x500?text=T-Shirt",
+            isFeatured: true
+          },
+          {
+            name: "قابلمه استیل",
+            nameEn: "Stainless Steel Pot",
+            slug: "steel-pot",
+            description: "قابلمه با کیفیت بالا از جنس استیل ضدزنگ",
+            shortDescription: "قابلمه استیل دوبلکس",
+            price: "450000",
+            comparePrice: "600000",
+            sku: "POT-001",
+            stock: 30,
+            categoryId: createdCategories[2]?.id || 3,
+            image: "https://via.placeholder.com/500x500?text=Steel+Pot",
+            isFeatured: false
+          },
+          {
+            name: "کتاب مثیر",
+            nameEn: "Inspiring Book",
+            slug: "inspiring-book",
+            description: "کتاب تاثیرگذار درباره موفقیت و رشد شخصی",
+            shortDescription: "کتاب الهام بخش برای زندگی بهتر",
+            price: "75000",
+            comparePrice: "95000",
+            sku: "BOOK-001",
+            stock: 100,
+            categoryId: createdCategories[3]?.id || 4,
+            image: "https://via.placeholder.com/500x500?text=Inspiring+Book",
+            isFeatured: false
+          },
+          {
+            name: "دمبل 10 کیلویی",
+            nameEn: "10kg Dumbbell",
+            slug: "dumbbell-10kg",
+            description: "دمبل با وزن 10 کیلوگرم برای تمرینات قدرتی",
+            shortDescription: "دمبل فولادی 10 کیلو",
+            price: "1200000",
+            comparePrice: "1500000",
+            sku: "DUMBBELL-001",
+            stock: 25,
+            categoryId: createdCategories[4]?.id || 5,
+            image: "https://via.placeholder.com/500x500?text=Dumbbell",
+            isFeatured: false
+          },
+          {
+            name: "هدفون بلوتوث",
+            nameEn: "Bluetooth Headphone",
+            slug: "bluetooth-headphone",
+            description: "هدفون بی‌سیم با صدای بالا و باتری دوام",
+            shortDescription: "هدفون بلوتوث مدرن",
+            price: "2500000",
+            comparePrice: "3200000",
+            sku: "HEADPHONE-001",
+            stock: 40,
+            categoryId: createdCategories[0]?.id || 1,
+            image: "https://via.placeholder.com/500x500?text=Headphones",
+            isFeatured: true
+          }
+        ];
+
+        for (const prod of products) {
+          try {
+            const existing = await storage.getProductBySlug(prod.slug);
+            if (!existing) {
+              await storage.createProduct(prod);
+            }
+          } catch (e) {}
+        }
+      }
+
+      res.json({ success: true, message: "Seed data processed successfully" });
     } catch (error) {
       res.json({ success: true, message: "Seed attempted" });
     }
