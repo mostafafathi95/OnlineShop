@@ -1430,6 +1430,60 @@ export async function registerRoutes(
     }
   });
 
+  // ==================== BANNERS ROUTES ====================
+  
+  // Public - Get all active banners
+  app.get("/api/banners", async (req, res) => {
+    try {
+      const banners = await storage.getAllBanners();
+      res.json(banners);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch banners" });
+    }
+  });
+
+  // Admin - Get all banners
+  app.get("/api/banners/admin", requireAdmin, async (req, res) => {
+    try {
+      const banners = await storage.getAllBannersAdmin();
+      res.json(banners);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch banners" });
+    }
+  });
+
+  // Admin - Create banner
+  app.post("/api/banners", requireAdmin, async (req, res) => {
+    try {
+      const data = insertBannerSchema.parse(req.body);
+      const banner = await storage.createBanner(data);
+      res.json(banner);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid banner data" });
+    }
+  });
+
+  // Admin - Update banner
+  app.put("/api/banners/:id", requireAdmin, async (req, res) => {
+    try {
+      const data = insertBannerSchema.partial().parse(req.body);
+      const banner = await storage.updateBanner(parseInt(req.params.id), data);
+      res.json(banner);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid banner data" });
+    }
+  });
+
+  // Admin - Delete banner
+  app.delete("/api/banners/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteBanner(parseInt(req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete banner" });
+    }
+  });
+
   // ==================== SEARCH ROUTES ====================
 
   // Advanced Search - Full-text search with fuzzy matching
