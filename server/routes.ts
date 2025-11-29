@@ -83,6 +83,67 @@ export async function registerRoutes(
 
   // ==================== Auth Routes ====================
   
+  app.post("/api/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      if (!email || !password) {
+        return res.status(400).json({ error: "ایمیل و رمز عبور ضروری است" });
+      }
+      
+      const user = await storage.getUserByEmail(email);
+      if (!user || user.password !== password) {
+        return res.status(401).json({ error: "ایمیل یا رمز عبور اشتباه است" });
+      }
+      
+      // Generate token
+      const token = `auth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const sessionId = `session_${Date.now()}`;
+      
+      res.json({
+        success: true,
+        token,
+        user: { id: user.id, email: user.email, fullName: user.fullName, role: user.role }
+      });
+    } catch (error) {
+      res.status(500).json({ error: "خطای سرور" });
+    }
+  });
+
+  app.post("/api/register", async (req, res) => {
+    try {
+      const { fullName, email, password } = req.body;
+      if (!fullName || !email || !password) {
+        return res.status(400).json({ error: "تمام فیلدها ضروری هستند" });
+      }
+      
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ error: "این ایمیل قبلاً ثبت شده است" });
+      }
+      
+      const user = await storage.createUser({
+        fullName,
+        email,
+        password,
+        role: "customer"
+      });
+      
+      const token = `auth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      res.json({
+        success: true,
+        token,
+        user: { id: user.id, email: user.email, fullName: user.fullName, role: user.role }
+      });
+    } catch (error) {
+      res.status(500).json({ error: "خطای سرور" });
+    }
+  });
+
+  app.post("/api/logout", async (req, res) => {
+    res.json({ success: true });
+  });
+  
   app.get("/api/auth/user", requireAuth, async (req, res) => {
     try {
       const user = await storage.getUser((req.user as any).id);
