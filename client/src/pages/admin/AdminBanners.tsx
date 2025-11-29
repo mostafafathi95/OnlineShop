@@ -22,7 +22,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Plus, Edit, Trash2, ChevronUp, ChevronDown } from "lucide-react";
+import { Plus, Edit, Trash2, ChevronUp, ChevronDown, Upload, X as XIcon } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Banner, InsertBanner } from "@shared/schema";
@@ -31,6 +31,7 @@ export default function AdminBanners() {
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState<InsertBanner>({
     title: "",
     subtitle: "",
@@ -275,6 +276,59 @@ export default function AdminBanners() {
                   maxLength={2}
                   data-testid="input-banner-icon"
                 />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium">تصویر بنر</label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    disabled={uploading}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setUploading(true);
+                        const formDataUpload = new FormData();
+                        formDataUpload.append('file', file);
+                        try {
+                          const response = await fetch('/api/upload', {
+                            method: 'POST',
+                            body: formDataUpload,
+                          });
+                          const data = await response.json();
+                          if (data.success) {
+                            setFormData({ ...formData, imageUrl: data.imageUrl });
+                            toast({ title: "تصویر آپلود شد" });
+                          }
+                        } catch (error) {
+                          toast({ title: "خطا در آپلود", variant: "destructive" });
+                        } finally {
+                          setUploading(false);
+                        }
+                      }
+                    }}
+                    data-testid="input-banner-image"
+                  />
+                  {formData.imageUrl && (
+                    <button
+                      onClick={() => setFormData({ ...formData, imageUrl: "" })}
+                      className="p-2 hover-elevate"
+                      type="button"
+                      data-testid="button-remove-image"
+                    >
+                      <XIcon className="h-4 w-4 text-red-500" />
+                    </button>
+                  )}
+                </div>
+                {formData.imageUrl && (
+                  <img
+                    src={formData.imageUrl}
+                    alt="Banner preview"
+                    className="mt-2 h-20 rounded object-cover"
+                    data-testid="img-banner-preview"
+                  />
+                )}
               </div>
 
               <div className="flex items-center gap-4">

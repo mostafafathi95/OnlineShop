@@ -1,11 +1,12 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { upload, getImageUrl, deleteImage } from "./utils/upload";
 import { 
   insertCategorySchema, insertProductSchema, insertAddressSchema, insertReviewSchema, insertCouponSchema,
   insertArticleSchema, insertNewsSchema, insertPageSchema, insertBrandSchema, insertProductAttributeSchema,
   insertShippingMethodSchema, insertCreditPointSchema, insertUserWalletSchema, insertUserRequestSchema,
-  insertSettingSchema, insertQuestionSchema, insertAnswerSchema, insertSliderSchema
+  insertSettingSchema, insertQuestionSchema, insertAnswerSchema, insertSliderSchema, insertBannerSchema
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -1477,10 +1478,32 @@ export async function registerRoutes(
   // Admin - Delete banner
   app.delete("/api/banners/:id", requireAdmin, async (req, res) => {
     try {
+      const banner = await storage.getBannerById(parseInt(req.params.id));
+      if (banner?.imageUrl) {
+        const filename = banner.imageUrl.split('/').pop();
+        if (filename) deleteImage(filename);
+      }
       await storage.deleteBanner(parseInt(req.params.id));
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ error: "Failed to delete banner" });
+    }
+  });
+
+  // Image Upload
+  app.post("/api/upload", requireAdmin, upload.single('file'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+      const imageUrl = getImageUrl(req.file.filename);
+      res.json({ 
+        success: true, 
+        imageUrl,
+        filename: req.file.filename
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Upload failed" });
     }
   });
 
