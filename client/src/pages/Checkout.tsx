@@ -15,6 +15,8 @@ import { useCartStore } from "@/stores/cartStore";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { StepProgressIndicator } from "@/components/checkout/StepProgressIndicator";
+import { CheckoutStepContent } from "@/components/checkout/CheckoutStepContent";
 import type { Address, Coupon } from "@shared/schema";
 
 const steps = [
@@ -242,41 +244,19 @@ export default function Checkout() {
   return (
     <Layout hideFooter>
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <nav className="flex items-center justify-center gap-2 md:gap-4">
-            {steps.map((step, index) => (
-              <div key={step.id} className="flex items-center">
-                <div
-                  className={`flex items-center gap-2 ${
-                    currentStep >= step.id ? "text-primary" : "text-muted-foreground"
-                  }`}
-                >
-                  <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${
-                      currentStep >= step.id
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-muted"
-                    }`}
-                  >
-                    {currentStep > step.id ? (
-                      <Check className="h-5 w-5" />
-                    ) : (
-                      <step.icon className="h-5 w-5" />
-                    )}
-                  </div>
-                  <span className="hidden sm:inline font-medium">{step.name}</span>
-                </div>
-                {index < steps.length - 1 && (
-                  <ArrowRight className="h-4 w-4 mx-2 md:mx-4 text-muted-foreground" />
-                )}
-              </div>
-            ))}
-          </nav>
-        </div>
+        <StepProgressIndicator 
+          steps={steps} 
+          currentStep={currentStep}
+          onStepClick={(step) => {
+            if (step < currentStep) {
+              setCurrentStep(step);
+            }
+          }}
+        />
 
         <div className="grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            {currentStep === 1 && (
+          <div className="lg:col-span-2 relative">
+            <CheckoutStepContent isActive={currentStep === 1}>
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
