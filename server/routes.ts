@@ -1430,5 +1430,111 @@ export async function registerRoutes(
     }
   });
 
+  // ==================== SEARCH ROUTES ====================
+
+  // Advanced Search - Full-text search
+  app.get("/api/search", async (req, res) => {
+    try {
+      const { q, category } = req.query;
+      if (!q) {
+        return res.status(400).json({ error: "Search query required" });
+      }
+
+      const query = q as string;
+      const products = await storage.searchProducts(query);
+      
+      // Track search analytics
+      if (req.user) {
+        await storage.trackSearch({
+          query,
+          userId: (req.user as any).id,
+          resultsCount: products.length,
+          isZeroResult: products.length === 0,
+          sessionId: req.sessionID,
+        });
+      }
+
+      res.json({ 
+        query, 
+        resultsCount: products.length, 
+        results: products.filter(p => p.isActive) 
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Search failed" });
+    }
+  });
+
+  // Autocomplete Suggestions
+  app.get("/api/search/autocomplete", async (req, res) => {
+    try {
+      const { q } = req.query;
+      if (!q || q.length < 2) {
+        return res.json({ suggestions: [] });
+      }
+
+      const query = (q as string).toLowerCase();
+      const products = await storage.searchProducts(query);
+      
+      // Build suggestions from products + categories
+      const categories = await storage.getAllCategories();
+      
+      const productSuggestions = products.slice(0, 5).map(p => ({
+        type: "product",
+        id: p.id,
+        title: p.name,
+        icon: "🛍️"
+      }));
+
+      const categorySuggestions = categories
+        .filter(c => c.name?.toLowerCase().includes(query))
+        .slice(0, 3)
+        .map(c => ({
+          type: "category",
+          id: c.id,
+          title: c.name,
+          icon: "📁"
+        }));
+
+      const suggestions = [...categorySuggestions, ...productSuggestions];
+
+      res.json({ suggestions: suggestions.slice(0, 8) });
+    } catch (error) {
+      res.status(500).json({ error: "Autocomplete failed" });
+    }
+  });
+
+  // Dynamic Filters
+  app.get("/api/search/filters", async (req, res) => {
+    try {
+      const { categoryId } = req.query;
+      const filters = await storage.getProductFilters(
+        categoryId ? parseInt(categoryId as string) : undefined
+      );
+      res.json(filters);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch filters" });
+    }
+  });
+
+  // Popular Searches
+  app.get("/api/search/popular", async (req, res) => {
+    try {
+      const popular = await storage.getPopularSearches(10);
+      res.json({ queries: popular });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch popular searches" });
+    }
+  });
+
+  // Zero-result Searches (admin only)
+  app.get("/api/search/zero-results", requireAdmin, async (req, res) => {
+    try {
+      const zeroResults = await storage.getZeroResultSearches(10);
+      res.json({ queries: zeroResults });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch zero-result searches" });
+    }
+  });
+
   return httpServer;
 }
