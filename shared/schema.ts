@@ -279,6 +279,23 @@ export const answers = pgTable("answers", {
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => [index("idx_answer_question").on(table.questionId)]);
 
+// Sliders table
+export const sliders = pgTable("sliders", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  title: varchar("title", { length: 200 }).notNull(),
+  slug: varchar("slug", { length: 200 }).notNull().unique(),
+  description: text("description"),
+  image: varchar("image").notNull(),
+  link: varchar("link"),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  sortOrder: integer("sort_order").default(0),
+  isActive: boolean("is_active").default(true).notNull(),
+  type: varchar("type", { length: 50 }).default("banner"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [index("idx_slider_slug").on(table.slug), index("idx_slider_active").on(table.isActive), index("idx_slider_dates").on(table.startDate), index("idx_slider_dates_end").on(table.endDate)]);
+
 // Addresses table
 export const addresses = pgTable("addresses", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
