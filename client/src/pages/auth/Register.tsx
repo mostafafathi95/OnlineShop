@@ -189,15 +189,7 @@ export default function Register() {
                     className="mt-1"
                   />
                   <label htmlFor="terms" className="text-sm cursor-pointer leading-relaxed">
-                    با{" "}
-                    <Link href="/terms" className="text-primary hover:underline">
-                      شرایط و ضوابط
-                    </Link>
-                    {" "}و{" "}
-                    <Link href="/privacy" className="text-primary hover:underline">
-                      سیاست حریم خصوصی
-                    </Link>
-                    {" "}موافق‌ام
+                    با شرایط و ضوابط و سیاست حریم خصوصی موافق‌ام
                   </label>
                 </div>
 

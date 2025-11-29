@@ -167,7 +167,7 @@ export default function Login() {
               <div className="flex gap-3">
                 <AlertCircle className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                 <p className="text-sm text-muted-foreground">
-                  برای تست از ایمیل <code className="bg-background px-2 py-1 rounded">test@example.com</code> و رمز <code className="bg-background px-2 py-1 rounded">password</code> استفاده کنید
+                  برای تست از ایمیل <code className="bg-background px-2 py-1 rounded">test@example.com</code> و رمز <code className="bg-background px-2 py-1 rounded">test123</code> استفاده کنید
                 </p>
               </div>
             </CardContent>

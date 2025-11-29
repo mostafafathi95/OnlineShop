@@ -83,6 +83,10 @@ export async function registerRoutes(
 
   // ==================== Auth Routes ====================
   
+  app.post("/api/logout", async (req, res) => {
+    res.json({ success: true });
+  });
+
   app.post("/api/login", async (req, res) => {
     try {
       const { email, password } = req.body;

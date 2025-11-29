@@ -11,16 +11,27 @@ export async function apiRequest(
   method: string,
   url: string,
   data?: unknown | undefined,
-): Promise<Response> {
+): Promise<any> {
+  const auth = localStorage.getItem("auth");
+  const headers: HeadersInit = data ? { "Content-Type": "application/json" } : {};
+  
+  if (auth) {
+    const authData = JSON.parse(auth);
+    if (authData.token) {
+      headers["Authorization"] = `Bearer ${authData.token}`;
+    }
+  }
+
   const res = await fetch(url, {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
+    headers,
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });
 
-  await throwIfResNotOk(res);
-  return res;
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || res.statusText);
+  return json;
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";
@@ -50,7 +61,18 @@ export const getQueryFn: <T>(options: {
       }
     }
     
+    const auth = localStorage.getItem("auth");
+    const headers: HeadersInit = {};
+    
+    if (auth) {
+      const authData = JSON.parse(auth);
+      if (authData.token) {
+        headers["Authorization"] = `Bearer ${authData.token}`;
+      }
+    }
+    
     const res = await fetch(url, {
+      headers,
       credentials: "include",
     });
 

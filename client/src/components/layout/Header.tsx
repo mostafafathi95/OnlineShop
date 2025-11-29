@@ -213,17 +213,22 @@ export default function Header() {
                       </>
                     )}
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <a href="/api/logout" className="w-full cursor-pointer text-destructive" data-testid="link-logout">
-                        <LogOut className="ml-2 h-4 w-4" />
-                        خروج
-                      </a>
+                    <DropdownMenuItem 
+                      onClick={() => {
+                        localStorage.removeItem("auth");
+                        window.location.href = "/";
+                      }}
+                      className="w-full cursor-pointer text-destructive" 
+                      data-testid="link-logout"
+                    >
+                      <LogOut className="ml-2 h-4 w-4" />
+                      خروج
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
                 <Button asChild data-testid="button-login">
-                  <a href="/api/login">ورود</a>
+                  <Link href="/login">ورود</Link>
                 </Button>
               )}
             </div>
