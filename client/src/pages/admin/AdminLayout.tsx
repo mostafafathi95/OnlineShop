@@ -49,6 +49,7 @@ const navigation = [
   { name: "پرسش‌ها", href: "/admin/questions", icon: HelpCircle },
   { name: "پاسخ‌ها", href: "/admin/answers", icon: MessageSquare },
   { name: "کیف‌پول کاربران", href: "/admin/user-wallets", icon: Wallet },
+  { name: "گزارشات", href: "/admin/reports", icon: TrendingUp },
   { name: "تنظیمات", href: "/admin/settings", icon: Settings },
 ];
 

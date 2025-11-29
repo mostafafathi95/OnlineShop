@@ -15,6 +15,11 @@ import Checkout from "@/pages/Checkout";
 import About from "@/pages/About";
 import Contact from "@/pages/Contact";
 import Terms from "@/pages/Terms";
+import Articles from "@/pages/Articles";
+import ArticleDetail from "@/pages/ArticleDetail";
+import News from "@/pages/News";
+import NewsDetail from "@/pages/NewsDetail";
+import StaticPage from "@/pages/StaticPage";
 
 import AccountDashboard from "@/pages/account/Dashboard";
 import AccountOrders from "@/pages/account/Orders";
@@ -47,6 +52,7 @@ import AdminAnswers from "@/pages/admin/Answers";
 import AdminUserWallets from "@/pages/admin/UserWallets";
 import ProductAttributesForm from "@/pages/admin/ProductAttributesForm";
 import ShippingMethodsForm from "@/pages/admin/ShippingMethodsForm";
+import AdminReports from "@/pages/admin/Reports";
 
 import AccountWishlist from "@/pages/account/Wishlist";
 import AccountReviews from "@/pages/account/Reviews";
@@ -70,6 +76,10 @@ function Router() {
       <Route path="/about" component={About} />
       <Route path="/contact" component={Contact} />
       <Route path="/terms" component={Terms} />
+      <Route path="/articles" component={Articles} />
+      <Route path="/articles/:slug" component={ArticleDetail} />
+      <Route path="/news" component={News} />
+      <Route path="/news/:slug" component={NewsDetail} />
 
       <Route path="/account" component={AccountDashboard} />
       <Route path="/account/orders" component={AccountOrders} />
@@ -106,7 +116,9 @@ function Router() {
       <Route path="/admin/product-attributes/:id" component={ProductAttributesForm} />
       <Route path="/admin/shipping-methods/new" component={ShippingMethodsForm} />
       <Route path="/admin/shipping-methods/:id" component={ShippingMethodsForm} />
+      <Route path="/admin/reports" component={AdminReports} />
 
+      <Route path="/:slug" component={StaticPage} />
       <Route component={NotFound} />
     </Switch>
   );
