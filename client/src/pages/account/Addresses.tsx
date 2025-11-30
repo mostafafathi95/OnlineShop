@@ -13,6 +13,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
@@ -187,6 +188,9 @@ export default function Addresses() {
                 <DialogTitle>
                   {editingAddress ? "ویرایش آدرس" : "افزودن آدرس جدید"}
                 </DialogTitle>
+                <DialogDescription>
+                  {editingAddress ? "اطلاعات آدرس را ویرایش کنید" : "یک آدرس تحویل جدید اضافه کنید"}
+                </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 mt-4">
                 <div className="grid grid-cols-2 gap-4">
