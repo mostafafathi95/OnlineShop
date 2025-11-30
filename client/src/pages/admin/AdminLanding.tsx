@@ -20,12 +20,22 @@ export default function AdminLanding() {
         method: "PUT",
         body: JSON.stringify({ isVisible: section.isVisible }),
       }),
-    onSuccess: () => {
+    onSuccess: (updatedSection: LandingPageSection) => {
+      // Invalidate both admin and public queries for immediate sync
       queryClient.invalidateQueries({ queryKey: ["/api/admin/landing-sections"] });
-      toast({ title: "تنظیمات ذخیره شد", description: "بخش‌های صفحه اصلی به‌روز شدند" });
+      queryClient.invalidateQueries({ queryKey: ["/api/landing-sections"] });
+      
+      toast({
+        title: updatedSection.isVisible ? "بخش فعال شد" : "بخش غیرفعال شد",
+        description: `${updatedSection.title} با موفقیت به‌روز شد`,
+      });
     },
-    onError: () => {
-      toast({ title: "خطا", description: "مشکلی در به‌روز‌رسانی پیش آمد", variant: "destructive" });
+    onError: (error: any) => {
+      toast({
+        title: "خطا",
+        description: error?.message || "مشکلی در به‌روز‌رسانی پیش آمد",
+        variant: "destructive",
+      });
     },
   });
 

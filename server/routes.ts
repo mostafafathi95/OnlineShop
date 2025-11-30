@@ -1670,11 +1670,25 @@ export async function registerRoutes(
   // Admin - Update landing section visibility
   app.put("/api/admin/landing-sections/:id", requireAdmin, async (req, res) => {
     try {
+      const id = parseInt(req.params.id);
       const { isVisible } = req.body;
-      const section = await storage.updateLandingSection(parseInt(req.params.id), { isVisible });
+
+      // Validation
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid section ID" });
+      }
+      if (typeof isVisible !== "boolean") {
+        return res.status(400).json({ error: "isVisible must be a boolean" });
+      }
+
+      const section = await storage.updateLandingSection(id, { isVisible });
+      if (!section) {
+        return res.status(404).json({ error: "Section not found" });
+      }
+
       res.json(section);
-    } catch (error) {
-      res.status(400).json({ error: "Failed to update section" });
+    } catch (error: any) {
+      res.status(400).json({ error: error.message || "Failed to update section" });
     }
   });
 

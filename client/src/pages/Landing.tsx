@@ -65,13 +65,19 @@ export default function Landing() {
     queryKey: ["/api/categories"],
   });
 
-  const { data: landingSections = [] } = useQuery({
+  const { data: landingSections = [], isLoading: sectionsLoading, error: sectionsError } = useQuery({
     queryKey: ["/api/landing-sections"],
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
+    retry: 2,
   });
 
   // Helper function to check if section is visible
-  const isSectionVisible = (key: string) => {
-    return landingSections.some(s => s.key === key && s.isVisible) || landingSections.length === 0;
+  // If API fails to load, show all sections by default
+  // If API loaded successfully but section not found, hide it
+  const isSectionVisible = (key: string): boolean => {
+    if (sectionsError) return true; // Show all if API error
+    if (landingSections.length === 0 && !sectionsError) return false; // Hide if explicitly disabled
+    return landingSections.some(s => s.key === key && s.isVisible);
   };
 
   return (
@@ -298,21 +304,35 @@ export default function Landing() {
 
       {/* NEWSLETTER SECTION */}
       {isSectionVisible("newsletter") && (
-      <section className="py-16 bg-gradient-to-r from-primary to-primary/80">
+      <section className="py-16 bg-gradient-to-r from-primary to-primary/80" data-testid="newsletter-section">
         <div className="container mx-auto px-4">
           <div className="max-w-md mx-auto text-center text-white">
             <h2 className="text-3xl font-bold mb-4">خبرنامه ما را دنبال کنید</h2>
             <p className="mb-6 opacity-90">آخرین پیشنهادات و محصولات جدید را اول دریافت کنید</p>
-            <div className="flex gap-2">
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const email = (e.currentTarget.elements.namedItem('newsletter-email') as HTMLInputElement)?.value;
+              if (email) {
+                console.log('Newsletter subscription:', email);
+              }
+            }} className="flex gap-2">
               <input
                 type="email"
+                name="newsletter-email"
                 placeholder="ایمیل خود را وارد کنید"
                 className="flex-1 px-4 py-3 rounded-lg text-right text-black"
+                required
+                data-testid="input-newsletter-email"
               />
-              <Button variant="secondary" className="rounded-lg">
+              <Button 
+                type="submit"
+                variant="secondary" 
+                className="rounded-lg"
+                data-testid="button-newsletter-subscribe"
+              >
                 ثبت‌نام
               </Button>
-            </div>
+            </form>
           </div>
         </div>
       </section>
