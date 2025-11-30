@@ -16,10 +16,7 @@ export default function AdminLanding() {
 
   const updateMutation = useMutation({
     mutationFn: (section: LandingPageSection) =>
-      apiRequest(`/api/admin/landing-sections/${section.id}`, {
-        method: "PUT",
-        body: JSON.stringify({ isVisible: section.isVisible }),
-      }),
+      apiRequest("PUT", `/api/admin/landing-sections/${section.id}`, { isVisible: section.isVisible }),
     onSuccess: (updatedSection: LandingPageSection) => {
       // Invalidate both admin and public queries for immediate sync
       queryClient.invalidateQueries({ queryKey: ["/api/admin/landing-sections"] });
