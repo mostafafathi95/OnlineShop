@@ -63,6 +63,7 @@ import AdminAccess from "@/pages/AdminAccess";
 
 import AdminSliders from "@/pages/admin/Sliders";
 import AdminSliderForm from "@/pages/admin/SliderForm";
+import AdminLanding from "@/pages/admin/AdminLanding";
 import SearchResults from "@/pages/SearchResults";
 
 function Router() {

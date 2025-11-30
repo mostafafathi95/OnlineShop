@@ -314,6 +314,19 @@ export const banners = pgTable("banners", {
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [index("idx_banner_active").on(table.isActive)]);
 
+// Landing Page Sections table
+export const landingPageSections = pgTable("landing_page_sections", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  key: varchar("key", { length: 100 }).unique().notNull(),
+  title: varchar("title", { length: 200 }).notNull(),
+  description: text("description"),
+  isVisible: boolean("is_visible").default(true).notNull(),
+  sortOrder: integer("sort_order").default(0),
+  config: jsonb("config"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [index("idx_landing_visible").on(table.isVisible)]);
+
 // Search Analytics table
 export const searchAnalytics = pgTable("search_analytics", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),

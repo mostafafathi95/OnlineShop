@@ -1655,6 +1655,39 @@ export async function registerRoutes(
     }
   });
 
+  // ==================== LANDING PAGE SECTIONS ====================
+  
+  // Admin - Get all landing sections
+  app.get("/api/admin/landing-sections", requireAdmin, async (req, res) => {
+    try {
+      const sections = await storage.getAllLandingSections();
+      res.json(sections);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch sections" });
+    }
+  });
+
+  // Admin - Update landing section visibility
+  app.put("/api/admin/landing-sections/:id", requireAdmin, async (req, res) => {
+    try {
+      const { isVisible } = req.body;
+      const section = await storage.updateLandingSection(parseInt(req.params.id), { isVisible });
+      res.json(section);
+    } catch (error) {
+      res.status(400).json({ error: "Failed to update section" });
+    }
+  });
+
+  // Public - Get visible landing sections
+  app.get("/api/landing-sections", async (req, res) => {
+    try {
+      const sections = await storage.getLandingVisibleSections();
+      res.json(sections);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch sections" });
+    }
+  });
+
   // ==================== ADMIN ROUTES ====================
   
   // Admin: Get all products

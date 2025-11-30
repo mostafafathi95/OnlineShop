@@ -26,6 +26,7 @@ import {
   answers,
   sliders,
   banners,
+  landingPageSections,
   searchAnalytics,
   type User,
   type UpsertUser,
@@ -76,6 +77,8 @@ import {
   type InsertSlider,
   type Banner,
   type InsertBanner,
+  type LandingPageSection,
+  type InsertLandingPageSection,
   type SearchAnalytics,
   type InsertSearchAnalytics,
 } from "@shared/schema";
@@ -1158,6 +1161,25 @@ export class DatabaseStorage implements IStorage {
 
   async getAllBannersAdmin(): Promise<Banner[]> {
     return db.select().from(banners).orderBy(desc(banners.createdAt));
+  }
+
+  // Landing Page Sections
+  async getAllLandingSections(): Promise<LandingPageSection[]> {
+    return db.select().from(landingPageSections).orderBy(asc(landingPageSections.sortOrder));
+  }
+
+  async getLandingVisibleSections(): Promise<LandingPageSection[]> {
+    return db.select().from(landingPageSections)
+      .where(eq(landingPageSections.isVisible, true))
+      .orderBy(asc(landingPageSections.sortOrder));
+  }
+
+  async updateLandingSection(id: number, data: Partial<InsertLandingPageSection>): Promise<LandingPageSection | undefined> {
+    const [updated] = await db.update(landingPageSections)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(landingPageSections.id, id))
+      .returning();
+    return updated;
   }
 
   // Search Analytics
