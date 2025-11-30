@@ -77,7 +77,7 @@ export default function Landing() {
   return (
     <Layout>
       {/* SLIDER SECTION - شامل 6 اسلائڈ */}
-      {isSectionVisible("slider") && sliders && sliders.length > 0 && (
+      {sliders && sliders.length > 0 && (
         <section className="w-full" data-testid="carousel-section">
           <Carousel 
             slides={sliders} 
@@ -246,7 +246,7 @@ export default function Landing() {
       )}
 
       {/* PRODUCTS SECTION */}
-      {isSectionVisible("products") && (
+      {isSectionVisible("products_featured") && (
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
@@ -275,13 +275,13 @@ export default function Landing() {
       </section>
       )}
 
-      {/* FEATURED PRODUCTS SECTION */}
-      {isSectionVisible("featured") && (
+      {/* TRENDING PRODUCTS SECTION */}
+      {isSectionVisible("products_trending") && (
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-3xl font-bold mb-2">محصولات پیشنهادی</h2>
+              <h2 className="text-3xl font-bold mb-2">محصولات محبوب</h2>
               <p className="text-muted-foreground">پرفروش‌ترین محصولات</p>
             </div>
             <Button variant="ghost" asChild>
@@ -292,6 +292,28 @@ export default function Landing() {
             </Button>
           </div>
           <ProductGrid products={featuredProducts?.slice(0, 8) || []} isLoading={productsLoading} />
+        </div>
+      </section>
+      )}
+
+      {/* NEWSLETTER SECTION */}
+      {isSectionVisible("newsletter") && (
+      <section className="py-16 bg-gradient-to-r from-primary to-primary/80">
+        <div className="container mx-auto px-4">
+          <div className="max-w-md mx-auto text-center text-white">
+            <h2 className="text-3xl font-bold mb-4">خبرنامه ما را دنبال کنید</h2>
+            <p className="mb-6 opacity-90">آخرین پیشنهادات و محصولات جدید را اول دریافت کنید</p>
+            <div className="flex gap-2">
+              <input
+                type="email"
+                placeholder="ایمیل خود را وارد کنید"
+                className="flex-1 px-4 py-3 rounded-lg text-right text-black"
+              />
+              <Button variant="secondary" className="rounded-lg">
+                ثبت‌نام
+              </Button>
+            </div>
+          </div>
         </div>
       </section>
       )}
