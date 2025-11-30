@@ -2062,5 +2062,218 @@ export async function registerRoutes(
     }
   });
 
+  // ==================== ORDERS ROUTES ====================
+
+  // Get user's orders
+  app.get("/api/orders", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const userOrders = await storage.getUserOrders(userId);
+      res.json(userOrders);
+    } catch (error) {
+      res.status(500).json({ error: "خطا در دریافت سفارشات" });
+    }
+  });
+
+  // Get order details
+  app.get("/api/orders/:id", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const orderId = parseInt(req.params.id);
+
+      const order = await storage.getOrderWithItems(orderId);
+      if (!order) {
+        return res.status(404).json({ error: "سفارش یافت نشد" });
+      }
+
+      // Verify ownership
+      if (order.userId !== userId && (req.user as any).role !== "admin") {
+        return res.status(403).json({ error: "دسترسی ممنوع" });
+      }
+
+      res.json(order);
+    } catch (error) {
+      res.status(500).json({ error: "خطا در دریافت جزئیات سفارش" });
+    }
+  });
+
+  // Create order (checkout)
+  app.post("/api/checkout", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const { items, shippingAddress, couponCode, notes } = req.body;
+
+      if (!items || items.length === 0) {
+        return res.status(400).json({ error: "سبد خرید خالی است" });
+      }
+
+      if (!shippingAddress) {
+        return res.status(400).json({ error: "آدرس تحویل الزامی است" });
+      }
+
+      // Calculate totals
+      let subtotal = 0;
+      const orderItems: any[] = [];
+
+      for (const item of items) {
+        const product = await storage.getProductById(item.productId);
+        if (!product) {
+          return res.status(400).json({ error: `محصول ${item.productId} یافت نشد` });
+        }
+
+        const itemTotal = Number(product.price) * item.quantity;
+        subtotal += itemTotal;
+
+        orderItems.push({
+          productId: item.productId,
+          productName: product.name,
+          productImage: product.image,
+          quantity: item.quantity,
+          price: product.price,
+        });
+      }
+
+      // Apply coupon if provided
+      let discount = 0;
+      if (couponCode) {
+        const coupon = await storage.getCouponByCode(couponCode);
+        if (coupon) {
+          discount = Math.floor(subtotal * (Number(coupon.discountPercent) / 100));
+        }
+      }
+
+      const shippingCost = subtotal > 500000 ? 0 : 50000;
+      const total = subtotal - discount + shippingCost;
+
+      // Create order
+      const order = await storage.createOrder(
+        {
+          userId,
+          orderNumber: generateOrderNumber(),
+          status: "pending",
+          subtotal: subtotal.toString(),
+          shippingCost: shippingCost.toString(),
+          discount: discount.toString(),
+          total: total.toString(),
+          shippingAddress: shippingAddress,
+          couponCode,
+          notes,
+        },
+        orderItems
+      );
+
+      // Clear cart
+      await storage.clearCart(userId);
+
+      res.json(order);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message || "خطا در ایجاد سفارش" });
+    }
+  });
+
+  // ==================== USER PROFILE ROUTES ====================
+
+  // Get current user
+  app.get("/api/auth/user", requireAuth, async (req, res) => {
+    try {
+      res.json(req.user);
+    } catch (error) {
+      res.status(500).json({ error: "خطا در دریافت اطلاعات کاربر" });
+    }
+  });
+
+  // Update user profile
+  app.patch("/api/auth/user", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const { firstName, lastName, phone } = req.body;
+
+      const updated = await storage.updateUser(userId, {
+        firstName: firstName || (req.user as any).firstName,
+        lastName: lastName || (req.user as any).lastName,
+        phone: phone || (req.user as any).phone,
+      });
+
+      if (!updated) {
+        return res.status(404).json({ error: "کاربر یافت نشد" });
+      }
+
+      res.json(updated);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message || "خطا در بروزرسانی پروفایل" });
+    }
+  });
+
+  // ==================== PAYMENT GATEWAY ROUTES ====================
+
+  // Initialize payment (Zarinpal)
+  app.post("/api/payment/zarinpal/initialize", requireAuth, async (req, res) => {
+    try {
+      const { orderId, amount, description } = req.body;
+
+      if (!orderId || !amount) {
+        return res.status(400).json({ error: "شناسه سفارش و مبلغ الزامی است" });
+      }
+
+      // Zarinpal API call
+      const zarinpalResponse = await fetch("https://api.zarinpal.com/rest/web/PaymentRequest.json", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          MerchantID: process.env.ZARINPAL_MERCHANT_ID || "test",
+          Amount: amount,
+          Description: description || `سفارش #${orderId}`,
+          CallbackURL: `${process.env.APP_URL || "http://localhost:5000"}/api/payment/zarinpal/callback`,
+        }),
+      });
+
+      const zarinpalData = await zarinpalResponse.json();
+
+      if (zarinpalData.Status !== 100) {
+        return res.status(400).json({ error: "خطا در اتصال به درگاه پرداخت" });
+      }
+
+      res.json({
+        paymentUrl: `https://www.zarinpal.com/pg/StartPay/${zarinpalData.Authority}`,
+        authority: zarinpalData.Authority,
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "خطا در ایجاد درخواست پرداخت" });
+    }
+  });
+
+  // Payment callback (Zarinpal)
+  app.post("/api/payment/zarinpal/callback", async (req, res) => {
+    try {
+      const { Authority, Status } = req.query;
+
+      if (!Authority || Status !== "OK") {
+        return res.status(400).json({ error: "پرداخت ناموفق" });
+      }
+
+      // Verify with Zarinpal
+      const amount = 0; // Would get from order
+      const verifyResponse = await fetch("https://api.zarinpal.com/rest/web/PaymentVerification.json", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          MerchantID: process.env.ZARINPAL_MERCHANT_ID || "test",
+          Authority,
+          Amount: amount,
+        }),
+      });
+
+      const verifyData = await verifyResponse.json();
+
+      if (verifyData.Status === 100) {
+        res.json({ success: true, refId: verifyData.RefID });
+      } else {
+        res.status(400).json({ error: "پرداخت تایید نشد" });
+      }
+    } catch (error) {
+      res.status(500).json({ error: "خطا در تایید پرداخت" });
+    }
+  });
+
   return httpServer;
 }
