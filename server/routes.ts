@@ -1655,5 +1655,113 @@ export async function registerRoutes(
     }
   });
 
+  // ==================== ADMIN ROUTES ====================
+  
+  // Admin: Get all products
+  app.get("/api/admin/products", requireAdmin, async (req, res) => {
+    try {
+      const products = await storage.getAllProducts({ limit: 1000 });
+      res.json(products);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch products" });
+    }
+  });
+
+  // Admin: Create product
+  app.post("/api/admin/products", requireAdmin, upload.single("image"), async (req, res) => {
+    try {
+      const validated = insertProductSchema.parse({
+        ...req.body,
+        price: parseInt(req.body.price),
+        comparePrice: req.body.comparePrice ? parseInt(req.body.comparePrice) : undefined,
+        categoryId: req.body.categoryId ? parseInt(req.body.categoryId) : undefined,
+        stock: parseInt(req.body.stock) || 0,
+        image: req.file ? getImageUrl(req.file.filename) : req.body.image,
+      });
+      const product = await storage.createProduct(validated);
+      res.json(product);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message || "Failed to create product" });
+    }
+  });
+
+  // Admin: Update product
+  app.put("/api/admin/products/:id", requireAdmin, upload.single("image"), async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const validated = insertProductSchema.partial().parse({
+        ...req.body,
+        price: req.body.price ? parseInt(req.body.price) : undefined,
+        comparePrice: req.body.comparePrice ? parseInt(req.body.comparePrice) : undefined,
+        categoryId: req.body.categoryId ? parseInt(req.body.categoryId) : undefined,
+        stock: req.body.stock ? parseInt(req.body.stock) : undefined,
+        image: req.file ? getImageUrl(req.file.filename) : req.body.image,
+      });
+      const product = await storage.updateProduct(id, validated);
+      res.json(product);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message || "Failed to update product" });
+    }
+  });
+
+  // Admin: Delete product
+  app.delete("/api/admin/products/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteProduct(parseInt(req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete product" });
+    }
+  });
+
+  // Admin: Get all categories
+  app.get("/api/admin/categories", requireAdmin, async (req, res) => {
+    try {
+      const categories = await storage.getAllCategories();
+      res.json(categories);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch categories" });
+    }
+  });
+
+  // Admin: Create category
+  app.post("/api/admin/categories", requireAdmin, upload.single("image"), async (req, res) => {
+    try {
+      const validated = insertCategorySchema.parse({
+        ...req.body,
+        image: req.file ? getImageUrl(req.file.filename) : req.body.image,
+      });
+      const category = await storage.createCategory(validated);
+      res.json(category);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message || "Failed to create category" });
+    }
+  });
+
+  // Admin: Update category
+  app.put("/api/admin/categories/:id", requireAdmin, upload.single("image"), async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const validated = insertCategorySchema.partial().parse({
+        ...req.body,
+        image: req.file ? getImageUrl(req.file.filename) : req.body.image,
+      });
+      const category = await storage.updateCategory(id, validated);
+      res.json(category);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message || "Failed to update category" });
+    }
+  });
+
+  // Admin: Delete category
+  app.delete("/api/admin/categories/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteCategory(parseInt(req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete category" });
+    }
+  });
+
   return httpServer;
 }
