@@ -13,6 +13,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -255,6 +256,9 @@ export default function AdminCategories() {
             <DialogTitle>
               {editingCategory ? "ویرایش دسته‌بندی" : "افزودن دسته‌بندی جدید"}
             </DialogTitle>
+            <DialogDescription>
+              {editingCategory ? "اطلاعات دسته‌بندی را ویرایش کنید" : "یک دسته‌بندی محصول جدید ایجاد کنید"}
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 mt-4">
             <div className="grid grid-cols-2 gap-4">
