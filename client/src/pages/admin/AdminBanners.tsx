@@ -22,7 +22,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Plus, Edit, Trash2, ChevronUp, ChevronDown, Upload, X as XIcon } from "lucide-react";
+import { Plus, Edit, Trash2, ChevronUp, ChevronDown, Upload, X as XIcon, CheckCircle, AlertCircle } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Banner, InsertBanner } from "@shared/schema";
@@ -279,15 +279,26 @@ export default function AdminBanners() {
               </div>
 
               <div>
-                <label className="text-sm font-medium">تصویر بنر</label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    disabled={uploading}
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
+                <label className="text-sm font-medium flex items-center gap-2">
+                  تصویر بنر (اختیاری)
+                  {formData.imageUrl && <CheckCircle className="h-4 w-4 text-green-600" />}
+                </label>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      disabled={uploading}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        
+                        // Validate file size (max 5MB)
+                        if (file.size > 5 * 1024 * 1024) {
+                          toast({ title: "حجم فایل بیشتر از 5MB است", variant: "destructive" });
+                          return;
+                        }
+                        
                         setUploading(true);
                         const formDataUpload = new FormData();
                         formDataUpload.append('file', file);
@@ -299,36 +310,52 @@ export default function AdminBanners() {
                           const data = await response.json();
                           if (data.success) {
                             setFormData({ ...formData, imageUrl: data.imageUrl });
-                            toast({ title: "تصویر آپلود شد" });
+                            toast({ title: "تصویر با موفقیت آپلود شد ✓" });
+                          } else {
+                            toast({ title: "خطا در آپلود تصویر", variant: "destructive" });
                           }
                         } catch (error) {
-                          toast({ title: "خطا در آپلود", variant: "destructive" });
+                          toast({ title: "خطای سرور در آپلود", variant: "destructive" });
                         } finally {
                           setUploading(false);
                         }
-                      }
-                    }}
-                    data-testid="input-banner-image"
-                  />
+                      }}
+                      data-testid="input-banner-image"
+                      className="cursor-pointer"
+                    />
+                    {formData.imageUrl && (
+                      <button
+                        onClick={() => setFormData({ ...formData, imageUrl: "" })}
+                        className="p-2 hover-elevate text-destructive"
+                        type="button"
+                        title="حذف تصویر"
+                        data-testid="button-remove-image"
+                      >
+                        <XIcon className="h-5 w-5" />
+                      </button>
+                    )}
+                  </div>
+                  {uploading && (
+                    <div className="flex items-center gap-2 text-sm text-blue-600">
+                      <Upload className="h-4 w-4 animate-spin" />
+                      درحال آپلود...
+                    </div>
+                  )}
                   {formData.imageUrl && (
-                    <button
-                      onClick={() => setFormData({ ...formData, imageUrl: "" })}
-                      className="p-2 hover-elevate"
-                      type="button"
-                      data-testid="button-remove-image"
-                    >
-                      <XIcon className="h-4 w-4 text-red-500" />
-                    </button>
+                    <div className="relative h-32 w-full rounded-lg overflow-hidden border-2 border-green-200 bg-green-50">
+                      <img
+                        src={formData.imageUrl}
+                        alt="Banner preview"
+                        className="w-full h-full object-cover"
+                        data-testid="img-banner-preview"
+                      />
+                      <div className="absolute top-2 right-2 bg-green-600 text-white px-2 py-1 rounded text-xs flex items-center gap-1">
+                        <CheckCircle className="h-3 w-3" />
+                        بارگذاری شد
+                      </div>
+                    </div>
                   )}
                 </div>
-                {formData.imageUrl && (
-                  <img
-                    src={formData.imageUrl}
-                    alt="Banner preview"
-                    className="mt-2 h-20 rounded object-cover"
-                    data-testid="img-banner-preview"
-                  />
-                )}
               </div>
 
               <div className="flex items-center gap-4">
