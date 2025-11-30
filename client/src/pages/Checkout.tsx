@@ -91,7 +91,7 @@ export default function Checkout() {
 
   const validateCouponMutation = useMutation({
     mutationFn: async (code: string) => {
-      return apiRequest("GET", `/api/coupons/validate/${code}`);
+      return apiRequest("POST", "/api/coupons/validate", { code });
     },
     onSuccess: (coupon: Coupon) => {
       setAppliedCoupon(coupon);
