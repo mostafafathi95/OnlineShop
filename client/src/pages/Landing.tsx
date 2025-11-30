@@ -65,10 +65,19 @@ export default function Landing() {
     queryKey: ["/api/categories"],
   });
 
+  const { data: landingSections = [] } = useQuery({
+    queryKey: ["/api/landing-sections"],
+  });
+
+  // Helper function to check if section is visible
+  const isSectionVisible = (key: string) => {
+    return landingSections.some(s => s.key === key && s.isVisible) || landingSections.length === 0;
+  };
+
   return (
     <Layout>
       {/* SLIDER SECTION - شامل 6 اسلائڈ */}
-      {sliders && sliders.length > 0 && (
+      {isSectionVisible("slider") && sliders && sliders.length > 0 && (
         <section className="w-full" data-testid="carousel-section">
           <Carousel 
             slides={sliders} 
@@ -78,6 +87,8 @@ export default function Landing() {
         </section>
       )}
 
+      {/* HERO SECTION */}
+      {isSectionVisible("hero") && (
       <section className="relative min-h-[80vh] flex items-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/30" />
         <div
@@ -151,11 +162,32 @@ export default function Landing() {
           </div>
         </div>
       </section>
+      )}
 
+      {/* DEALS SECTION */}
+      {isSectionVisible("deals") && (
+      <section className="py-12 bg-muted/50">
+        <div className="container mx-auto px-4">
+          <h2 className="text-2xl font-bold mb-8 text-center">پیشنهادات خاص</h2>
+          <div className="grid grid-cols-3 gap-4">
+            {deals.map((deal, idx) => (
+              <div key={idx} className={`${deal.color} text-white p-6 rounded-lg text-center hover-elevate cursor-pointer`}>
+                <div className="text-3xl font-bold mb-2">{deal.value}</div>
+                <div className="text-sm font-semibold">{deal.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+      )}
+
+      {/* BANNERS SECTION */}
+      {isSectionVisible("banners") && (
       <BannerSection />
+      )}
 
       {/* CATEGORIES SECTION */}
-      {categories && categories.length > 0 && (
+      {isSectionVisible("categories") && categories && categories.length > 0 && (
         <section className="py-16">
           <div className="container mx-auto px-4">
             <h2 className="text-3xl font-bold mb-12 text-center">دسته‌بندی‌ها</h2>
@@ -191,6 +223,8 @@ export default function Landing() {
         </section>
       )}
 
+      {/* FEATURES SECTION */}
+      {isSectionVisible("features") && (
       <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8">
@@ -209,7 +243,10 @@ export default function Landing() {
           </div>
         </div>
       </section>
+      )}
 
+      {/* PRODUCTS SECTION */}
+      {isSectionVisible("products") && (
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
@@ -236,7 +273,10 @@ export default function Landing() {
           <ProductGrid products={products || []} isLoading={productsLoading} />
         </div>
       </section>
+      )}
 
+      {/* FEATURED PRODUCTS SECTION */}
+      {isSectionVisible("featured") && (
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
@@ -254,6 +294,7 @@ export default function Landing() {
           <ProductGrid products={featuredProducts?.slice(0, 8) || []} isLoading={productsLoading} />
         </div>
       </section>
+      )}
     </Layout>
   );
 }

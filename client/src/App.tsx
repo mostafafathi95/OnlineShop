@@ -125,7 +125,9 @@ function Router() {
       <Route path="/admin/sliders" component={AdminSliders} />
       <Route path="/admin/sliders/new" component={AdminSliderForm} />
       <Route path="/admin/sliders/:id" component={AdminSliderForm} />
+      <Route path="/admin/landing" component={AdminLanding} />
 
+      <Route path="/search" component={SearchResults} />
       <Route path="/:slug" component={StaticPage} />
       <Route component={NotFound} />
     </Switch>

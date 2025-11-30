@@ -51,6 +51,8 @@ const navigation = [
   { name: "پاسخ‌ها", href: "/admin/answers", icon: MessageSquare },
   { name: "کیف‌پول کاربران", href: "/admin/user-wallets", icon: Wallet },
   { name: "اسلایدرها", href: "/admin/sliders", icon: Image },
+  { name: "بنرها", href: "/admin/banners", icon: Image },
+  { name: "صفحه اصلی", href: "/admin/landing", icon: LayoutDashboard },
   { name: "گزارشات", href: "/admin/reports", icon: TrendingUp },
   { name: "تنظیمات", href: "/admin/settings", icon: Settings },
 ];
