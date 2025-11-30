@@ -12,6 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -172,6 +173,9 @@ export default function AdminBanners() {
               <DialogTitle>
                 {editingId ? "ویرایش بنر" : "افزودن بنر جدید"}
               </DialogTitle>
+              <DialogDescription>
+                {editingId ? "بنر موجود را ویرایش کنید" : "یک بنر تبلیغاتی جدید ایجاد کنید"}
+              </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4">
