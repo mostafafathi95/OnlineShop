@@ -6,7 +6,8 @@ import {
   insertCategorySchema, insertProductSchema, insertAddressSchema, insertReviewSchema, insertCouponSchema,
   insertArticleSchema, insertNewsSchema, insertPageSchema, insertBrandSchema, insertProductAttributeSchema,
   insertShippingMethodSchema, insertCreditPointSchema, insertUserWalletSchema, insertUserRequestSchema,
-  insertSettingSchema, insertQuestionSchema, insertAnswerSchema, insertSliderSchema, insertBannerSchema
+  insertSettingSchema, insertQuestionSchema, insertAnswerSchema, insertSliderSchema, insertBannerSchema,
+  insertCartItemSchema
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -1807,6 +1808,101 @@ export async function registerRoutes(
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ error: "Failed to delete category" });
+    }
+  });
+
+  // ==================== CART ROUTES ====================
+
+  // Get user's cart
+  app.get("/api/cart", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const cartItems = await storage.getUserCart(userId);
+      res.json(cartItems);
+    } catch (error) {
+      res.status(500).json({ error: "خطا در دریافت سبد خرید" });
+    }
+  });
+
+  // Add to cart
+  app.post("/api/cart", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const { productId, quantity } = req.body;
+
+      // Validation
+      if (!productId || !quantity) {
+        return res.status(400).json({ error: "شناسه محصول و تعداد الزامی است" });
+      }
+
+      const validated = insertCartItemSchema.parse({
+        userId,
+        productId: parseInt(productId),
+        quantity: Math.max(1, parseInt(quantity) || 1),
+      });
+
+      const cartItem = await storage.addToCart(validated);
+      res.json(cartItem);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message || "خطا در اضافه کردن به سبد خرید" });
+    }
+  });
+
+  // Update cart item quantity
+  app.put("/api/cart/:id", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const cartItemId = parseInt(req.params.id);
+      const { quantity } = req.body;
+
+      if (!quantity || quantity < 1) {
+        return res.status(400).json({ error: "تعداد نباید کمتر از 1 باشد" });
+      }
+
+      // Verify ownership
+      const cartItems = await storage.getUserCart(userId);
+      const item = cartItems.find(ci => ci.id === cartItemId);
+      
+      if (!item) {
+        return res.status(404).json({ error: "محصول در سبد خرید یافت نشد" });
+      }
+
+      const updated = await storage.updateCartItem(cartItemId, parseInt(quantity));
+      res.json(updated);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message || "خطا در به‌روز‌رسانی سبد خرید" });
+    }
+  });
+
+  // Remove item from cart
+  app.delete("/api/cart/:id", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const cartItemId = parseInt(req.params.id);
+
+      // Verify ownership
+      const cartItems = await storage.getUserCart(userId);
+      const item = cartItems.find(ci => ci.id === cartItemId);
+      
+      if (!item) {
+        return res.status(404).json({ error: "محصول در سبد خرید یافت نشد" });
+      }
+
+      await storage.removeFromCart(cartItemId);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "خطا در حذف محصول از سبد خرید" });
+    }
+  });
+
+  // Clear entire cart
+  app.delete("/api/cart", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      await storage.clearCart(userId);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "خطا در خالی کردن سبد خرید" });
     }
   });
 
