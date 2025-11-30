@@ -534,18 +534,6 @@ export async function registerRoutes(
 
   // ==================== Coupon Routes ====================
 
-  app.get("/api/coupons/validate/:code", async (req, res) => {
-    try {
-      const coupon = await storage.getCouponByCode(req.params.code);
-      if (!coupon || !coupon.isActive || (coupon.expiresAt && new Date(coupon.expiresAt) < new Date())) {
-        return res.status(404).json({ error: "Invalid coupon" });
-      }
-      res.json(coupon);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to validate coupon" });
-    }
-  });
-
   app.get("/api/admin/coupons", requireAdmin, async (req, res) => {
     try {
       const coupons = await storage.getAllCoupons?.() || [];
