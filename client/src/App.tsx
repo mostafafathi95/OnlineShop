@@ -64,6 +64,7 @@ import AdminAccess from "@/pages/AdminAccess";
 import AdminSliders from "@/pages/admin/Sliders";
 import AdminSliderForm from "@/pages/admin/SliderForm";
 import AdminLanding from "@/pages/admin/AdminLanding";
+import AdminBanners from "@/pages/admin/AdminBanners";
 import SearchResults from "@/pages/SearchResults";
 
 function Router() {
@@ -125,6 +126,7 @@ function Router() {
       <Route path="/admin/sliders" component={AdminSliders} />
       <Route path="/admin/sliders/new" component={AdminSliderForm} />
       <Route path="/admin/sliders/:id" component={AdminSliderForm} />
+      <Route path="/admin/banners" component={AdminBanners} />
       <Route path="/admin/landing" component={AdminLanding} />
 
       <Route path="/search" component={SearchResults} />
