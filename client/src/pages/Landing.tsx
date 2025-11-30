@@ -61,6 +61,10 @@ export default function Landing() {
     queryKey: ["/api/sliders/active"],
   });
 
+  const { data: categories = [] } = useQuery({
+    queryKey: ["/api/categories"],
+  });
+
   return (
     <Layout>
       {/* SLIDER SECTION - شامل 6 اسلائڈ */}
@@ -149,6 +153,43 @@ export default function Landing() {
       </section>
 
       <BannerSection />
+
+      {/* CATEGORIES SECTION */}
+      {categories && categories.length > 0 && (
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold mb-12 text-center">دسته‌بندی‌ها</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
+              {categories.map((category: any) => (
+                <Link key={category.id} href={`/products?category=${category.slug}`} data-testid={`category-${category.id}`}>
+                  <div className="group cursor-pointer">
+                    <div className="relative overflow-hidden rounded-lg mb-3 h-40 bg-muted hover-elevate">
+                      {category.image ? (
+                        <img
+                          src={category.image}
+                          alt={category.name}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                          data-testid={`category-image-${category.id}`}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10">
+                          <div className="text-center">
+                            <div className="text-4xl mb-2">📦</div>
+                            <p className="text-xs text-muted-foreground">بدون عکس</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <h3 className="text-sm font-semibold text-center group-hover:text-primary transition-colors" data-testid={`category-name-${category.id}`}>
+                      {category.name}
+                    </h3>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
