@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import AdminLayout from "./AdminLayout";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -93,6 +93,9 @@ export default function AdminUserWallets() {
                         <DialogContent>
                           <DialogHeader>
                             <DialogTitle>شارژ کیف‌پول</DialogTitle>
+                            <DialogDescription>
+                              مبلغ مورد نظر را وارد کنید و تایید کنید
+                            </DialogDescription>
                           </DialogHeader>
                           <div className="space-y-4">
                             <div>
