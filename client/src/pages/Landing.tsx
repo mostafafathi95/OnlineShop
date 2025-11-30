@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/layout/Layout";
 import ProductGrid from "@/components/products/ProductGrid";
 import { BannerSection } from "@/components/landing/BannerSection";
+import { Carousel } from "@/components/Carousel";
 import { useQuery } from "@tanstack/react-query";
 import type { Product, Slider } from "@shared/schema";
 
@@ -62,6 +63,17 @@ export default function Landing() {
 
   return (
     <Layout>
+      {/* SLIDER SECTION - شامل 6 اسلائڈ */}
+      {sliders && sliders.length > 0 && (
+        <section className="w-full" data-testid="carousel-section">
+          <Carousel 
+            slides={sliders} 
+            autoPlay={true} 
+            autoPlayInterval={4000}
+          />
+        </section>
+      )}
+
       <section className="relative min-h-[80vh] flex items-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/30" />
         <div
@@ -117,58 +129,21 @@ export default function Landing() {
               </div>
             </div>
 
-            {sliders && sliders.length > 0 ? (
-              <div
-                className="relative w-full h-96 rounded-lg overflow-hidden group"
-                data-testid="slider-container"
-              >
-                {sliders.map((slide, idx) => (
-                  <div
-                    key={slide.id}
-                    className="absolute inset-0 transition-opacity duration-700"
-                    style={{ opacity: idx === 0 ? 1 : 0 }}
-                    data-testid={`slide-${idx}`}
-                  >
-                    <img
-                      src={slide.image}
-                      alt={slide.title}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/30" />
-                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white space-y-4 p-4">
-                      <h2 className="text-3xl md:text-4xl font-bold">{slide.title}</h2>
-                      {slide.description && (
-                        <p className="text-lg max-w-xl">{slide.description}</p>
-                      )}
-                      {slide.link && (
-                        <Button asChild variant="secondary" size="lg">
-                          <a href={slide.link}>
-                            مشاهده بیشتر
-                            <ArrowLeft className="ml-2 h-4 w-4" />
-                          </a>
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {deals.map((deal, idx) => (
-                  <Card key={idx} className={`${deal.color} text-white overflow-hidden hover-elevate`}>
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm opacity-90">{deal.label}</p>
-                          <p className="text-2xl font-bold">{deal.value}</p>
-                        </div>
-                        <TrendingUp className="h-12 w-12 opacity-20" />
+            <div className="space-y-4">
+              {deals.map((deal, idx) => (
+                <Card key={idx} className={`${deal.color} text-white overflow-hidden hover-elevate`}>
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm opacity-90">{deal.label}</p>
+                        <p className="text-2xl font-bold">{deal.value}</p>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
+                      <TrendingUp className="h-12 w-12 opacity-20" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
         </div>
       </section>
