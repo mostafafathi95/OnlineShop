@@ -9,6 +9,7 @@ import {
   insertSettingSchema, insertQuestionSchema, insertAnswerSchema, insertSliderSchema, insertBannerSchema,
   insertCartItemSchema
 } from "@shared/schema";
+import type { Review } from "@shared/schema";
 import { z } from "zod";
 
 // Auth middleware
@@ -1903,6 +1904,161 @@ export async function registerRoutes(
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ error: "خطا در خالی کردن سبد خرید" });
+    }
+  });
+
+  // ==================== WISHLIST ROUTES ====================
+
+  // Get user's wishlist
+  app.get("/api/wishlist", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const wishlist = await storage.getUserWishlist(userId);
+      res.json(wishlist);
+    } catch (error) {
+      res.status(500).json({ error: "خطا در دریافت علاقه‌مندی‌ها" });
+    }
+  });
+
+  // Add to wishlist
+  app.post("/api/wishlist", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const { productId } = req.body;
+
+      if (!productId) {
+        return res.status(400).json({ error: "شناسه محصول الزامی است" });
+      }
+
+      const isInWishlist = await storage.isInWishlist(userId, parseInt(productId));
+      if (isInWishlist) {
+        return res.status(400).json({ error: "این محصول قبلاً در علاقه‌مندی‌ها است" });
+      }
+
+      const item = await storage.addToWishlist(userId, parseInt(productId));
+      res.json(item);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message || "خطا در اضافه کردن به علاقه‌مندی‌ها" });
+    }
+  });
+
+  // Remove from wishlist
+  app.delete("/api/wishlist/:productId", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const productId = parseInt(req.params.productId);
+
+      await storage.removeFromWishlist(userId, productId);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "خطا در حذف از علاقه‌مندی‌ها" });
+    }
+  });
+
+  // ==================== REVIEWS ROUTES ====================
+
+  // Get user's reviews
+  app.get("/api/account/reviews", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const reviews = await storage.getUserReviews(userId);
+      res.json(reviews);
+    } catch (error) {
+      res.status(500).json({ error: "خطا در دریافت نظرات" });
+    }
+  });
+
+  // Get product reviews (public)
+  app.get("/api/products/:productId/reviews", async (req, res) => {
+    try {
+      const productId = parseInt(req.params.productId);
+      const reviews = await storage.getProductReviews(productId);
+      res.json(reviews.filter((r: Review) => r.isApproved));
+    } catch (error) {
+      res.status(500).json({ error: "خطا در دریافت نظرات" });
+    }
+  });
+
+  // Create review
+  app.post("/api/reviews", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const { productId, title, content, rating } = req.body;
+
+      if (!productId || !title || !content || !rating) {
+        return res.status(400).json({ error: "تمام فیلدها الزامی است" });
+      }
+
+      if (rating < 1 || rating > 5) {
+        return res.status(400).json({ error: "امتیاز بین 1 تا 5 باید باشد" });
+      }
+
+      const validated = insertReviewSchema.parse({
+        userId,
+        productId: parseInt(productId),
+        title,
+        content,
+        rating: parseInt(rating),
+      });
+
+      const review = await storage.createReview(validated);
+      res.json(review);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message || "خطا در ثبت نظر" });
+    }
+  });
+
+  // Delete review
+  app.delete("/api/reviews/:id", requireAuth, async (req, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const reviewId = parseInt(req.params.id);
+
+      // Verify ownership
+      const reviews = await storage.getUserReviews(userId);
+      const review = reviews.find((r) => r.id === reviewId);
+      
+      if (!review) {
+        return res.status(404).json({ error: "نظر یافت نشد" });
+      }
+
+      await storage.deleteReview(reviewId);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "خطا در حذف نظر" });
+    }
+  });
+
+  // ==================== COUPONS ROUTES ====================
+
+  // Apply/validate coupon
+  app.post("/api/coupons/validate", async (req, res) => {
+    try {
+      const { code } = req.body;
+
+      if (!code) {
+        return res.status(400).json({ error: "کد تخفیف الزامی است" });
+      }
+
+      const coupon = await storage.getCouponByCode(code);
+      
+      if (!coupon) {
+        return res.status(404).json({ error: "کد تخفیف معتبر نیست" });
+      }
+
+      res.json(coupon);
+    } catch (error) {
+      res.status(500).json({ error: "خطا در اعتبارسنجی کد تخفیف" });
+    }
+  });
+
+  // Get all active coupons (for display)
+  app.get("/api/coupons", async (req, res) => {
+    try {
+      const coupons = await storage.getAllCoupons({ active: true });
+      res.json(coupons);
+    } catch (error) {
+      res.status(500).json({ error: "خطا در دریافت کوپن‌ها" });
     }
   });
 
