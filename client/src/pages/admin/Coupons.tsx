@@ -254,6 +254,9 @@ export default function AdminCoupons() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>{editingCoupon ? "ویرایش کوپن" : "کوپن جدید"}</DialogTitle>
+            <DialogDescription>
+              {editingCoupon ? "کد تخفیف را ویرایش کنید" : "یک کد تخفیف جدید ایجاد کنید"}
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
