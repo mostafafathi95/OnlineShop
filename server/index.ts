@@ -75,6 +75,7 @@ app.use((req, res, next) => {
     if (decoded) {
       (req as any).userId = decoded.userId;
       (req as any).sessionId = decoded.sessionId;
+      (req as any).role = decoded.role;
     }
   }
   next();

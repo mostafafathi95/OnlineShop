@@ -21,10 +21,10 @@ function requireAuth(req: Request, res: Response, next: NextFunction) {
 }
 
 function requireAdmin(req: Request, res: Response, next: NextFunction) {
-  if (!req.isAuthenticated?.() || !req.user) {
+  if (!(req as any).userId) {
     return res.status(401).json({ error: "Unauthorized" });
   }
-  if ((req.user as any).role !== "admin") {
+  if (!(req as any).role || (req as any).role !== "admin") {
     return res.status(403).json({ error: "Forbidden" });
   }
   next();
