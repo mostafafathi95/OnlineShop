@@ -14,7 +14,7 @@ import { z } from "zod";
 
 // Auth middleware
 function requireAuth(req: Request, res: Response, next: NextFunction) {
-  if (!req.isAuthenticated?.() || !req.user) {
+  if (!(req as any).userId) {
     return res.status(401).json({ error: "Unauthorized" });
   }
   next();
