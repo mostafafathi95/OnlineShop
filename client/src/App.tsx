@@ -65,6 +65,8 @@ import AdminSliders from "@/pages/admin/Sliders";
 import AdminSliderForm from "@/pages/admin/SliderForm";
 import AdminLanding from "@/pages/admin/AdminLanding";
 import AdminBanners from "@/pages/admin/AdminBanners";
+import AdminRequests from "@/pages/admin/Requests";
+import AdminAnalytics from "@/pages/admin/Analytics";
 import SearchResults from "@/pages/SearchResults";
 
 function Router() {
@@ -128,6 +130,8 @@ function Router() {
       <Route path="/admin/sliders/:id" component={AdminSliderForm} />
       <Route path="/admin/banners" component={AdminBanners} />
       <Route path="/admin/landing" component={AdminLanding} />
+      <Route path="/admin/requests" component={AdminRequests} />
+      <Route path="/admin/analytics" component={AdminAnalytics} />
 
       <Route path="/search" component={SearchResults} />
       <Route path="/:slug" component={StaticPage} />
