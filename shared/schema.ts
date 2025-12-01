@@ -586,6 +586,7 @@ export const insertQuestionSchema = createInsertSchema(questions).omit({ id: tru
 export const insertAnswerSchema = createInsertSchema(answers).omit({ id: true, createdAt: true });
 export const insertSliderSchema = createInsertSchema(sliders).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertBannerSchema = createInsertSchema(banners).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertLandingPageSectionSchema = createInsertSchema(landingPageSections).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertSearchAnalyticsSchema = createInsertSchema(searchAnalytics).omit({ id: true, createdAt: true });
 
 // Types
@@ -638,6 +639,8 @@ export type InsertSlider = z.infer<typeof insertSliderSchema>;
 export type Slider = typeof sliders.$inferSelect;
 export type InsertBanner = z.infer<typeof insertBannerSchema>;
 export type Banner = typeof banners.$inferSelect;
+export type InsertLandingPageSection = z.infer<typeof insertLandingPageSectionSchema>;
+export type LandingPageSection = typeof landingPageSections.$inferSelect;
 export type InsertSearchAnalytics = z.infer<typeof insertSearchAnalyticsSchema>;
 export type SearchAnalytics = typeof searchAnalytics.$inferSelect;
 
