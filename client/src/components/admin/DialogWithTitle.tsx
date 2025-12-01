@@ -5,7 +5,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 interface DialogWithTitleProps {
   open: boolean;
@@ -28,13 +27,9 @@ export function DialogWithTitle({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          {hideTitle ? (
-            <VisuallyHidden asChild>
-              <DialogTitle>{title}</DialogTitle>
-            </VisuallyHidden>
-          ) : (
-            <DialogTitle>{title}</DialogTitle>
-          )}
+          <DialogTitle className={hideTitle ? "sr-only" : ""}>
+            {title}
+          </DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
         {children}
