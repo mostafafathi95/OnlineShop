@@ -1,7 +1,6 @@
 import { pgTable, timestamp, varchar, text, integer, decimal, boolean, jsonb } from "drizzle-orm/pg-core";
 import { users } from "./auth";
 import { products } from "./products";
-import { addresses as addressesTable } from "./orders";
 
 // Addresses table
 export const addresses = pgTable("addresses", {
