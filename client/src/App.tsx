@@ -11,7 +11,7 @@ import Products from "@/pages/Products";
 import ProductDetail from "@/pages/ProductDetail";
 import ProductsCompare from "@/pages/ProductsCompare";
 import Cart from "@/pages/Cart";
-import Checkout from "@/pages/Checkout";
+import Checkout from "@/pages/checkout/Checkout";
 import About from "@/pages/About";
 import Contact from "@/pages/Contact";
 import Terms from "@/pages/Terms";
