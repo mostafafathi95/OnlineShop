@@ -5,7 +5,9 @@ import { Loader2, Eye, EyeOff } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import AdminLayout from "./AdminLayout";
-import type { LandingPageSection } from "@shared/schema";
+import { landingPageSections } from "@shared/schema";
+
+type LandingPageSection = typeof landingPageSections.$inferSelect;
 
 export default function AdminLanding() {
   const { toast } = useToast();
