@@ -3,7 +3,7 @@ import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
 import { logger } from "./utils/logger";
-import { authManager } from "./utils/advanced-auth";
+import { authManager } from "./utils/auth";
 import path from "path";
 
 const app = express();
