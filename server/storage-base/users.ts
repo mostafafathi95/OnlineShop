@@ -25,6 +25,7 @@ export class Users {
           firstName: userData.firstName,
           lastName: userData.lastName,
           profileImageUrl: userData.profileImageUrl,
+          role: userData.role,
           updatedAt: new Date(),
         },
       })
