@@ -185,6 +185,31 @@ export interface IStorage {
   updateAnswer(id: number, data: Partial<InsertAnswer>): Promise<Answer | undefined>;
   deleteAnswer(id: number): Promise<void>;
 
+  // Sliders
+  getAllSliders(): Promise<Slider[]>;
+  getSliderById(id: number): Promise<Slider | undefined>;
+  getSliderBySlug(slug: string): Promise<Slider | undefined>;
+  getActiveSliders(): Promise<Slider[]>;
+  createSlider(slider: InsertSlider): Promise<Slider>;
+  updateSlider(id: number, data: Partial<InsertSlider>): Promise<Slider | undefined>;
+  deleteSlider(id: number): Promise<void>;
+
+  // Banners
+  getAllBanners(): Promise<Banner[]>;
+  getAllBannersAdmin(): Promise<Banner[]>;
+  getBannerById(id: number): Promise<Banner | undefined>;
+  createBanner(banner: InsertBanner): Promise<Banner>;
+  updateBanner(id: number, data: Partial<InsertBanner>): Promise<Banner | undefined>;
+  deleteBanner(id: number): Promise<void>;
+  updateBannerSortOrder(id: number, sortOrder: number): Promise<Banner | undefined>;
+
+  // Landing Page
+  getLandingPageSections(): Promise<LandingPageSection[]>;
+  getLandingPageSectionById(id: number): Promise<LandingPageSection | undefined>;
+  createLandingPageSection(section: InsertLandingPageSection): Promise<LandingPageSection>;
+  updateLandingPageSection(id: number, data: Partial<InsertLandingPageSection>): Promise<LandingPageSection | undefined>;
+  deleteLandingPageSection(id: number): Promise<void>;
+
   // Stats
   getStats(): Promise<{
     totalProducts: number;

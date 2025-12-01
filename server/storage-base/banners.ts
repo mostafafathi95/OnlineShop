@@ -31,4 +31,8 @@ export class Banners {
     const [updated] = await db.update(banners).set({ sortOrder }).where(eq(banners.id, id)).returning();
     return updated;
   }
+
+  async getAllBannersAdmin(): Promise<Banner[]> {
+    return db.select().from(banners).orderBy(asc(banners.sortOrder));
+  }
 }

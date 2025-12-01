@@ -558,6 +558,85 @@ export class DatabaseStorage implements IStorage {
     return this.answers.deleteAnswer(id);
   }
 
+  // Sliders
+  async getAllSliders(): Promise<Slider[]> {
+    return this.sliders.getAllSliders();
+  }
+
+  async getSliderById(id: number): Promise<Slider | undefined> {
+    return this.sliders.getSliderById(id);
+  }
+
+  async getSliderBySlug(slug: string): Promise<Slider | undefined> {
+    return this.sliders.getSliderBySlug(slug);
+  }
+
+  async getActiveSliders(): Promise<Slider[]> {
+    return this.sliders.getActiveSliders();
+  }
+
+  async createSlider(slider: InsertSlider): Promise<Slider> {
+    return this.sliders.createSlider(slider);
+  }
+
+  async updateSlider(id: number, data: Partial<InsertSlider>): Promise<Slider | undefined> {
+    return this.sliders.updateSlider(id, data);
+  }
+
+  async deleteSlider(id: number): Promise<void> {
+    return this.sliders.deleteSlider(id);
+  }
+
+  // Banners
+  async getAllBanners(): Promise<Banner[]> {
+    return this.banners.getAllBanners();
+  }
+
+  async getAllBannersAdmin(): Promise<Banner[]> {
+    return this.banners.getAllBannersAdmin();
+  }
+
+  async getBannerById(id: number): Promise<Banner | undefined> {
+    return this.banners.getBannerById(id);
+  }
+
+  async createBanner(banner: InsertBanner): Promise<Banner> {
+    return this.banners.createBanner(banner);
+  }
+
+  async updateBanner(id: number, data: Partial<InsertBanner>): Promise<Banner | undefined> {
+    return this.banners.updateBanner(id, data);
+  }
+
+  async deleteBanner(id: number): Promise<void> {
+    return this.banners.deleteBanner(id);
+  }
+
+  async updateBannerSortOrder(id: number, sortOrder: number): Promise<Banner | undefined> {
+    return this.banners.updateBannerSortOrder(id, sortOrder);
+  }
+
+  // Landing Page Sections
+  async getLandingPageSections(): Promise<LandingPageSection[]> {
+    return this.landingPageSections.getLandingPageSections();
+  }
+
+  async getLandingPageSectionById(id: number): Promise<LandingPageSection | undefined> {
+    return this.landingPageSections.getLandingPageSectionById(id);
+  }
+
+  async createLandingPageSection(section: InsertLandingPageSection): Promise<LandingPageSection> {
+    return this.landingPageSections.createLandingPageSection(section);
+  }
+
+  async updateLandingPageSection(id: number, data: Partial<InsertLandingPageSection>): Promise<LandingPageSection | undefined> {
+    return this.landingPageSections.updateLandingPageSection(id, data);
+  }
+
+  async deleteLandingPageSection(id: number): Promise<void> {
+    return this.landingPageSections.deleteLandingPageSection(id);
+  }
+
   // Stats
   async getStats(): Promise<{ totalProducts: number; totalOrders: number; totalUsers: number; totalRevenue: number }> {
     return this.stats.getStats();
