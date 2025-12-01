@@ -1,0 +1,12 @@
+export { AuthStorageAdapter } from './auth-storage';
+export { ProductStorageAdapter } from './product-storage';
+export { ReviewStorageAdapter } from './review-storage';
+export { CommerceStorageAdapter } from './commerce-storage';
+export { OrderStorageAdapter } from './order-storage';
+export { ContentStorageAdapter } from './content-storage';
+export { CatalogStorageAdapter } from './catalog-storage';
+export { WalletStorageAdapter } from './wallet-storage';
+export { AdminStorageAdapter } from './admin-storage';
+export { QAStorageAdapter } from './qa-storage';
+export { ComparisonStorageAdapter } from './comparison-storage';
+export { AnalyticsStorageAdapter } from './analytics-storage';

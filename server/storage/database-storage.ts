@@ -1,11 +1,10 @@
 import type { IStorage } from "../storage-interface";
 import {
-  Users, Categories, Products, ProductImages, Reviews, Wishlist, Coupons,
-  Addresses, Cart, Orders, Articles, News as NewsOps, Pages, Brands,
-  ProductAttributes, ShippingMethods, CreditPoints, Wallets, Requests,
-  Settings, Questions, Answers, Sliders, Banners, LandingPageSections,
-  Comparisons, Analytics, Stats
-} from "../storage-base/index";
+  AuthStorageAdapter, ProductStorageAdapter, ReviewStorageAdapter,
+  CommerceStorageAdapter, OrderStorageAdapter, ContentStorageAdapter,
+  CatalogStorageAdapter, WalletStorageAdapter, AdminStorageAdapter,
+  QAStorageAdapter, ComparisonStorageAdapter, AnalyticsStorageAdapter
+} from "./adapters";
 import type {
   User, UpsertUser, Category, InsertCategory,
   Product, InsertProduct, ProductImage, InsertProductImage,
@@ -24,110 +23,78 @@ import type {
 } from "@shared/schema";
 
 export class DatabaseStorage implements IStorage {
-  private users: Users;
-  private categories: Categories;
-  private products: Products;
-  private productImages: ProductImages;
-  private reviews: Reviews;
-  private wishlist: Wishlist;
-  private coupons: Coupons;
-  private addresses: Addresses;
-  private cart: Cart;
-  private orders: Orders;
-  private articles: Articles;
-  private news: NewsOps;
-  private pages: Pages;
-  private brands: Brands;
-  private productAttributes: ProductAttributes;
-  private shippingMethods: ShippingMethods;
-  private creditPoints: CreditPoints;
-  private wallets: Wallets;
-  private requests: Requests;
-  private settings: Settings;
-  private questions: Questions;
-  private answers: Answers;
-  private sliders: Sliders;
-  private banners: Banners;
-  private landingPageSections: LandingPageSections;
-  private comparisons: Comparisons;
-  private analytics: Analytics;
-  private stats: Stats;
+  private auth: AuthStorageAdapter;
+  private products: ProductStorageAdapter;
+  private reviews: ReviewStorageAdapter;
+  private commerce: CommerceStorageAdapter;
+  private orders: OrderStorageAdapter;
+  private content: ContentStorageAdapter;
+  private catalog: CatalogStorageAdapter;
+  private wallet: WalletStorageAdapter;
+  private admin: AdminStorageAdapter;
+  private qa: QAStorageAdapter;
+  private comparisons: ComparisonStorageAdapter;
+  private analytics: AnalyticsStorageAdapter;
 
   constructor() {
-    this.users = new Users();
-    this.categories = new Categories();
-    this.products = new Products();
-    this.productImages = new ProductImages();
-    this.reviews = new Reviews();
-    this.wishlist = new Wishlist();
-    this.coupons = new Coupons();
-    this.addresses = new Addresses();
-    this.cart = new Cart();
-    this.orders = new Orders();
-    this.articles = new Articles();
-    this.news = new NewsOps();
-    this.pages = new Pages();
-    this.brands = new Brands();
-    this.productAttributes = new ProductAttributes();
-    this.shippingMethods = new ShippingMethods();
-    this.creditPoints = new CreditPoints();
-    this.wallets = new Wallets();
-    this.requests = new Requests();
-    this.settings = new Settings();
-    this.questions = new Questions();
-    this.answers = new Answers();
-    this.sliders = new Sliders();
-    this.banners = new Banners();
-    this.landingPageSections = new LandingPageSections();
-    this.comparisons = new Comparisons();
-    this.analytics = new Analytics();
-    this.stats = new Stats();
+    this.auth = new AuthStorageAdapter();
+    this.products = new ProductStorageAdapter();
+    this.reviews = new ReviewStorageAdapter();
+    this.commerce = new CommerceStorageAdapter();
+    this.orders = new OrderStorageAdapter();
+    this.content = new ContentStorageAdapter();
+    this.catalog = new CatalogStorageAdapter();
+    this.wallet = new WalletStorageAdapter();
+    this.admin = new AdminStorageAdapter();
+    this.qa = new QAStorageAdapter();
+    this.comparisons = new ComparisonStorageAdapter();
+    this.analytics = new AnalyticsStorageAdapter();
   }
 
-  // Users
+  // Auth
   async getUser(id: string): Promise<User | undefined> {
-    return this.users.getUser(id);
+    return this.auth.getUser(id);
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    return this.users.getUserByEmail(email);
+    return this.auth.getUserByEmail(email);
   }
 
   async upsertUser(user: UpsertUser): Promise<User> {
-    return this.users.upsertUser(user);
+    return this.auth.upsertUser(user);
   }
 
   async updateUser(id: string, data: Partial<User>): Promise<User | undefined> {
-    return this.users.updateUser(id, data);
+    return this.auth.updateUser(id, data);
   }
 
   async getAllUsers(): Promise<User[]> {
-    return this.users.getAllUsers();
+    return this.auth.getAllUsers();
   }
 
   // Categories
   async getAllCategories(): Promise<Category[]> {
-    return this.categories.getAllCategories();
+    return this.products.getAllCategories();
   }
 
   async getCategoryById(id: number): Promise<Category | undefined> {
-    return this.categories.getCategoryById(id);
+    return this.products.getCategoryById(id);
   }
 
   async getCategoryBySlug(slug: string): Promise<Category | undefined> {
-    return this.categories.getCategoryBySlug(slug);
+    return this.products.getCategoryBySlug(slug);
   }
 
   async createCategory(category: InsertCategory): Promise<Category> {
-    return this.categories.createCategory(category);
+    return this.products.createCategory(category);
   }
 
   async updateCategory(id: number, data: Partial<InsertCategory>): Promise<Category | undefined> {
-    return this.categories.updateCategory(id, data);
+    return this.products.updateCategory(id, data);
   }
 
   async deleteCategory(id: number): Promise<void> {
-    return this.categories.deleteCategory(id);
+    return this.products.deleteCategory(id);
   }
 
   // Products
@@ -157,15 +124,15 @@ export class DatabaseStorage implements IStorage {
 
   // Product Images
   async getProductImages(productId: number): Promise<ProductImage[]> {
-    return this.productImages.getProductImages(productId);
+    return this.products.getProductImages(productId);
   }
 
   async addProductImage(image: InsertProductImage): Promise<ProductImage> {
-    return this.productImages.addProductImage(image);
+    return this.products.addProductImage(image);
   }
 
   async deleteProductImage(id: number): Promise<void> {
-    return this.productImages.deleteProductImage(id);
+    return this.products.deleteProductImage(id);
   }
 
   // Reviews
@@ -193,92 +160,100 @@ export class DatabaseStorage implements IStorage {
     return this.reviews.updateReviewHelpfulness(id, helpful, unhelpful);
   }
 
+  async getReviewById(id: number): Promise<Review | undefined> {
+    return this.reviews.getReviewById(id);
+  }
+
+  async getAllReviews(): Promise<Review[]> {
+    return this.reviews.getAllReviews();
+  }
+
   // Wishlist
   async getUserWishlist(userId: string): Promise<(WishlistItem & { product: Product })[]> {
-    return this.wishlist.getUserWishlist(userId);
+    return this.commerce.getUserWishlist(userId);
   }
 
   async addToWishlist(userId: string, productId: number): Promise<WishlistItem> {
-    return this.wishlist.addToWishlist(userId, productId);
+    return this.commerce.addToWishlist(userId, productId);
   }
 
   async removeFromWishlist(userId: string, productId: number): Promise<void> {
-    return this.wishlist.removeFromWishlist(userId, productId);
+    return this.commerce.removeFromWishlist(userId, productId);
   }
 
   async isInWishlist(userId: string, productId: number): Promise<boolean> {
-    return this.wishlist.isInWishlist(userId, productId);
+    return this.commerce.isInWishlist(userId, productId);
   }
 
   // Coupons
   async getAllCoupons(options?: { active?: boolean }): Promise<Coupon[]> {
-    return this.coupons.getAllCoupons(options);
+    return this.commerce.getAllCoupons(options);
   }
 
   async getCouponByCode(code: string): Promise<Coupon | undefined> {
-    return this.coupons.getCouponByCode(code);
+    return this.commerce.getCouponByCode(code);
   }
 
   async createCoupon(coupon: InsertCoupon): Promise<Coupon> {
-    return this.coupons.createCoupon(coupon);
+    return this.commerce.createCoupon(coupon);
   }
 
   async updateCoupon(id: number, data: Partial<InsertCoupon>): Promise<Coupon | undefined> {
-    return this.coupons.updateCoupon(id, data);
+    return this.commerce.updateCoupon(id, data);
   }
 
   async deleteCoupon(id: number): Promise<void> {
-    return this.coupons.deleteCoupon(id);
+    return this.commerce.deleteCoupon(id);
   }
 
   async incrementCouponUses(code: string): Promise<void> {
-    return this.coupons.incrementCouponUses(code);
+    return this.commerce.incrementCouponUses(code);
   }
 
   // Addresses
   async getUserAddresses(userId: string): Promise<Address[]> {
-    return this.addresses.getUserAddresses(userId);
+    return this.orders.getUserAddresses(userId);
   }
 
   async getAddressById(id: number): Promise<Address | undefined> {
-    return this.addresses.getAddressById(id);
+    return this.orders.getAddressById(id);
   }
 
   async createAddress(address: InsertAddress): Promise<Address> {
-    return this.addresses.createAddress(address);
+    return this.orders.createAddress(address);
   }
 
   async updateAddress(id: number, data: Partial<InsertAddress>): Promise<Address | undefined> {
-    return this.addresses.updateAddress(id, data);
+    return this.orders.updateAddress(id, data);
   }
 
   async deleteAddress(id: number): Promise<void> {
-    return this.addresses.deleteAddress(id);
+    return this.orders.deleteAddress(id);
   }
 
   async setDefaultAddress(userId: string, addressId: number): Promise<void> {
-    return this.addresses.setDefaultAddress(userId, addressId);
+    return this.orders.setDefaultAddress(userId, addressId);
   }
 
   // Cart
   async getUserCart(userId: string): Promise<(CartItem & { product: Product })[]> {
-    return this.cart.getUserCart(userId);
+    return this.orders.getUserCart(userId);
   }
 
   async addToCart(item: InsertCartItem): Promise<CartItem> {
-    return this.cart.addToCart(item);
+    return this.orders.addToCart(item);
   }
 
   async updateCartItem(id: number, quantity: number): Promise<CartItem | undefined> {
-    return this.cart.updateCartItem(id, quantity);
+    return this.orders.updateCartItem(id, quantity);
   }
 
   async removeFromCart(id: number): Promise<void> {
-    return this.cart.removeFromCart(id);
+    return this.orders.removeFromCart(id);
   }
 
   async clearCart(userId: string): Promise<void> {
-    return this.cart.clearCart(userId);
+    return this.orders.clearCart(userId);
   }
 
   // Orders
@@ -308,347 +283,338 @@ export class DatabaseStorage implements IStorage {
 
   // Articles
   async getAllArticles(options?: { published?: boolean; limit?: number }): Promise<Article[]> {
-    return this.articles.getAllArticles(options);
+    return this.content.getAllArticles(options);
   }
 
   async getArticleById(id: number): Promise<Article | undefined> {
-    return this.articles.getArticleById(id);
+    return this.content.getArticleById(id);
   }
 
   async getArticleBySlug(slug: string): Promise<Article | undefined> {
-    return this.articles.getArticleBySlug(slug);
+    return this.content.getArticleBySlug(slug);
   }
 
   async createArticle(article: InsertArticle): Promise<Article> {
-    return this.articles.createArticle(article);
+    return this.content.createArticle(article);
   }
 
   async updateArticle(id: number, data: Partial<InsertArticle>): Promise<Article | undefined> {
-    return this.articles.updateArticle(id, data);
+    return this.content.updateArticle(id, data);
   }
 
   async deleteArticle(id: number): Promise<void> {
-    return this.articles.deleteArticle(id);
+    return this.content.deleteArticle(id);
   }
 
   // News
   async getAllNews(options?: { published?: boolean; limit?: number }): Promise<News[]> {
-    return this.news.getAllNews(options);
+    return this.content.getAllNews(options);
   }
 
   async getNewsById(id: number): Promise<News | undefined> {
-    return this.news.getNewsById(id);
+    return this.content.getNewsById(id);
   }
 
   async getNewsBySlug(slug: string): Promise<News | undefined> {
-    return this.news.getNewsBySlug(slug);
+    return this.content.getNewsBySlug(slug);
   }
 
   async createNews(news: InsertNews): Promise<News> {
-    return this.news.createNews(news);
+    return this.content.createNews(news);
   }
 
   async updateNews(id: number, data: Partial<InsertNews>): Promise<News | undefined> {
-    return this.news.updateNews(id, data);
+    return this.content.updateNews(id, data);
   }
 
   async deleteNews(id: number): Promise<void> {
-    return this.news.deleteNews(id);
+    return this.content.deleteNews(id);
   }
 
   // Pages
   async getAllPages(options?: { published?: boolean }): Promise<Page[]> {
-    return this.pages.getAllPages(options);
+    return this.content.getAllPages(options);
   }
 
   async getPageById(id: number): Promise<Page | undefined> {
-    return this.pages.getPageById(id);
+    return this.content.getPageById(id);
   }
 
   async getPageBySlug(slug: string): Promise<Page | undefined> {
-    return this.pages.getPageBySlug(slug);
+    return this.content.getPageBySlug(slug);
   }
 
   async createPage(page: InsertPage): Promise<Page> {
-    return this.pages.createPage(page);
+    return this.content.createPage(page);
   }
 
   async updatePage(id: number, data: Partial<InsertPage>): Promise<Page | undefined> {
-    return this.pages.updatePage(id, data);
+    return this.content.updatePage(id, data);
   }
 
   async deletePage(id: number): Promise<void> {
-    return this.pages.deletePage(id);
+    return this.content.deletePage(id);
   }
 
   // Brands
   async getAllBrands(options?: { active?: boolean }): Promise<Brand[]> {
-    return this.brands.getAllBrands(options);
+    return this.catalog.getAllBrands(options);
   }
 
   async getBrandById(id: number): Promise<Brand | undefined> {
-    return this.brands.getBrandById(id);
+    return this.catalog.getBrandById(id);
   }
 
   async getBrandBySlug(slug: string): Promise<Brand | undefined> {
-    return this.brands.getBrandBySlug(slug);
+    return this.catalog.getBrandBySlug(slug);
   }
 
   async createBrand(brand: InsertBrand): Promise<Brand> {
-    return this.brands.createBrand(brand);
+    return this.catalog.createBrand(brand);
   }
 
   async updateBrand(id: number, data: Partial<InsertBrand>): Promise<Brand | undefined> {
-    return this.brands.updateBrand(id, data);
+    return this.catalog.updateBrand(id, data);
   }
 
   async deleteBrand(id: number): Promise<void> {
-    return this.brands.deleteBrand(id);
+    return this.catalog.deleteBrand(id);
   }
 
   // Product Attributes
   async getProductAttributes(productId: number): Promise<ProductAttribute[]> {
-    return this.productAttributes.getProductAttributes(productId);
+    return this.catalog.getProductAttributes(productId);
   }
 
   async createProductAttribute(attr: InsertProductAttribute): Promise<ProductAttribute> {
-    return this.productAttributes.createProductAttribute(attr);
+    return this.catalog.createProductAttribute(attr);
   }
 
   async updateProductAttribute(id: number, data: Partial<InsertProductAttribute>): Promise<ProductAttribute | undefined> {
-    return this.productAttributes.updateProductAttribute(id, data);
+    return this.catalog.updateProductAttribute(id, data);
   }
 
   async deleteProductAttribute(id: number): Promise<void> {
-    return this.productAttributes.deleteProductAttribute(id);
+    return this.catalog.deleteProductAttribute(id);
   }
 
   // Shipping Methods
   async getAllShippingMethods(options?: { active?: boolean }): Promise<ShippingMethod[]> {
-    return this.shippingMethods.getAllShippingMethods(options);
+    return this.catalog.getAllShippingMethods(options);
   }
 
   async getShippingMethodById(id: number): Promise<ShippingMethod | undefined> {
-    return this.shippingMethods.getShippingMethodById(id);
+    return this.catalog.getShippingMethodById(id);
   }
 
   async createShippingMethod(method: InsertShippingMethod): Promise<ShippingMethod> {
-    return this.shippingMethods.createShippingMethod(method);
+    return this.catalog.createShippingMethod(method);
   }
 
   async updateShippingMethod(id: number, data: Partial<InsertShippingMethod>): Promise<ShippingMethod | undefined> {
-    return this.shippingMethods.updateShippingMethod(id, data);
+    return this.catalog.updateShippingMethod(id, data);
   }
 
   async deleteShippingMethod(id: number): Promise<void> {
-    return this.shippingMethods.deleteShippingMethod(id);
+    return this.catalog.deleteShippingMethod(id);
   }
 
   // Credit Points
   async getUserCreditPoints(userId: string): Promise<CreditPoint[]> {
-    return this.creditPoints.getUserCreditPoints(userId);
+    return this.wallet.getUserCreditPoints(userId);
   }
 
   async getTotalCreditPoints(userId: string): Promise<number> {
-    return this.creditPoints.getTotalCreditPoints(userId);
+    return this.wallet.getTotalCreditPoints(userId);
   }
 
   async addCreditPoints(creditPoint: InsertCreditPoint): Promise<CreditPoint> {
-    return this.creditPoints.addCreditPoints(creditPoint);
+    return this.wallet.addCreditPoints(creditPoint);
   }
 
   async removeCreditPoints(id: number): Promise<void> {
-    return this.creditPoints.removeCreditPoints(id);
+    return this.wallet.removeCreditPoints(id);
   }
 
   // User Wallets
   async getUserWallet(userId: string): Promise<UserWallet | undefined> {
-    return this.wallets.getUserWallet(userId);
+    return this.wallet.getUserWallet(userId);
   }
 
   async createUserWallet(wallet: InsertUserWallet): Promise<UserWallet> {
-    return this.wallets.createUserWallet(wallet);
+    return this.wallet.createUserWallet(wallet);
   }
 
   async updateWalletBalance(userId: string, balance: string): Promise<UserWallet | undefined> {
-    return this.wallets.updateWalletBalance(userId, balance);
+    return this.wallet.updateWalletBalance(userId, balance);
   }
 
   // User Requests
   async getUserRequests(userId: string): Promise<UserRequest[]> {
-    return this.requests.getUserRequests(userId);
+    return this.wallet.getUserRequests(userId);
   }
 
   async getAllUserRequests(options?: { status?: string }): Promise<UserRequest[]> {
-    return this.requests.getAllUserRequests(options);
+    return this.wallet.getAllUserRequests(options);
   }
 
   async getUserRequestById(id: number): Promise<UserRequest | undefined> {
-    return this.requests.getUserRequestById(id);
+    return this.wallet.getUserRequestById(id);
   }
 
   async createUserRequest(request: InsertUserRequest): Promise<UserRequest> {
-    return this.requests.createUserRequest(request);
+    return this.wallet.createUserRequest(request);
   }
 
   async updateUserRequest(id: number, data: Partial<InsertUserRequest>): Promise<UserRequest | undefined> {
-    return this.requests.updateUserRequest(id, data);
+    return this.wallet.updateUserRequest(id, data);
   }
 
   async deleteUserRequest(id: number): Promise<void> {
-    return this.requests.deleteUserRequest(id);
+    return this.wallet.deleteUserRequest(id);
   }
 
   // Settings
   async getAllSettings(): Promise<Setting[]> {
-    return this.settings.getAllSettings();
+    return this.admin.getAllSettings();
   }
 
   async getSettingByKey(key: string): Promise<Setting | undefined> {
-    return this.settings.getSettingByKey(key);
+    return this.admin.getSettingByKey(key);
   }
 
   async createSetting(setting: InsertSetting): Promise<Setting> {
-    return this.settings.createSetting(setting);
+    return this.admin.createSetting(setting);
   }
 
   async updateSetting(key: string, value: string): Promise<Setting | undefined> {
-    return this.settings.updateSetting(key, value);
+    return this.admin.updateSetting(key, value);
   }
 
   // Questions
   async getProductQuestions(productId: number): Promise<Question[]> {
-    return this.questions.getProductQuestions(productId);
+    return this.qa.getProductQuestions(productId);
   }
 
   async getQuestionById(id: number): Promise<Question | undefined> {
-    return this.questions.getQuestionById(id);
+    return this.qa.getQuestionById(id);
   }
 
   async createQuestion(question: InsertQuestion): Promise<Question> {
-    return this.questions.createQuestion(question);
+    return this.qa.createQuestion(question);
   }
 
   async updateQuestion(id: number, data: Partial<InsertQuestion>): Promise<Question | undefined> {
-    return this.questions.updateQuestion(id, data);
+    return this.qa.updateQuestion(id, data);
   }
 
   async deleteQuestion(id: number): Promise<void> {
-    return this.questions.deleteQuestion(id);
+    return this.qa.deleteQuestion(id);
   }
 
   // Answers
   async getQuestionAnswers(questionId: number): Promise<Answer[]> {
-    return this.answers.getQuestionAnswers(questionId);
+    return this.qa.getQuestionAnswers(questionId);
   }
 
   async getAnswerById(id: number): Promise<Answer | undefined> {
-    return this.answers.getAnswerById(id);
+    return this.qa.getAnswerById(id);
   }
 
   async createAnswer(answer: InsertAnswer): Promise<Answer> {
-    return this.answers.createAnswer(answer);
+    return this.qa.createAnswer(answer);
   }
 
   async updateAnswer(id: number, data: Partial<InsertAnswer>): Promise<Answer | undefined> {
-    return this.answers.updateAnswer(id, data);
+    return this.qa.updateAnswer(id, data);
   }
 
   async deleteAnswer(id: number): Promise<void> {
-    return this.answers.deleteAnswer(id);
+    return this.qa.deleteAnswer(id);
   }
 
   // Sliders
   async getAllSliders(): Promise<Slider[]> {
-    return this.sliders.getAllSliders();
+    return this.admin.getAllSliders();
   }
 
   async getSliderById(id: number): Promise<Slider | undefined> {
-    return this.sliders.getSliderById(id);
+    return this.admin.getSliderById(id);
   }
 
   async getSliderBySlug(slug: string): Promise<Slider | undefined> {
-    return this.sliders.getSliderBySlug(slug);
+    return this.admin.getSliderBySlug(slug);
   }
 
   async getActiveSliders(): Promise<Slider[]> {
-    return this.sliders.getActiveSliders();
+    return this.admin.getActiveSliders();
   }
 
   async createSlider(slider: InsertSlider): Promise<Slider> {
-    return this.sliders.createSlider(slider);
+    return this.admin.createSlider(slider);
   }
 
   async updateSlider(id: number, data: Partial<InsertSlider>): Promise<Slider | undefined> {
-    return this.sliders.updateSlider(id, data);
+    return this.admin.updateSlider(id, data);
   }
 
   async deleteSlider(id: number): Promise<void> {
-    return this.sliders.deleteSlider(id);
+    return this.admin.deleteSlider(id);
   }
 
   // Banners
   async getAllBanners(): Promise<Banner[]> {
-    return this.banners.getAllBanners();
+    return this.admin.getAllBanners();
   }
 
   async getAllBannersAdmin(): Promise<Banner[]> {
-    return this.banners.getAllBannersAdmin();
+    return this.admin.getAllBannersAdmin();
   }
 
   async getBannerById(id: number): Promise<Banner | undefined> {
-    return this.banners.getBannerById(id);
+    return this.admin.getBannerById(id);
   }
 
   async createBanner(banner: InsertBanner): Promise<Banner> {
-    return this.banners.createBanner(banner);
+    return this.admin.createBanner(banner);
   }
 
   async updateBanner(id: number, data: Partial<InsertBanner>): Promise<Banner | undefined> {
-    return this.banners.updateBanner(id, data);
+    return this.admin.updateBanner(id, data);
   }
 
   async deleteBanner(id: number): Promise<void> {
-    return this.banners.deleteBanner(id);
+    return this.admin.deleteBanner(id);
   }
 
   async updateBannerSortOrder(id: number, sortOrder: number): Promise<Banner | undefined> {
-    return this.banners.updateBannerSortOrder(id, sortOrder);
+    return this.admin.updateBannerSortOrder(id, sortOrder);
   }
 
   // Landing Page Sections
   async getLandingPageSections(): Promise<LandingPageSection[]> {
-    return this.landingPageSections.getLandingPageSections();
+    return this.admin.getLandingPageSections();
   }
 
   async getLandingPageSectionById(id: number): Promise<LandingPageSection | undefined> {
-    return this.landingPageSections.getLandingPageSectionById(id);
+    return this.admin.getLandingPageSectionById(id);
   }
 
   async createLandingPageSection(section: InsertLandingPageSection): Promise<LandingPageSection> {
-    return this.landingPageSections.createLandingPageSection(section);
+    return this.admin.createLandingPageSection(section);
   }
 
   async updateLandingPageSection(id: number, data: Partial<InsertLandingPageSection>): Promise<LandingPageSection | undefined> {
-    return this.landingPageSections.updateLandingPageSection(id, data);
+    return this.admin.updateLandingPageSection(id, data);
   }
 
   async deleteLandingPageSection(id: number): Promise<void> {
-    return this.landingPageSections.deleteLandingPageSection(id);
+    return this.admin.deleteLandingPageSection(id);
   }
 
   // Stats
   async getStats(): Promise<{ totalProducts: number; totalOrders: number; totalUsers: number; totalRevenue: number }> {
-    return this.stats.getStats();
-  }
-
-  // Additional Review methods
-  async getReviewById(id: number): Promise<Review | undefined> {
-    return this.reviews.getReviewById(id);
-  }
-
-  async getAllReviews(): Promise<Review[]> {
-    return this.reviews.getAllReviews();
+    return this.analytics.getStats();
   }
 
   // Comparisons
