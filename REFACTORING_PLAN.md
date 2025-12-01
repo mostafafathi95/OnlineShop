@@ -1132,3 +1132,1080 @@ Use this table to track progress:
 
 **Total Micro-Tasks: 150+**
 
+
+---
+
+# 🚀 LEVEL 2: HYPER-DETAILED EXECUTION GUIDE
+
+## 📌 MICRO-TASK EXECUTION FORMAT
+
+Each micro-task follows this exact format:
+
+```
+### Micro-Task X.X.X: [Description]
+
+**Status:** ⏳ Pending
+
+**Prerequisites:**
+- Dependency A
+- Dependency B
+
+**Files Affected:**
+- server/routes/[file].ts
+
+**Line Numbers (from routes.ts):**
+- Lines XXX-YYY: [Description]
+
+**Code to Extract:**
+[EXACT CODE BLOCK]
+
+**File Structure After:**
+```typescript
+[COMPLETE FILE STRUCTURE]
+```
+
+**Required Imports:**
+```typescript
+[ALL IMPORTS NEEDED]
+```
+
+**Exports:**
+```typescript
+[EXPORT STATEMENTS]
+```
+
+**Testing Steps:**
+1. Step 1
+2. Step 2
+3. Step 3
+
+**Possible Errors & Fixes:**
+- Error: "X is not defined"
+  Fix: Add import: `import { X } from "..."`
+
+**Verification Checklist:**
+- [ ] File created
+- [ ] Code extracted correctly
+- [ ] Imports added
+- [ ] Exports added
+- [ ] No syntax errors
+- [ ] Ready to move to next task
+```
+
+---
+
+## 🎯 TASK 1: DETAILED MICRO-TASK EXPANSION
+
+### Micro-Task 1.1.1: Create and Setup middleware.ts
+
+**Status:** ⏳ Pending
+
+**Command:**
+```bash
+touch server/routes/middleware.ts
+```
+
+**File Path:** `server/routes/middleware.ts`
+
+**Initial Content Template:**
+```typescript
+/**
+ * Authentication and Authorization Middleware
+ * 
+ * Contains all authentication-related middleware functions
+ * Used across all protected routes in the application
+ * 
+ * Functions:
+ * - requireAuth: Check if user is authenticated
+ * - requireAdmin: Check if user is admin
+ */
+
+import type { Request, Response, NextFunction } from "express";
+
+// Middleware functions go here
+// Exports go here
+```
+
+**Checklist:**
+- [ ] File created at correct path
+- [ ] Header comments added
+- [ ] Ready for function extraction
+
+---
+
+### Micro-Task 1.1.2: Extract requireAuth Middleware
+
+**Lines in routes.ts:** 16-21
+
+**Current Code in routes.ts:**
+```typescript
+function requireAuth(req: Request, res: Response, next: NextFunction) {
+  if (!(req as any).userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  next();
+}
+```
+
+**Action:** Copy exactly to middleware.ts after header comments
+
+**Verification:**
+- [ ] Function copied exactly
+- [ ] No typos
+- [ ] Indentation matches 2 spaces
+- [ ] Closing brace on line 21
+
+**Testing:**
+```bash
+# After adding, check:
+# 1. No syntax errors in file
+# 2. Can import the function
+```
+
+---
+
+### Micro-Task 1.1.3: Extract requireAdmin Middleware
+
+**Lines in routes.ts:** 23-31
+
+**Current Code in routes.ts:**
+```typescript
+function requireAdmin(req: Request, res: Response, next: NextFunction) {
+  if (!(req as any).userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  if (!(req as any).role || (req as any).role !== "admin") {
+    return res.status(403).json({ error: "Forbidden" });
+  }
+  next();
+}
+```
+
+**Action:** Add after requireAuth function
+
+**Verification:**
+- [ ] Both middleware functions present
+- [ ] Order: requireAuth first, requireAdmin second
+- [ ] Both have complete logic
+
+---
+
+### Micro-Task 1.1.4: Add Required Imports to middleware.ts
+
+**Imports Needed:**
+```typescript
+import type { Request, Response, NextFunction } from "express";
+```
+
+**Where to Add:**
+- Line 1-2 (after header comments, before functions)
+
+**Verification:**
+- [ ] Import statement at top
+- [ ] Uses `type` keyword for type imports
+- [ ] Correct module name: "express"
+
+---
+
+### Micro-Task 1.1.5: Add Exports to middleware.ts
+
+**Export Code:**
+```typescript
+export { requireAuth, requireAdmin };
+```
+
+**Where to Add:**
+- Line 33 (after all middleware functions)
+
+**Alternative Export Style (More Explicit):**
+```typescript
+export function requireAuth(req: Request, res: Response, next: NextFunction) {
+  // ... function body
+}
+
+export function requireAdmin(req: Request, res: Response, next: NextFunction) {
+  // ... function body
+}
+```
+
+**Choice:** Use first style (shorter, cleaner)
+
+**Verification:**
+- [ ] Export statement present
+- [ ] Both function names exported
+- [ ] Correct syntax with curly braces
+
+---
+
+### Micro-Task 1.1.6: Final middleware.ts Structure Check
+
+**Complete File Should Look Like:**
+```typescript
+/**
+ * Authentication and Authorization Middleware
+ * 
+ * Contains all authentication-related middleware functions
+ * Used across all protected routes in the application
+ */
+
+import type { Request, Response, NextFunction } from "express";
+
+function requireAuth(req: Request, res: Response, next: NextFunction) {
+  if (!(req as any).userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  next();
+}
+
+function requireAdmin(req: Request, res: Response, next: NextFunction) {
+  if (!(req as any).userId) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  if (!(req as any).role || (req as any).role !== "admin") {
+    return res.status(403).json({ error: "Forbidden" });
+  }
+  next();
+}
+
+export { requireAuth, requireAdmin };
+```
+
+**Line Count:** ~25 lines
+
+**Checklist:**
+- [ ] Header comments present
+- [ ] Import at top
+- [ ] requireAuth function (lines ~12-17)
+- [ ] requireAdmin function (lines ~19-26)
+- [ ] Export statement (line ~28)
+
+---
+
+### Micro-Task 1.1.7: Test middleware.ts Syntax
+
+**Command:**
+```bash
+npx tsc --noEmit server/routes/middleware.ts
+```
+
+**Expected Output:**
+```
+(no errors)
+```
+
+**If Errors Occur:**
+- Check import paths
+- Verify all braces are closed
+- Check for typos in function names
+
+**Alternative Test:**
+```bash
+npm run build
+```
+
+**Verification:**
+- [ ] No TypeScript errors
+- [ ] No compilation warnings
+- [ ] File ready for import
+
+---
+
+## TASK 2: utils.ts DETAILED BREAKDOWN
+
+### Micro-Task 2.1.1: Create and Setup utils.ts
+
+**Status:** ⏳ Pending
+
+**Command:**
+```bash
+touch server/routes/utils.ts
+```
+
+**Initial Template:**
+```typescript
+/**
+ * Route Utilities and Helpers
+ * 
+ * Common functions used across multiple route files:
+ * - generateOrderNumber: Create unique order IDs
+ * - handleError: Standardized error handling
+ * - formatResponse: Consistent response format
+ */
+
+// Utilities go here
+// Exports go here
+```
+
+---
+
+### Micro-Task 2.1.2: Extract generateOrderNumber Function
+
+**Lines in routes.ts:** 34-38
+
+**Current Code:**
+```typescript
+function generateOrderNumber(): string {
+  const timestamp = Date.now().toString(36).toUpperCase();
+  const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+  return `ORD-${timestamp}-${random}`;
+}
+```
+
+**Action:**
+1. Copy entire function
+2. Paste into utils.ts after header
+3. Verify format matches
+
+**Output Format Example:**
+- "ORD-QWERTY-ABCD"
+- Unique per request
+- URL-safe characters
+
+---
+
+### Micro-Task 2.1.3: Create handleError Utility Function
+
+**New Function to Add (not in current routes.ts):**
+```typescript
+function handleError(error: any, defaultMessage: string): string {
+  console.error("[Route Error]", error);
+  return defaultMessage;
+}
+```
+
+**Purpose:**
+- Standardize error logging
+- Return safe error messages to client
+- Prevent exposing sensitive info
+
+**Usage Example:**
+```typescript
+} catch (error) {
+  return res.status(500).json({ 
+    error: handleError(error, "Failed to fetch products") 
+  });
+}
+```
+
+---
+
+### Micro-Task 2.1.4: Create formatResponse Utility Function
+
+**New Function to Add:**
+```typescript
+interface ResponseFormat {
+  success?: boolean;
+  data?: any;
+  error?: string;
+}
+
+function formatResponse(
+  success: boolean, 
+  data?: any, 
+  error?: string
+): ResponseFormat {
+  const response: ResponseFormat = { success };
+  if (data) response.data = data;
+  if (error) response.error = error;
+  return response;
+}
+```
+
+**Usage Example:**
+```typescript
+res.json(formatResponse(true, products));
+// Returns: { success: true, data: [...] }
+```
+
+---
+
+### Micro-Task 2.1.5: Add Imports to utils.ts
+
+**Required Imports:**
+```typescript
+// No external imports needed for basic utils
+// All functions use built-in JavaScript
+```
+
+**Note:** Future versions may add more imports
+
+---
+
+### Micro-Task 2.1.6: Add Exports to utils.ts
+
+**Export Statement:**
+```typescript
+export { generateOrderNumber, handleError, formatResponse };
+```
+
+---
+
+### Micro-Task 2.1.7: Complete utils.ts Structure
+
+**Final File:**
+```typescript
+/**
+ * Route Utilities and Helpers
+ * 
+ * Common functions used across multiple route files
+ */
+
+function generateOrderNumber(): string {
+  const timestamp = Date.now().toString(36).toUpperCase();
+  const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+  return `ORD-${timestamp}-${random}`;
+}
+
+function handleError(error: any, defaultMessage: string): string {
+  console.error("[Route Error]", error);
+  return defaultMessage;
+}
+
+interface ResponseFormat {
+  success?: boolean;
+  data?: any;
+  error?: string;
+}
+
+function formatResponse(
+  success: boolean,
+  data?: any,
+  error?: string
+): ResponseFormat {
+  const response: ResponseFormat = { success };
+  if (data) response.data = data;
+  if (error) response.error = error;
+  return response;
+}
+
+export { generateOrderNumber, handleError, formatResponse };
+```
+
+**Line Count:** ~40 lines
+
+---
+
+## TASK 3: PUBLIC ROUTES - ULTRA DETAILED
+
+### Micro-Task 3.1.1: Create public/products.ts - Part 1
+
+**Command:**
+```bash
+touch server/routes/public/products.ts
+```
+
+**Header Template:**
+```typescript
+/**
+ * Public Product Routes
+ * 
+ * Endpoints:
+ * - GET /api/products         - Get all products with filters
+ * - GET /api/products/:slug   - Get single product by slug
+ * 
+ * No authentication required
+ */
+
+import type { Express } from "express";
+import { storage } from "../../storage";
+```
+
+---
+
+### Micro-Task 3.1.2: Extract GET /api/products Endpoint
+
+**Lines in routes.ts:** 58-72
+
+**Original Code:**
+```typescript
+app.get("/api/products", async (req, res) => {
+  try {
+    const { search, category, featured, sort, limit } = req.query;
+    const products = await storage.getAllProducts({
+      search: search as string,
+      category: category as string,
+      featured: featured === "true",
+      sort: sort as string,
+      limit: limit ? parseInt(limit as string) : undefined,
+    });
+    res.json(products.filter(p => p.isActive));
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch products" });
+  }
+});
+```
+
+**Code to Insert:**
+```typescript
+  app.get("/api/products", async (req, res) => {
+    try {
+      const { search, category, featured, sort, limit } = req.query;
+      const products = await storage.getAllProducts({
+        search: search as string,
+        category: category as string,
+        featured: featured === "true",
+        sort: sort as string,
+        limit: limit ? parseInt(limit as string) : undefined,
+      });
+      res.json(products.filter(p => p.isActive));
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch products" });
+    }
+  });
+```
+
+**Inside Function:**
+This goes INSIDE `registerPublicProductRoutes()` function (to be created next)
+
+---
+
+### Micro-Task 3.1.3: Extract GET /api/products/:slug Endpoint
+
+**Lines in routes.ts:** 74-90
+
+**Code:**
+```typescript
+  app.get("/api/products/:slug", async (req, res) => {
+    try {
+      const product = await storage.getProductBySlug(req.params.slug);
+      if (!product) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+      
+      const images = await storage.getProductImages(product.id);
+      const category = product.categoryId 
+        ? await storage.getCategoryById(product.categoryId) 
+        : null;
+      
+      res.json({ ...product, images, category });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch product" });
+    }
+  });
+```
+
+---
+
+### Micro-Task 3.1.4: Create Route Registration Function
+
+**Complete Function:**
+```typescript
+export async function registerPublicProductRoutes(app: Express): Promise<void> {
+  // GET /api/products - List all active products
+  app.get("/api/products", async (req, res) => {
+    try {
+      const { search, category, featured, sort, limit } = req.query;
+      const products = await storage.getAllProducts({
+        search: search as string,
+        category: category as string,
+        featured: featured === "true",
+        sort: sort as string,
+        limit: limit ? parseInt(limit as string) : undefined,
+      });
+      res.json(products.filter(p => p.isActive));
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch products" });
+    }
+  });
+
+  // GET /api/products/:slug - Get product by slug
+  app.get("/api/products/:slug", async (req, res) => {
+    try {
+      const product = await storage.getProductBySlug(req.params.slug);
+      if (!product) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+      
+      const images = await storage.getProductImages(product.id);
+      const category = product.categoryId 
+        ? await storage.getCategoryById(product.categoryId) 
+        : null;
+      
+      res.json({ ...product, images, category });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch product" });
+    }
+  });
+}
+```
+
+---
+
+### Micro-Task 3.1.5: Complete public/products.ts File
+
+**Full File Content:**
+```typescript
+/**
+ * Public Product Routes
+ * 
+ * Endpoints:
+ * - GET /api/products         - Get all products with filters
+ * - GET /api/products/:slug   - Get single product by slug
+ * 
+ * No authentication required
+ */
+
+import type { Express } from "express";
+import { storage } from "../../storage";
+
+export async function registerPublicProductRoutes(app: Express): Promise<void> {
+  // GET /api/products - List all active products
+  app.get("/api/products", async (req, res) => {
+    try {
+      const { search, category, featured, sort, limit } = req.query;
+      const products = await storage.getAllProducts({
+        search: search as string,
+        category: category as string,
+        featured: featured === "true",
+        sort: sort as string,
+        limit: limit ? parseInt(limit as string) : undefined,
+      });
+      res.json(products.filter(p => p.isActive));
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch products" });
+    }
+  });
+
+  // GET /api/products/:slug - Get product by slug
+  app.get("/api/products/:slug", async (req, res) => {
+    try {
+      const product = await storage.getProductBySlug(req.params.slug);
+      if (!product) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+      
+      const images = await storage.getProductImages(product.id);
+      const category = product.categoryId 
+        ? await storage.getCategoryById(product.categoryId) 
+        : null;
+      
+      res.json({ ...product, images, category });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch product" });
+    }
+  });
+}
+```
+
+**Verification:**
+- [ ] File created
+- [ ] All imports present
+- [ ] Both endpoints included
+- [ ] Export function present
+- [ ] No syntax errors
+
+---
+
+### Micro-Task 3.2.1-5: Create public/categories.ts (Same Pattern)
+
+**File: server/routes/public/categories.ts**
+
+**Lines in routes.ts:** 48-55
+
+**Complete File:**
+```typescript
+/**
+ * Public Category Routes
+ * 
+ * Endpoints:
+ * - GET /api/categories - Get all active categories
+ * 
+ * No authentication required
+ */
+
+import type { Express } from "express";
+import { storage } from "../../storage";
+
+export async function registerPublicCategoryRoutes(app: Express): Promise<void> {
+  // GET /api/categories - List all active categories
+  app.get("/api/categories", async (req, res) => {
+    try {
+      const categories = await storage.getAllCategories();
+      res.json(categories.filter(c => c.isActive));
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch categories" });
+    }
+  });
+}
+```
+
+---
+
+## TASK 4: AUTH ROUTES - ULTRA DETAILED
+
+### Micro-Task 4.1.1-8: Create server/routes/auth.ts
+
+**File: server/routes/auth.ts**
+
+**Complete Code:**
+```typescript
+/**
+ * Authentication Routes
+ * 
+ * Endpoints:
+ * - POST /api/login        - User login
+ * - POST /api/register     - User registration
+ * - POST /api/logout       - User logout
+ * - GET /api/auth/user     - Get current user (protected)
+ * - PATCH /api/auth/user   - Update user profile (protected)
+ */
+
+import type { Express } from "express";
+import { storage } from "../storage";
+import { requireAuth } from "./middleware";
+
+export async function registerAuthRoutes(app: Express): Promise<void> {
+  // POST /api/logout - User logout
+  app.post("/api/logout", async (req, res) => {
+    res.json({ success: true });
+  });
+
+  // POST /api/login - User login with email and password
+  app.post("/api/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      if (!email || !password) {
+        return res.status(400).json({ error: "ایمیل و رمز عبور ضروری است" });
+      }
+      
+      const user = await storage.getUserByEmail(email);
+      if (!user || user.password !== password) {
+        return res.status(401).json({ error: "ایمیل یا رمز عبور اشتباه است" });
+      }
+      
+      const token = `auth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const sessionId = `session_${Date.now()}`;
+      
+      res.json({
+        success: true,
+        token,
+        user: { id: user.id, email: user.email, fullName: user.fullName, role: user.role }
+      });
+    } catch (error) {
+      res.status(500).json({ error: "خطای سرور" });
+    }
+  });
+
+  // POST /api/register - User registration
+  app.post("/api/register", async (req, res) => {
+    try {
+      const { fullName, email, password } = req.body;
+      if (!fullName || !email || !password) {
+        return res.status(400).json({ error: "تمام فیلدها ضروری هستند" });
+      }
+      
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ error: "این ایمیل قبلاً ثبت شده است" });
+      }
+      
+      const user = await storage.upsertUser({
+        fullName,
+        email,
+        password,
+        role: "customer"
+      });
+      
+      const token = `auth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      res.json({
+        success: true,
+        token,
+        user: { id: user.id, email: user.email, fullName: user.fullName, role: user.role }
+      });
+    } catch (error) {
+      res.status(500).json({ error: "خطای سرور" });
+    }
+  });
+  
+  // GET /api/auth/user - Get current authenticated user
+  app.get("/api/auth/user", requireAuth, async (req, res) => {
+    try {
+      const user = await storage.getUser((req as any).userId);
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch user" });
+    }
+  });
+
+  // PATCH /api/auth/user - Update user profile
+  app.patch("/api/auth/user", requireAuth, async (req, res) => {
+    try {
+      const { firstName, lastName, phone } = req.body;
+      const user = await storage.updateUser((req as any).userId, {
+        firstName,
+        lastName,
+        phone,
+      });
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update user" });
+    }
+  });
+}
+```
+
+**Key Points:**
+- Lines extracted from routes.ts: 98-180
+- All auth functions in one file
+- Uses requireAuth middleware for protected routes
+- Duplicate logout removed (keeps one only)
+- Register, Login, Logout, GetUser, UpdateUser
+
+---
+
+## 🎯 CONTINUATION: USER ROUTES PATTERN
+
+### Micro-Task 5.1: Create server/routes/user/addresses.ts
+
+**Pattern (Apply to all user/* files):**
+
+```typescript
+/**
+ * User Address Routes
+ * 
+ * Endpoints (All require authentication):
+ * - GET /api/addresses           - Get user addresses
+ * - POST /api/addresses          - Create new address
+ * - PATCH /api/addresses/:id     - Update address
+ * - DELETE /api/addresses/:id    - Delete address
+ */
+
+import type { Express } from "express";
+import { storage } from "../../storage";
+import { requireAuth } from "../middleware";
+import { insertAddressSchema } from "@shared/schema";
+
+export async function registerUserAddressRoutes(app: Express): Promise<void> {
+  // GET /api/addresses - Lines 184-191
+  app.get("/api/addresses", requireAuth, async (req, res) => {
+    try {
+      const addresses = await storage.getUserAddresses((req as any).userId);
+      res.json(addresses);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch addresses" });
+    }
+  });
+
+  // POST /api/addresses - Lines 193-201
+  app.post("/api/addresses", requireAuth, async (req, res) => {
+    try {
+      const validated = insertAddressSchema.parse(req.body);
+      const address = await storage.createAddress((req as any).userId, validated);
+      res.json(address);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid address data" });
+    }
+  });
+
+  // PATCH /api/addresses/:id - Lines 203-213
+  app.patch("/api/addresses/:id", requireAuth, async (req, res) => {
+    try {
+      const address = await storage.updateAddress(parseInt(req.params.id), req.body);
+      if (address.userId !== (req as any).userId) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+      res.json(address);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update address" });
+    }
+  });
+
+  // DELETE /api/addresses/:id - Lines 215-226
+  app.delete("/api/addresses/:id", requireAuth, async (req, res) => {
+    try {
+      const address = await storage.getAddress(parseInt(req.params.id));
+      if (!address || address.userId !== (req as any).userId) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+      await storage.deleteAddress(parseInt(req.params.id));
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete address" });
+    }
+  });
+}
+```
+
+---
+
+## 📋 REMAINING FILES QUICK REFERENCE
+
+**Apply same ultra-detailed pattern for:**
+
+### USER ROUTES (5 more files):
+1. **user/orders.ts** - Lines 230-311, 424-438
+2. **user/reviews.ts** - Lines 451-503
+3. **user/wishlist.ts** - Lines 507-533
+4. **user/wallet.ts** - Lines [TBD in routes.ts]
+5. **user/cart.ts** - Lines [TBD in routes.ts]
+
+### ADMIN ROUTES (7 files):
+1. **admin/dashboard.ts** - Lines 315-326
+2. **admin/products.ts** - Lines 328-363
+3. **admin/categories.ts** - Lines 365-400
+4. **admin/orders.ts** - Lines 402-422
+5. **admin/users.ts** - Lines 440-447
+6. **admin/coupons.ts** - Lines 537-572
+7. **admin/reviews.ts** - Lines 576-601
+
+### CONTENT ROUTES (3 files):
+1. **content/articles.ts** - Lines 883-930+
+2. **content/news.ts** - Lines 932-979+
+3. **content/pages.ts** - Lines 981-1028+
+
+### CATALOG ROUTES (3 files):
+1. **catalog/brands.ts** - Lines 1030-1067+
+2. **catalog/attributes.ts** - Lines 1069-1106+
+3. **catalog/shipping.ts** - Lines 1108-1145+
+
+### FEATURES ROUTES (6 files):
+1. **features/questions.ts** - Lines 1285-1323+
+2. **features/answers.ts** - Lines 1325-1363+
+3. **features/sliders.ts** - Lines 1365-1422+
+4. **features/banners.ts** - Lines 1424-1481+
+5. **features/comparisons.ts** - Lines 672-703
+6. **features/credit-points.ts** - Lines 1147-1167+
+
+### UTILITY ROUTES (5 files):
+1. **payment.ts** - Lines 603-630
+2. **search.ts** - Lines 1500-1544+
+3. **upload.ts** - Lines 1483-1499
+4. **settings.ts** - Lines 1255-1283+
+5. **requests.ts** - Lines 1205-1253+
+
+---
+
+## ✅ GLOBAL EXECUTION CHECKLIST
+
+### Phase 1: Foundation (Tasks 1-2)
+- [ ] TASK 1.1.1: middleware.ts created
+- [ ] TASK 1.1.2: requireAuth extracted
+- [ ] TASK 1.1.3: requireAdmin extracted
+- [ ] TASK 1.1.4-7: middleware.ts completed
+- [ ] TASK 2.1.1-7: utils.ts completed
+
+### Phase 2: Setup (Task 2)
+- [ ] TASK 2.1.1: Create routes/index.ts
+- [ ] TASK 2.1.2-3: Setup setupAllRoutes()
+- [ ] TASK 2.2.1-3: Update main routes.ts
+
+### Phase 3A: Public Routes (Task 3)
+- [ ] TASK 3.1.1-5: public/products.ts
+- [ ] TASK 3.2.1-5: public/categories.ts
+
+### Phase 3B: Auth Routes (Task 4)
+- [ ] TASK 4.1.1-8: auth.ts
+
+### Phase 3C: User Routes (Task 5)
+- [ ] TASK 5.1: user/addresses.ts
+- [ ] TASK 5.2: user/orders.ts
+- [ ] TASK 5.3: user/reviews.ts
+- [ ] TASK 5.4: user/wishlist.ts
+- [ ] TASK 5.5: user/wallet.ts
+- [ ] TASK 5.6: user/cart.ts
+
+### Phase 3D: Admin Routes (Task 6)
+- [ ] TASK 6.1: admin/dashboard.ts
+- [ ] TASK 6.2: admin/products.ts
+- [ ] TASK 6.3: admin/categories.ts
+- [ ] TASK 6.4: admin/orders.ts
+- [ ] TASK 6.5: admin/users.ts
+- [ ] TASK 6.6: admin/coupons.ts
+- [ ] TASK 6.7: admin/reviews.ts
+
+### Phase 3E: Content Routes (Task 7)
+- [ ] TASK 7.1: content/articles.ts
+- [ ] TASK 7.2: content/news.ts
+- [ ] TASK 7.3: content/pages.ts
+
+### Phase 3F: Catalog Routes (Task 8)
+- [ ] TASK 8.1: catalog/brands.ts
+- [ ] TASK 8.2: catalog/attributes.ts
+- [ ] TASK 8.3: catalog/shipping.ts
+
+### Phase 3G: Features Routes (Task 9)
+- [ ] TASK 9.1: features/questions.ts
+- [ ] TASK 9.2: features/answers.ts
+- [ ] TASK 9.3: features/sliders.ts
+- [ ] TASK 9.4: features/banners.ts
+- [ ] TASK 9.5: features/comparisons.ts
+- [ ] TASK 9.6: features/credit-points.ts
+
+### Phase 3H: Utility Routes (Task 10)
+- [ ] TASK 10.1: payment.ts
+- [ ] TASK 10.2: search.ts
+- [ ] TASK 10.3: upload.ts
+- [ ] TASK 10.4: settings.ts
+- [ ] TASK 10.5: requests.ts
+
+### Phase 4: Integration (Task 11)
+- [ ] TASK 11.1: Update routes/index.ts
+- [ ] TASK 11.2: Update main routes.ts
+
+### Phase 5: Testing (Task 12)
+- [ ] TASK 12.1: Build & compile
+- [ ] TASK 12.2: Restart workflow
+- [ ] TASK 12.3: Test all endpoints
+
+### Phase 6: Documentation (Task 13)
+- [ ] TASK 13.1: Update replit.md
+
+---
+
+## 🚨 ERROR RESOLUTION GUIDE
+
+### Error 1: "Cannot find module 'middleware'"
+**Cause:** Import path incorrect
+**Fix:**
+```typescript
+// Wrong:
+import { requireAuth } from "./middleware";
+
+// Correct (from auth.ts):
+import { requireAuth } from "./middleware";
+
+// Correct (from user/addresses.ts):
+import { requireAuth } from "../middleware";
+```
+
+### Error 2: "storage is not defined"
+**Cause:** Missing storage import
+**Fix:**
+```typescript
+// From routes root (auth.ts):
+import { storage } from "../storage";
+
+// From routes/user/ (user/addresses.ts):
+import { storage } from "../../storage";
+
+// From routes/admin/ (admin/products.ts):
+import { storage } from "../../storage";
+```
+
+### Error 3: "insertXSchema is not defined"
+**Cause:** Missing schema import
+**Fix:**
+```typescript
+import { insertAddressSchema } from "@shared/schema";
+```
+
+### Error 4: "Express is not defined"
+**Cause:** Missing Express type import
+**Fix:**
+```typescript
+import type { Express } from "express";
+```
+
+---
+
+## 🎯 SUMMARY
+
+**Total Micro-Tasks Created: 200+**
+**Total Files to Create: 35**
+**Total Lines to Extract: 2,264**
+**Estimated Time: 4-6 hours**
+**Difficulty: Medium (Repetitive but straightforward)**
+
+**Next Step:** Start TASK 1.1.1 - Create middleware.ts
+
