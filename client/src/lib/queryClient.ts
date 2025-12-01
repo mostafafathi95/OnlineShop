@@ -1,5 +1,8 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
+// Request deduplication cache
+const requestCache = new Map<string, Promise<any>>();
+
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
@@ -22,16 +25,34 @@ export async function apiRequest(
     }
   }
 
-  const res = await fetch(url, {
+  // Deduplicate identical requests
+  const cacheKey = `${method}:${url}`;
+  if (method === "GET" && requestCache.has(cacheKey)) {
+    return requestCache.get(cacheKey);
+  }
+
+  const promise = fetch(url, {
     method,
     headers,
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
-  });
+  })
+    .then(async (res) => {
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || res.statusText);
+      return json;
+    })
+    .finally(() => {
+      if (method === "GET") {
+        setTimeout(() => requestCache.delete(cacheKey), 300); // Clear after 300ms
+      }
+    });
 
-  const json = await res.json();
-  if (!res.ok) throw new Error(json.error || res.statusText);
-  return json;
+  if (method === "GET") {
+    requestCache.set(cacheKey, promise);
+  }
+
+  return promise;
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";
@@ -90,11 +111,14 @@ export const queryClient = new QueryClient({
       queryFn: getQueryFn({ on401: "throw" }),
       refetchInterval: false,
       refetchOnWindowFocus: false,
-      staleTime: Infinity,
-      retry: false,
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      gcTime: 1000 * 60 * 30, // 30 minutes (formerly cacheTime)
+      retry: 1,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
     },
     mutations: {
-      retry: false,
+      retry: 1,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
     },
   },
 });
