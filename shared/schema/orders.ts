@@ -1,6 +1,7 @@
-import { index, pgTable, timestamp, varchar, text, integer, decimal, boolean, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, timestamp, varchar, text, integer, decimal, boolean, jsonb } from "drizzle-orm/pg-core";
 import { users } from "./auth";
 import { products } from "./products";
+import { addresses as addressesTable } from "./orders";
 
 // Addresses table
 export const addresses = pgTable("addresses", {
@@ -27,7 +28,7 @@ export const cartItems = pgTable("cart_items", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Orders table
+// Orders table - declared before orderItems since it's referenced
 export const orders = pgTable("orders", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   orderNumber: varchar("order_number", { length: 20 }).notNull().unique(),
@@ -37,7 +38,7 @@ export const orders = pgTable("orders", {
   shippingCost: decimal("shipping_cost", { precision: 12, scale: 0 }).default("0"),
   discount: decimal("discount", { precision: 12, scale: 0 }).default("0"),
   total: decimal("total", { precision: 12, scale: 0 }).notNull(),
-  addressId: integer("address_id").references(() => addresses.id),
+  addressId: integer("address_id"),
   shippingAddress: jsonb("shipping_address"),
   couponCode: varchar("coupon_code", { length: 50 }),
   notes: text("notes"),

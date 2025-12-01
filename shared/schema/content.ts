@@ -1,4 +1,4 @@
-import { index, pgTable, timestamp, varchar, text, integer } from "drizzle-orm/pg-core";
+import { index, pgTable, timestamp, varchar, text, integer, boolean } from "drizzle-orm/pg-core";
 import { users } from "./auth";
 
 // Articles table

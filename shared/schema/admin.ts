@@ -1,7 +1,4 @@
 import { index, pgTable, timestamp, varchar, text, integer, boolean, jsonb } from "drizzle-orm/pg-core";
-import { users } from "./auth";
-import { products } from "./products";
-import { questions as questionsTable } from "./community";
 
 // Sliders table
 export const sliders = pgTable("sliders", {
