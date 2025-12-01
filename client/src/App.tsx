@@ -67,6 +67,7 @@ import AdminLanding from "@/pages/admin/AdminLanding";
 import AdminBanners from "@/pages/admin/AdminBanners";
 import AdminRequests from "@/pages/admin/Requests";
 import AdminAnalytics from "@/pages/admin/Analytics";
+import AdminExport from "@/pages/admin/Export";
 import SearchResults from "@/pages/SearchResults";
 
 function Router() {
@@ -132,6 +133,7 @@ function Router() {
       <Route path="/admin/landing" component={AdminLanding} />
       <Route path="/admin/requests" component={AdminRequests} />
       <Route path="/admin/analytics" component={AdminAnalytics} />
+      <Route path="/admin/export" component={AdminExport} />
 
       <Route path="/search" component={SearchResults} />
       <Route path="/:slug" component={StaticPage} />

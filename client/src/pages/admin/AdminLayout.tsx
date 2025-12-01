@@ -54,6 +54,7 @@ const navigation = [
   { name: "بنرها", href: "/admin/banners", icon: Image },
   { name: "صفحه اصلی", href: "/admin/landing", icon: LayoutDashboard },
   { name: "تحلیلات", href: "/admin/analytics", icon: TrendingUp },
+  { name: "صادرات", href: "/admin/export", icon: TrendingUp },
   { name: "گزارشات", href: "/admin/reports", icon: TrendingUp },
   { name: "درخواست‌ها", href: "/admin/requests", icon: MessageSquare },
   { name: "تنظیمات", href: "/admin/settings", icon: Settings },
