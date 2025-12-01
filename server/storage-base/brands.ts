@@ -23,7 +23,7 @@ export class Brands {
   }
 
   async createBrand(brand: InsertBrand): Promise<Brand> {
-    const [newBrand] = await db.insert(brands).values(brand).returning();
+    const [newBrand] = await db.insert(brands).values(brand as any).returning();
     return newBrand;
   }
 
