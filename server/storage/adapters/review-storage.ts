@@ -1,4 +1,4 @@
-import { Reviews } from "../storage-base/index";
+import { Reviews } from "../../storage-base";
 import type { Review, InsertReview } from "@shared/schema";
 
 export class ReviewStorageAdapter {

@@ -1,4 +1,4 @@
-import { CreditPoints, Wallets, Requests } from "../storage-base/index";
+import { CreditPoints, Wallets, Requests } from "../../storage-base";
 import type {
   CreditPoint, InsertCreditPoint, UserWallet, InsertUserWallet,
   UserRequest, InsertUserRequest

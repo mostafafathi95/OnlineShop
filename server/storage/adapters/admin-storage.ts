@@ -1,4 +1,4 @@
-import { Settings, Sliders, Banners, LandingPageSections } from "../storage-base/index";
+import { Settings, Sliders, Banners, LandingPageSections } from "../../storage-base";
 import type {
   Setting, InsertSetting, Slider, InsertSlider, Banner, InsertBanner,
   LandingPageSection, InsertLandingPageSection

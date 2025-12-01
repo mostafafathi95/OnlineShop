@@ -1,4 +1,4 @@
-import { Questions, Answers } from "../storage-base/index";
+import { Questions, Answers } from "../../storage-base";
 import type { Question, InsertQuestion, Answer, InsertAnswer } from "@shared/schema";
 
 export class QAStorageAdapter {

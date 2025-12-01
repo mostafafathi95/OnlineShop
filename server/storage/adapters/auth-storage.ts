@@ -1,4 +1,4 @@
-import { Users } from "../storage-base/index";
+import { Users } from "../../storage-base";
 import type { User, UpsertUser } from "@shared/schema";
 
 export class AuthStorageAdapter {

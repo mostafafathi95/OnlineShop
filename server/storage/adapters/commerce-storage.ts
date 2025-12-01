@@ -1,4 +1,4 @@
-import { Wishlist, Coupons } from "../storage-base/index";
+import { Wishlist, Coupons } from "../../storage-base";
 import type { WishlistItem, Product, Coupon, InsertCoupon } from "@shared/schema";
 
 export class CommerceStorageAdapter {

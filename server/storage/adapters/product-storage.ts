@@ -1,4 +1,4 @@
-import { Categories, Products, ProductImages } from "../storage-base/index";
+import { Categories, Products, ProductImages } from "../../storage-base";
 import type {
   Category, InsertCategory, Product, InsertProduct,
   ProductImage, InsertProductImage

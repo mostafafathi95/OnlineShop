@@ -1,4 +1,4 @@
-import { Addresses, Cart, Orders } from "../storage-base/index";
+import { Addresses, Cart, Orders } from "../../storage-base";
 import type {
   Address, InsertAddress, CartItem, Product, Order, InsertOrder,
   OrderItem, InsertOrderItem

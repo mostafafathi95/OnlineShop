@@ -1,4 +1,4 @@
-import { Articles, Pages, News as NewsOps } from "../storage-base/index";
+import { Articles, Pages, News as NewsOps } from "../../storage-base";
 import type {
   Article, InsertArticle, News, InsertNews, Page, InsertPage
 } from "@shared/schema";

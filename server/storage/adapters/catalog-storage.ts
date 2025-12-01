@@ -1,4 +1,4 @@
-import { Brands, ProductAttributes, ShippingMethods } from "../storage-base/index";
+import { Brands, ProductAttributes, ShippingMethods } from "../../storage-base";
 import type {
   Brand, InsertBrand, ProductAttribute, InsertProductAttribute,
   ShippingMethod, InsertShippingMethod

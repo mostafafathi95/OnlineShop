@@ -1,4 +1,4 @@
-import { Analytics, Stats } from "../storage-base/index";
+import { Analytics, Stats } from "../../storage-base";
 
 export class AnalyticsStorageAdapter {
   private analytics: Analytics;

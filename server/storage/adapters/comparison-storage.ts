@@ -1,4 +1,4 @@
-import { Comparisons } from "../storage-base/index";
+import { Comparisons } from "../../storage-base";
 
 export class ComparisonStorageAdapter {
   private comparisons: Comparisons;
