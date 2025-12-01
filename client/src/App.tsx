@@ -1,3 +1,4 @@
+import { Suspense, lazy } from "react";
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -5,78 +6,85 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import NotFound from "@/pages/not-found";
+import Loading from "@/components/ui/skeleton";
 
-import Landing from "@/pages/Landing";
-import Products from "@/pages/Products";
-import ProductDetail from "@/pages/ProductDetail";
-import ProductsCompare from "@/pages/ProductsCompare";
-import Cart from "@/pages/Cart";
-import Checkout from "@/pages/checkout/Checkout";
-import About from "@/pages/About";
-import Contact from "@/pages/Contact";
-import Terms from "@/pages/Terms";
-import Articles from "@/pages/Articles";
-import ArticleDetail from "@/pages/ArticleDetail";
-import News from "@/pages/News";
-import NewsDetail from "@/pages/NewsDetail";
-import StaticPage from "@/pages/StaticPage";
+// Lazy load pages
+const Landing = lazy(() => import("@/pages/Landing"));
+const Products = lazy(() => import("@/pages/Products"));
+const ProductDetail = lazy(() => import("@/pages/ProductDetail"));
+const ProductsCompare = lazy(() => import("@/pages/ProductsCompare"));
+const Cart = lazy(() => import("@/pages/Cart"));
+const Checkout = lazy(() => import("@/pages/checkout/Checkout"));
+const About = lazy(() => import("@/pages/About"));
+const Contact = lazy(() => import("@/pages/Contact"));
+const Terms = lazy(() => import("@/pages/Terms"));
+const Articles = lazy(() => import("@/pages/Articles"));
+const ArticleDetail = lazy(() => import("@/pages/ArticleDetail"));
+const News = lazy(() => import("@/pages/News"));
+const NewsDetail = lazy(() => import("@/pages/NewsDetail"));
+const StaticPage = lazy(() => import("@/pages/StaticPage"));
 
-import AccountDashboard from "@/pages/account/Dashboard";
-import AccountOrders from "@/pages/account/Orders";
-import AccountOrderDetail from "@/pages/account/OrderDetail";
-import AccountAddresses from "@/pages/account/Addresses";
-import AccountProfile from "@/pages/account/Profile";
+// Lazy load account pages
+const AccountDashboard = lazy(() => import("@/pages/account/Dashboard"));
+const AccountOrders = lazy(() => import("@/pages/account/Orders"));
+const AccountOrderDetail = lazy(() => import("@/pages/account/OrderDetail"));
+const AccountAddresses = lazy(() => import("@/pages/account/Addresses"));
+const AccountProfile = lazy(() => import("@/pages/account/Profile"));
+const AccountWishlist = lazy(() => import("@/pages/account/Wishlist"));
+const AccountReviews = lazy(() => import("@/pages/account/Reviews"));
 
-import AdminDashboard from "@/pages/admin/Dashboard";
-import AdminProducts from "@/pages/admin/Products";
-import AdminProductForm from "@/pages/admin/ProductForm";
-import AdminCategories from "@/pages/admin/Categories";
-import AdminOrders from "@/pages/admin/Orders";
-import AdminUsers from "@/pages/admin/Users";
-import AdminCoupons from "@/pages/admin/Coupons";
-import AdminReviews from "@/pages/admin/Reviews";
-import AdminArticles from "@/pages/admin/Articles";
-import AdminArticleForm from "@/pages/admin/ArticleForm";
-import AdminNews from "@/pages/admin/News";
-import AdminNewsForm from "@/pages/admin/NewsForm";
-import AdminPages from "@/pages/admin/Pages";
-import AdminPageForm from "@/pages/admin/PageForm";
-import AdminBrands from "@/pages/admin/Brands";
-import AdminBrandForm from "@/pages/admin/BrandForm";
-import AdminProductAttributes from "@/pages/admin/ProductAttributes";
-import AdminShippingMethods from "@/pages/admin/ShippingMethods";
-import AdminCreditPoints from "@/pages/admin/CreditPoints";
-import AdminSettings from "@/pages/admin/Settings";
-import AdminQuestions from "@/pages/admin/Questions";
-import AdminAnswers from "@/pages/admin/Answers";
-import AdminUserWallets from "@/pages/admin/UserWallets";
-import ProductAttributesForm from "@/pages/admin/ProductAttributesForm";
-import ShippingMethodsForm from "@/pages/admin/ShippingMethodsForm";
-import AdminReports from "@/pages/admin/Reports";
+// Lazy load admin pages
+const AdminDashboard = lazy(() => import("@/pages/admin/Dashboard"));
+const AdminProducts = lazy(() => import("@/pages/admin/Products"));
+const AdminProductForm = lazy(() => import("@/pages/admin/ProductForm"));
+const AdminCategories = lazy(() => import("@/pages/admin/Categories"));
+const AdminOrders = lazy(() => import("@/pages/admin/Orders"));
+const AdminUsers = lazy(() => import("@/pages/admin/Users"));
+const AdminCoupons = lazy(() => import("@/pages/admin/Coupons"));
+const AdminReviews = lazy(() => import("@/pages/admin/Reviews"));
+const AdminArticles = lazy(() => import("@/pages/admin/Articles"));
+const AdminArticleForm = lazy(() => import("@/pages/admin/ArticleForm"));
+const AdminNews = lazy(() => import("@/pages/admin/News"));
+const AdminNewsForm = lazy(() => import("@/pages/admin/NewsForm"));
+const AdminPages = lazy(() => import("@/pages/admin/Pages"));
+const AdminPageForm = lazy(() => import("@/pages/admin/PageForm"));
+const AdminBrands = lazy(() => import("@/pages/admin/Brands"));
+const AdminBrandForm = lazy(() => import("@/pages/admin/BrandForm"));
+const AdminProductAttributes = lazy(() => import("@/pages/admin/ProductAttributes"));
+const AdminShippingMethods = lazy(() => import("@/pages/admin/ShippingMethods"));
+const AdminCreditPoints = lazy(() => import("@/pages/admin/CreditPoints"));
+const AdminSettings = lazy(() => import("@/pages/admin/Settings"));
+const AdminQuestions = lazy(() => import("@/pages/admin/Questions"));
+const AdminAnswers = lazy(() => import("@/pages/admin/Answers"));
+const AdminUserWallets = lazy(() => import("@/pages/admin/UserWallets"));
+const ProductAttributesForm = lazy(() => import("@/pages/admin/ProductAttributesForm"));
+const ShippingMethodsForm = lazy(() => import("@/pages/admin/ShippingMethodsForm"));
+const AdminReports = lazy(() => import("@/pages/admin/Reports"));
+const Login = lazy(() => import("@/pages/auth/Login"));
+const Register = lazy(() => import("@/pages/auth/Register"));
+const AdminAccess = lazy(() => import("@/pages/AdminAccess"));
+const AdminSliders = lazy(() => import("@/pages/admin/Sliders"));
+const AdminSliderForm = lazy(() => import("@/pages/admin/SliderForm"));
+const AdminLanding = lazy(() => import("@/pages/admin/AdminLanding"));
+const AdminBanners = lazy(() => import("@/pages/admin/AdminBanners"));
+const AdminRequests = lazy(() => import("@/pages/admin/Requests"));
+const AdminAnalytics = lazy(() => import("@/pages/admin/Analytics"));
+const AdminExport = lazy(() => import("@/pages/admin/Export"));
+const SearchResults = lazy(() => import("@/pages/SearchResults"));
 
-import AccountWishlist from "@/pages/account/Wishlist";
-import AccountReviews from "@/pages/account/Reviews";
-
-import Login from "@/pages/auth/Login";
-import Register from "@/pages/auth/Register";
-import AdminAccess from "@/pages/AdminAccess";
-
-import AdminSliders from "@/pages/admin/Sliders";
-import AdminSliderForm from "@/pages/admin/SliderForm";
-import AdminLanding from "@/pages/admin/AdminLanding";
-import AdminBanners from "@/pages/admin/AdminBanners";
-import AdminRequests from "@/pages/admin/Requests";
-import AdminAnalytics from "@/pages/admin/Analytics";
-import AdminExport from "@/pages/admin/Export";
-import SearchResults from "@/pages/SearchResults";
+function LoadingFallback() {
+  return (
+    <div className="flex items-center justify-center h-screen">
+      <Loading className="h-8 w-8" />
+    </div>
+  );
+}
 
 function Router() {
   return (
     <Switch>
+      {/* Public routes */}
       <Route path="/" component={Landing} />
-      <Route path="/admin-access" component={AdminAccess} />
-      <Route path="/login" component={Login} />
-      <Route path="/register" component={Register} />
       <Route path="/products" component={Products} />
       <Route path="/products/:slug" component={ProductDetail} />
       <Route path="/products/compare" component={ProductsCompare} />
@@ -89,15 +97,24 @@ function Router() {
       <Route path="/articles/:slug" component={ArticleDetail} />
       <Route path="/news" component={News} />
       <Route path="/news/:slug" component={NewsDetail} />
+      <Route path="/page/:slug" component={StaticPage} />
+      <Route path="/search" component={SearchResults} />
 
+      {/* Auth routes */}
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
+      <Route path="/admin-access" component={AdminAccess} />
+
+      {/* Account routes */}
       <Route path="/account" component={AccountDashboard} />
       <Route path="/account/orders" component={AccountOrders} />
       <Route path="/account/orders/:id" component={AccountOrderDetail} />
-      <Route path="/account/wishlist" component={AccountWishlist} />
-      <Route path="/account/reviews" component={AccountReviews} />
       <Route path="/account/addresses" component={AccountAddresses} />
       <Route path="/account/profile" component={AccountProfile} />
+      <Route path="/account/wishlist" component={AccountWishlist} />
+      <Route path="/account/reviews" component={AccountReviews} />
 
+      {/* Admin routes */}
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/products" component={AdminProducts} />
       <Route path="/admin/products/:id" component={AdminProductForm} />
@@ -114,45 +131,40 @@ function Router() {
       <Route path="/admin/pages/:id" component={AdminPageForm} />
       <Route path="/admin/brands" component={AdminBrands} />
       <Route path="/admin/brands/:id" component={AdminBrandForm} />
-      <Route path="/admin/product-attributes" component={AdminProductAttributes} />
-      <Route path="/admin/shipping-methods" component={AdminShippingMethods} />
-      <Route path="/admin/credit-points" component={AdminCreditPoints} />
+      <Route path="/admin/attributes" component={AdminProductAttributes} />
+      <Route path="/admin/attributes/:id" component={ProductAttributesForm} />
+      <Route path="/admin/shipping" component={AdminShippingMethods} />
+      <Route path="/admin/shipping/:id" component={ShippingMethodsForm} />
+      <Route path="/admin/credits" component={AdminCreditPoints} />
       <Route path="/admin/settings" component={AdminSettings} />
       <Route path="/admin/questions" component={AdminQuestions} />
       <Route path="/admin/answers" component={AdminAnswers} />
-      <Route path="/admin/user-wallets" component={AdminUserWallets} />
-      <Route path="/admin/product-attributes/new" component={ProductAttributesForm} />
-      <Route path="/admin/product-attributes/:id" component={ProductAttributesForm} />
-      <Route path="/admin/shipping-methods/new" component={ShippingMethodsForm} />
-      <Route path="/admin/shipping-methods/:id" component={ShippingMethodsForm} />
+      <Route path="/admin/wallets" component={AdminUserWallets} />
       <Route path="/admin/reports" component={AdminReports} />
       <Route path="/admin/sliders" component={AdminSliders} />
-      <Route path="/admin/sliders/new" component={AdminSliderForm} />
       <Route path="/admin/sliders/:id" component={AdminSliderForm} />
-      <Route path="/admin/banners" component={AdminBanners} />
       <Route path="/admin/landing" component={AdminLanding} />
+      <Route path="/admin/banners" component={AdminBanners} />
       <Route path="/admin/requests" component={AdminRequests} />
       <Route path="/admin/analytics" component={AdminAnalytics} />
       <Route path="/admin/export" component={AdminExport} />
 
-      <Route path="/search" component={SearchResults} />
-      <Route path="/:slug" component={StaticPage} />
       <Route component={NotFound} />
     </Switch>
   );
 }
 
-function App() {
+export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <TooltipProvider>
+          <Suspense fallback={<LoadingFallback />}>
+            <Router />
+          </Suspense>
           <Toaster />
-          <Router />
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );
 }
-
-export default App;
