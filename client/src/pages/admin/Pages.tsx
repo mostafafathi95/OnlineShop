@@ -141,11 +141,12 @@ export default function AdminPages() {
               </DialogDescription>
             </DialogHeader>
             <div className="flex justify-end gap-2">
-              <Button variant="outline">انصراف</Button>
-              <Button>
-              >
+              <Button variant="outline" onClick={() => setDeleteId(null)}>
+                انصراف
+              </Button>
+              <Button variant="destructive" onClick={() => deleteId && deleteMutation.mutate(deleteId)}>
                 حذف
-              />
+              </Button>
             </div>
           </DialogContent>
         </Dialog>

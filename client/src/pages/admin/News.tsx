@@ -148,6 +148,7 @@ export default function AdminNews() {
               <Button variant="destructive" onClick={() => deleteId && deleteMutation.mutate(deleteId)}>
                 حذف
               </Button>
+            </div>
           </DialogContent>
         </Dialog>
       </div>

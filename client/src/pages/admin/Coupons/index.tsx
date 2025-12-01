@@ -69,7 +69,7 @@ export default function AdminCoupons() {
               <p className="text-muted-foreground">ایجاد و مدیریت کوپن‌های تخفیف</p>
             </div>
           </div>
-          <Button>
+          <Button
             onClick={() => {
               resetForm();
               setEditingCoupon(null);
@@ -128,7 +128,7 @@ export default function AdminCoupons() {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button>
+                      <Button
                         variant="outline"
                         size="icon"
                         onClick={() => handleEdit(coupon)}
@@ -136,7 +136,7 @@ export default function AdminCoupons() {
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button>
+                      <Button
                         variant="destructive"
                         size="icon"
                         onClick={() => setDeleteId(coupon.id)}
@@ -185,11 +185,13 @@ export default function AdminCoupons() {
             <DialogTitle>حذف کوپن</DialogTitle>
             <DialogDescription>آیا مطمئن هستید؟ این عمل قابل بازگشت نیست.</DialogDescription>
           </DialogHeader>
-          <div>
-            <Button data-testid="button-cancel-delete">انصراف</Button>
-            <Button>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setDeleteId(null)} data-testid="button-cancel-delete">
+              انصراف
+            </Button>
+            <Button
+              variant="destructive"
               onClick={() => deleteId && deleteMutation.mutate(deleteId)}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               data-testid="button-confirm-delete"
             >
               حذف
