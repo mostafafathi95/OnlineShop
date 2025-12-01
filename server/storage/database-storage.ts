@@ -629,4 +629,17 @@ export class DatabaseStorage implements IStorage {
   async removeFromComparison(sessionId: string, product1Id: number, product2Id: number): Promise<void> {
     return this.comparisons.removeFromComparison(sessionId, product1Id, product2Id);
   }
+
+  // Session Management
+  async createSession(token: string, data: any): Promise<void> {
+    return this.auth.createSession(token, data);
+  }
+
+  async getSession(token: string): Promise<any | null> {
+    return this.auth.getSession(token);
+  }
+
+  async deleteSession(token: string): Promise<void> {
+    return this.auth.deleteSession(token);
+  }
 }

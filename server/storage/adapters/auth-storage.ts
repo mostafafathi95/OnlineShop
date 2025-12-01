@@ -3,6 +3,7 @@ import type { User, UpsertUser } from "@shared/schema";
 
 export class AuthStorageAdapter {
   private users: Users;
+  private sessions: Map<string, any> = new Map();
 
   constructor() {
     this.users = new Users();
@@ -26,5 +27,18 @@ export class AuthStorageAdapter {
 
   async getAllUsers(): Promise<User[]> {
     return this.users.getAllUsers();
+  }
+
+  // Session Management
+  async createSession(token: string, data: any): Promise<void> {
+    this.sessions.set(token, { ...data, createdAt: Date.now() });
+  }
+
+  async getSession(token: string): Promise<any | null> {
+    return this.sessions.get(token) || null;
+  }
+
+  async deleteSession(token: string): Promise<void> {
+    this.sessions.delete(token);
   }
 }
