@@ -50,7 +50,6 @@ export default function AdminSliders() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold">اسلایدرهای صفحه اصلی</h2>
-          <Button onClick={() => setLocation("/admin/sliders/new")} data-testid="button-new-slider">
             <Plus className="w-4 h-4 ml-2" />
             اسلایدر جدید
           </Button>
@@ -93,7 +92,6 @@ export default function AdminSliders() {
                       <Button>
                         size="icon"
                         variant="ghost"
-                        onClick={() =>
                           toggleActiveMutation.mutate(slider)
                         }
                         data-testid={`button-toggle-${slider.id}`}
@@ -107,7 +105,6 @@ export default function AdminSliders() {
                       <Button>
                         size="icon"
                         variant="ghost"
-                        onClick={() => setLocation(`/admin/sliders/${slider.id}`)}
                         data-testid={`button-edit-${slider.id}`}
                       >
                         <Edit className="w-4 h-4" />
@@ -115,7 +112,6 @@ export default function AdminSliders() {
                       <Button>
                         size="icon"
                         variant="ghost"
-                        onClick={() => setDeleteId(slider.id)}
                         data-testid={`button-delete-${slider.id}`}
                       >
                         <Trash2 className="w-4 h-4" />
@@ -147,7 +143,6 @@ export default function AdminSliders() {
           <div className="flex gap-3 justify-end">
             <Button variant="outline">لغو</Button>
             <Button>
-              onClick={() => deleteId && deleteMutation.mutate(deleteId)}
               data-testid="button-confirm-delete"
             >
               حذف

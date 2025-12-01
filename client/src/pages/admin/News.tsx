@@ -142,13 +142,12 @@ export default function AdminNews() {
               </DialogDescription>
             </DialogHeader>
             <div className="flex justify-end gap-2">
-              <Button variant="outline">انصراف</Button>
-              <Button>
-                onClick={() => deleteId && deleteMutation.mutate(deleteId)}
-              >
+              <Button variant="outline" onClick={() => setDeleteId(null)}>
+                انصراف
+              </Button>
+              <Button variant="destructive" onClick={() => deleteId && deleteMutation.mutate(deleteId)}>
                 حذف
-              />
-            </div>
+              </Button>
           </DialogContent>
         </Dialog>
       </div>

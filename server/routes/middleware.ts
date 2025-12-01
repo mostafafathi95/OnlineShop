@@ -7,6 +7,7 @@
 
 import type { Request, Response, NextFunction } from "express";
 import { logger } from "../utils/logger";
+import { validateToken } from "../utils/auth/token-validator";
 
 // Token storage (should be replaced with session store in production)
 const tokenStore = new Map<string, any>();
@@ -21,12 +22,12 @@ function requireAuth(req: Request, res: Response, next: NextFunction) {
     const token = authHeader?.replace("Bearer ", "");
 
     if (!token) {
+      logger.debug("AUTH", "No auth token provided");
       return res.status(401).json({ error: "Unauthorized - No token" });
     }
 
     const tokenData = tokenStore.get(token);
     if (!tokenData) {
-      logger.warn("AUTH", "Token not found", { token: token.substring(0, 20) });
       return res.status(401).json({ error: "Unauthorized - Invalid token" });
     }
 
@@ -49,12 +50,12 @@ function requireAdmin(req: Request, res: Response, next: NextFunction) {
     const token = authHeader?.replace("Bearer ", "");
 
     if (!token) {
+      logger.debug("AUTH", "No auth token for admin route");
       return res.status(401).json({ error: "Unauthorized - No token" });
     }
 
     const tokenData = tokenStore.get(token);
     if (!tokenData) {
-      logger.warn("AUTH", "Token not found", { token: token.substring(0, 20) });
       return res.status(401).json({ error: "Unauthorized - Invalid token" });
     }
 

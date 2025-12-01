@@ -125,7 +125,6 @@ export default function AdminArticles() {
                             </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => setDeleteId(article.id)}
                             className="text-destructive"
                           >
                             <Trash2 className="w-4 h-4 ml-2" />
@@ -152,7 +151,6 @@ export default function AdminArticles() {
             <div className="flex justify-end gap-2">
               <Button variant="outline">انصراف</Button>
               <Button>
-                onClick={() => deleteId && deleteMutation.mutate(deleteId)}
               >
                 حذف
               />
