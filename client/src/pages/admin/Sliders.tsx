@@ -90,7 +90,7 @@ export default function AdminSliders() {
 
                     {/* Actions */}
                     <div className="flex items-center gap-2">
-                      <Button
+                      <Button>
                         size="icon"
                         variant="ghost"
                         onClick={() =>
@@ -104,7 +104,7 @@ export default function AdminSliders() {
                           <EyeOff className="w-4 h-4" />
                         )}
                       </Button>
-                      <Button
+                      <Button>
                         size="icon"
                         variant="ghost"
                         onClick={() => setLocation(`/admin/sliders/${slider.id}`)}
@@ -112,7 +112,7 @@ export default function AdminSliders() {
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
-                      <Button
+                      <Button>
                         size="icon"
                         variant="ghost"
                         onClick={() => setDeleteId(slider.id)}
@@ -146,12 +146,12 @@ export default function AdminSliders() {
           </DialogHeader>
           <div className="flex gap-3 justify-end">
             <Button variant="outline">لغو</Button>
-            <Button
+            <Button>
               onClick={() => deleteId && deleteMutation.mutate(deleteId)}
               data-testid="button-confirm-delete"
             >
               حذف
-            </>
+            />
           </div>
         </DialogContent>
       </Dialog>

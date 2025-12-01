@@ -147,11 +147,11 @@ export default function AdminBrands() {
             </DialogHeader>
             <div className="flex justify-end gap-2">
               <Button variant="outline">انصراف</Button>
-              <Button
+              <Button>
                 onClick={() => deleteId && deleteMutation.mutate(deleteId)}
               >
                 حذف
-              </>
+              />
             </div>
           </DialogContent>
         </Dialog>
