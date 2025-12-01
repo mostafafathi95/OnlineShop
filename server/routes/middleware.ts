@@ -6,22 +6,75 @@
  */
 
 import type { Request, Response, NextFunction } from "express";
+import { logger } from "../utils/logger";
+
+// Token storage (should be replaced with session store in production)
+const tokenStore = new Map<string, any>();
+
+export function setTokenData(token: string, data: any) {
+  tokenStore.set(token, data);
+}
 
 function requireAuth(req: Request, res: Response, next: NextFunction) {
-  if (!(req as any).userId) {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.replace("Bearer ", "");
+
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized - No token" });
+    }
+
+    const tokenData = tokenStore.get(token);
+    if (!tokenData) {
+      logger.warn("AUTH", "Token not found", { token: token.substring(0, 20) });
+      return res.status(401).json({ error: "Unauthorized - Invalid token" });
+    }
+
+    // Set user data in request
+    (req as any).userId = tokenData.userId;
+    (req as any).email = tokenData.email;
+    (req as any).role = tokenData.role;
+    (req as any).token = token;
+
+    next();
+  } catch (error) {
+    logger.error("AUTH", "Auth middleware error", { error: String(error) });
     return res.status(401).json({ error: "Unauthorized" });
   }
-  next();
 }
 
 function requireAdmin(req: Request, res: Response, next: NextFunction) {
-  if (!(req as any).userId) {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.replace("Bearer ", "");
+
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized - No token" });
+    }
+
+    const tokenData = tokenStore.get(token);
+    if (!tokenData) {
+      logger.warn("AUTH", "Token not found", { token: token.substring(0, 20) });
+      return res.status(401).json({ error: "Unauthorized - Invalid token" });
+    }
+
+    // Check admin role
+    if (tokenData.role !== "admin") {
+      logger.warn("AUTH", "Non-admin access attempt", { userId: tokenData.userId, role: tokenData.role });
+      return res.status(403).json({ error: "Forbidden - Admin access required" });
+    }
+
+    // Set user data in request
+    (req as any).userId = tokenData.userId;
+    (req as any).email = tokenData.email;
+    (req as any).role = tokenData.role;
+    (req as any).token = token;
+
+    next();
+  } catch (error) {
+    logger.error("AUTH", "Admin middleware error", { error: String(error) });
     return res.status(401).json({ error: "Unauthorized" });
   }
-  if (!(req as any).role || (req as any).role !== "admin") {
-    return res.status(403).json({ error: "Forbidden" });
-  }
-  next();
 }
 
 export { requireAuth, requireAdmin };

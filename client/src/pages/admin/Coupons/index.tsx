@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Dialog, DialogAction, DialogCancel, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/alert-dialog";
 import AdminLayout from "../AdminLayout";
 import { useToast } from "@/hooks/use-toast";
 import type { Coupon } from "@shared/schema";
@@ -182,24 +182,24 @@ export default function AdminCoupons() {
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={deleteId !== null} onOpenChange={() => setDeleteId(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>حذف کوپن</AlertDialogTitle>
-            <AlertDialogDescription>آیا مطمئن هستید؟ این عمل قابل بازگشت نیست.</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel data-testid="button-cancel-delete">انصراف</AlertDialogCancel>
-            <AlertDialogAction
+      <Dialog open={deleteId !== null} onOpenChange={() => setDeleteId(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>حذف کوپن</DialogTitle>
+            <DialogDescription>آیا مطمئن هستید؟ این عمل قابل بازگشت نیست.</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogCancel data-testid="button-cancel-delete">انصراف</DialogCancel>
+            <DialogAction
               onClick={() => deleteId && deleteMutation.mutate(deleteId)}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               data-testid="button-confirm-delete"
             >
               حذف
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+            </DialogAction>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }

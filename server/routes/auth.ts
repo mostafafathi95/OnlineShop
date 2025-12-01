@@ -35,6 +35,14 @@ export async function registerAuthRoutes(app: Express): Promise<void> {
       const token = `auth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       const fullName = `${user.firstName || ""} ${user.lastName || ""}`.trim();
       
+      // Store token data for middleware
+      const { setTokenData } = await import("./middleware");
+      setTokenData(token, {
+        userId: user.id,
+        email: user.email,
+        role: user.role
+      });
+      
       res.json({
         success: true,
         token,
@@ -70,6 +78,14 @@ export async function registerAuthRoutes(app: Express): Promise<void> {
       
       const token = `auth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       const userFullName = `${user.firstName} ${user.lastName}`.trim();
+      
+      // Store token data for middleware
+      const { setTokenData } = await import("./middleware");
+      setTokenData(token, {
+        userId: user.id,
+        email: user.email,
+        role: user.role
+      });
       
       res.json({
         success: true,
