@@ -40,6 +40,7 @@ import { registerRequestRoutes } from "./requests";
 import { registerWalletRoutes } from "./user/wallet";
 import { registerCartRoutes } from "./user/cart";
 import { registerSeedRoutes } from "./seed";
+import { registerHealthRoutes } from "./admin/health";
 
 export { requireAuth, requireAdmin } from "./middleware";
 export { generateOrderNumber, handleError, formatResponse } from "./utils";
@@ -93,6 +94,7 @@ export async function setupAllRoutes(app: Express): Promise<void> {
   await registerSettingRoutes(app);
   await registerRequestRoutes(app);
   await registerSeedRoutes(app);
+  await registerHealthRoutes(app);
   
   // Payment
   await registerPaymentRoutes(app);
