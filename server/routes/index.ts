@@ -25,6 +25,20 @@ import { registerPaymentRoutes } from "./payment";
 import { registerArticleRoutes } from "./content/articles";
 import { registerNewsRoutes } from "./content/news";
 import { registerPageRoutes } from "./content/pages";
+import { registerBrandRoutes } from "./catalog/brands";
+import { registerAttributeRoutes } from "./catalog/attributes";
+import { registerShippingRoutes } from "./catalog/shipping";
+import { registerQuestionRoutes } from "./features/questions";
+import { registerAnswerRoutes } from "./features/answers";
+import { registerSliderRoutes } from "./features/sliders";
+import { registerBannerRoutes } from "./features/banners";
+import { registerCreditPointRoutes } from "./features/credit-points";
+import { registerSearchRoutes } from "./search";
+import { registerUploadRoutes } from "./upload";
+import { registerSettingRoutes } from "./settings";
+import { registerRequestRoutes } from "./requests";
+import { registerWalletRoutes } from "./user/wallet";
+import { registerCartRoutes } from "./user/cart";
 
 export { requireAuth, requireAdmin } from "./middleware";
 export { generateOrderNumber, handleError, formatResponse } from "./utils";
@@ -42,6 +56,8 @@ export async function setupAllRoutes(app: Express): Promise<void> {
   await registerUserOrderRoutes(app);
   await registerUserReviewRoutes(app);
   await registerUserWishlistRoutes(app);
+  await registerWalletRoutes(app);
+  await registerCartRoutes(app);
   
   // Admin routes
   await registerAdminDashboardRoutes(app);
@@ -57,8 +73,24 @@ export async function setupAllRoutes(app: Express): Promise<void> {
   await registerNewsRoutes(app);
   await registerPageRoutes(app);
   
+  // Catalog routes
+  await registerBrandRoutes(app);
+  await registerAttributeRoutes(app);
+  await registerShippingRoutes(app);
+  
   // Features
+  await registerQuestionRoutes(app);
+  await registerAnswerRoutes(app);
+  await registerSliderRoutes(app);
+  await registerBannerRoutes(app);
+  await registerCreditPointRoutes(app);
   await registerComparisonRoutes(app);
+  
+  // Utilities
+  await registerSearchRoutes(app);
+  await registerUploadRoutes(app);
+  await registerSettingRoutes(app);
+  await registerRequestRoutes(app);
   
   // Payment
   await registerPaymentRoutes(app);
