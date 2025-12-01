@@ -1,6 +1,6 @@
 import { Addresses, Cart, Orders } from "../../storage-base";
 import type {
-  Address, InsertAddress, CartItem, Product, Order, InsertOrder,
+  Address, InsertAddress, CartItem, InsertCartItem, Product, Order, InsertOrder,
   OrderItem, InsertOrderItem
 } from "@shared/schema";
 
