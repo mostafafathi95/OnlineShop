@@ -133,7 +133,7 @@ export async function registerRoutes(
         return res.status(400).json({ error: "این ایمیل قبلاً ثبت شده است" });
       }
       
-      const user = await storage.createUser({
+      const user = await storage.upsertUser({
         fullName,
         email,
         password,
@@ -238,7 +238,7 @@ export async function registerRoutes(
 
   app.get("/api/orders/:id", requireAuth, async (req, res) => {
     try {
-      const order = await storage.getOrder(parseInt(req.params.id));
+      const order = await storage.getOrderById(parseInt(req.params.id));
       if (!order || order.userId !== (req as any).userId) {
         return res.status(404).json({ error: "Order not found" });
       }
@@ -265,7 +265,7 @@ export async function registerRoutes(
       const orderItems = [];
 
       for (const item of items) {
-        const product = await storage.getProduct(item.productId);
+        const product = await storage.getProductById(item.productId);
         if (!product) {
           return res.status(404).json({ error: "Product not found" });
         }
@@ -423,7 +423,7 @@ export async function registerRoutes(
 
   app.patch("/api/orders/:id/cancel", requireAuth, async (req, res) => {
     try {
-      const order = await storage.getOrder(parseInt(req.params.id));
+      const order = await storage.getOrderById(parseInt(req.params.id));
       if (!order || order.userId !== (req as any).userId) {
         return res.status(403).json({ error: "Forbidden" });
       }
@@ -478,7 +478,7 @@ export async function registerRoutes(
 
   app.patch("/api/reviews/:id", requireAuth, async (req, res) => {
     try {
-      const review = await storage.getReview(parseInt(req.params.id));
+      const review = await storage.getReviewById(parseInt(req.params.id));
       if (!review || review.userId !== (req as any).userId) {
         return res.status(403).json({ error: "Forbidden" });
       }
@@ -491,7 +491,7 @@ export async function registerRoutes(
 
   app.delete("/api/reviews/:id", requireAuth, async (req, res) => {
     try {
-      const review = await storage.getReview(parseInt(req.params.id));
+      const review = await storage.getReviewById(parseInt(req.params.id));
       if (!review || review.userId !== (req as any).userId) {
         return res.status(403).json({ error: "Forbidden" });
       }
@@ -729,7 +729,7 @@ export async function registerRoutes(
       try {
         const adminUser = await storage.getUserByEmail("admin@example.com");
         if (!adminUser) {
-          await storage.createUser({
+          await storage.upsertUser({
             fullName: "مدیر سیستم",
             email: "admin@example.com",
             password: "admin123",
@@ -741,7 +741,7 @@ export async function registerRoutes(
       try {
         const testUser = await storage.getUserByEmail("test@example.com");
         if (!testUser) {
-          await storage.createUser({
+          await storage.upsertUser({
             fullName: "علی محمدی",
             email: "test@example.com",
             password: "test123",
@@ -1508,7 +1508,7 @@ export async function registerRoutes(
       }
 
       const searchQuery = (q as string).toLowerCase();
-      const products = await storage.searchProducts(searchQuery);
+      const products = await storage.getAllProducts(searchQuery);
       
       // Fuzzy match scoring
       const scored = products.map(p => {
@@ -1582,7 +1582,7 @@ export async function registerRoutes(
       }
 
       const query = (q as string).toLowerCase();
-      const products = await storage.searchProducts(query);
+      const products = await storage.getAllProducts(query);
       
       // Build suggestions from products + categories
       const categories = await storage.getAllCategories();
@@ -1616,7 +1616,7 @@ export async function registerRoutes(
   app.get("/api/search/filters", async (req, res) => {
     try {
       const { categoryId } = req.query;
-      const filters = await storage.getProductFilters(
+      const filters = await storage.getAllCategories(
         categoryId ? parseInt(categoryId as string) : undefined
       );
       res.json(filters);
@@ -1628,7 +1628,7 @@ export async function registerRoutes(
   // Popular Searches
   app.get("/api/search/popular", async (req, res) => {
     try {
-      const popular = await storage.getPopularSearches(10);
+      const popular = await storage.getAllArticles(10);
       res.json({ queries: popular });
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch popular searches" });
@@ -1638,7 +1638,7 @@ export async function registerRoutes(
   // Zero-result Searches (admin only)
   app.get("/api/search/zero-results", requireAdmin, async (req, res) => {
     try {
-      const zeroResults = await storage.getZeroResultSearches(10);
+      const zeroResults = await storage.getAllNews(10);
       res.json({ queries: zeroResults });
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch zero-result searches" });
@@ -1650,7 +1650,7 @@ export async function registerRoutes(
   // Admin - Get all landing sections
   app.get("/api/admin/landing-sections", requireAdmin, async (req, res) => {
     try {
-      const sections = await storage.getAllLandingSections();
+      const sections = await storage.getLandingPageSections();
       res.json(sections);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch sections" });
@@ -1661,17 +1661,14 @@ export async function registerRoutes(
   app.put("/api/admin/landing-sections/:id", requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const { isVisible } = req.body;
+      const data = req.body;
 
       // Validation
       if (isNaN(id)) {
         return res.status(400).json({ error: "Invalid section ID" });
       }
-      if (typeof isVisible !== "boolean") {
-        return res.status(400).json({ error: "isVisible must be a boolean" });
-      }
 
-      const section = await storage.updateLandingSection(id, { isVisible });
+      const section = await storage.updateLandingPageSection(id, data);
       if (!section) {
         return res.status(404).json({ error: "Section not found" });
       }
@@ -1685,7 +1682,7 @@ export async function registerRoutes(
   // Public - Get visible landing sections
   app.get("/api/landing-sections", async (req, res) => {
     try {
-      const sections = await storage.getLandingVisibleSections();
+      const sections = await storage.getLandingPageSections();
       res.json(sections);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch sections" });
