@@ -43,6 +43,7 @@ import { registerSeedRoutes } from "./seed";
 import { registerHealthRoutes } from "./admin/health";
 import { registerExportRoutes } from "./admin/export";
 import { registerBulkOperationRoutes } from "./admin/bulk-operations";
+import { setupAdminInitRoutes } from "./admin-init";
 
 export { requireAuth, requireAdmin } from "./middleware";
 export { generateOrderNumber, handleError, formatResponse } from "./utils";
@@ -54,6 +55,7 @@ export async function setupAllRoutes(app: Express): Promise<void> {
   
   // Auth routes
   await registerAuthRoutes(app);
+  await setupAdminInitRoutes(app);
   
   // User routes
   await registerUserAddressRoutes(app);
