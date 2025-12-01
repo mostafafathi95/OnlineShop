@@ -642,6 +642,15 @@ export class DatabaseStorage implements IStorage {
     return this.stats.getStats();
   }
 
+  // Additional Review methods
+  async getReviewById(id: number): Promise<Review | undefined> {
+    return this.reviews.getReviewById(id);
+  }
+
+  async getAllReviews(): Promise<Review[]> {
+    return this.reviews.getAllReviews();
+  }
+
   // Comparisons
   async getComparison(sessionId: string): Promise<any[]> {
     return this.comparisons.getComparison(sessionId);

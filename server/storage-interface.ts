@@ -185,6 +185,10 @@ export interface IStorage {
   updateAnswer(id: number, data: Partial<InsertAnswer>): Promise<Answer | undefined>;
   deleteAnswer(id: number): Promise<void>;
 
+  // Additional Review Methods
+  getReviewById(id: number): Promise<Review | undefined>;
+  getAllReviews(): Promise<Review[]>;
+
   // Sliders
   getAllSliders(): Promise<Slider[]>;
   getSliderById(id: number): Promise<Slider | undefined>;

@@ -48,4 +48,9 @@ export class Reviews {
   async getAllReviews(): Promise<Review[]> {
     return db.select().from(reviews).orderBy(desc(reviews.createdAt));
   }
+
+  async getReviewById(id: number): Promise<Review | undefined> {
+    const [review] = await db.select().from(reviews).where(eq(reviews.id, id));
+    return review;
+  }
 }
