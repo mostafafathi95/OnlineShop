@@ -214,6 +214,11 @@ export interface IStorage {
   updateLandingPageSection(id: number, data: Partial<InsertLandingPageSection>): Promise<LandingPageSection | undefined>;
   deleteLandingPageSection(id: number): Promise<void>;
 
+  // Session Management
+  createSession(token: string, data: any): Promise<void>;
+  getSession(token: string): Promise<any | null>;
+  deleteSession(token: string): Promise<void>;
+
   // Stats
   getStats(): Promise<{
     totalProducts: number;
