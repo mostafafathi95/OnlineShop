@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import NotFound from "@/pages/not-found";
 import { Skeleton } from "@/components/ui/skeleton";
 import { initPerformanceMonitoring } from "@/utils/performanceMonitoring";
+import { AdminRoute } from "@/components/AdminRoute";
 
 // Lazy load pages
 const Landing = lazy(() => import("@/pages/Landing"));
@@ -115,40 +116,40 @@ function Router() {
       <Route path="/account/wishlist" component={AccountWishlist} />
       <Route path="/account/reviews" component={AccountReviews} />
 
-      {/* Admin routes */}
-      <Route path="/admin" component={AdminDashboard} />
-      <Route path="/admin/products" component={AdminProducts} />
-      <Route path="/admin/products/:id" component={AdminProductForm} />
-      <Route path="/admin/categories" component={AdminCategories} />
-      <Route path="/admin/orders" component={AdminOrders} />
-      <Route path="/admin/users" component={AdminUsers} />
-      <Route path="/admin/coupons" component={AdminCoupons} />
-      <Route path="/admin/reviews" component={AdminReviews} />
-      <Route path="/admin/articles" component={AdminArticles} />
-      <Route path="/admin/articles/:id" component={AdminArticleForm} />
-      <Route path="/admin/news" component={AdminNews} />
-      <Route path="/admin/news/:id" component={AdminNewsForm} />
-      <Route path="/admin/pages" component={AdminPages} />
-      <Route path="/admin/pages/:id" component={AdminPageForm} />
-      <Route path="/admin/brands" component={AdminBrands} />
-      <Route path="/admin/brands/:id" component={AdminBrandForm} />
-      <Route path="/admin/attributes" component={AdminProductAttributes} />
-      <Route path="/admin/attributes/:id" component={ProductAttributesForm} />
-      <Route path="/admin/shipping" component={AdminShippingMethods} />
-      <Route path="/admin/shipping/:id" component={ShippingMethodsForm} />
-      <Route path="/admin/credits" component={AdminCreditPoints} />
-      <Route path="/admin/settings" component={AdminSettings} />
-      <Route path="/admin/questions" component={AdminQuestions} />
-      <Route path="/admin/answers" component={AdminAnswers} />
-      <Route path="/admin/wallets" component={AdminUserWallets} />
-      <Route path="/admin/reports" component={AdminReports} />
-      <Route path="/admin/sliders" component={AdminSliders} />
-      <Route path="/admin/sliders/:id" component={AdminSliderForm} />
-      <Route path="/admin/landing" component={AdminLanding} />
-      <Route path="/admin/banners" component={AdminBanners} />
-      <Route path="/admin/requests" component={AdminRequests} />
-      <Route path="/admin/analytics" component={AdminAnalytics} />
-      <Route path="/admin/export" component={AdminExport} />
+      {/* Admin routes - Protected with auth guard */}
+      <Route path="/admin" component={(props) => <AdminRoute component={AdminDashboard} {...props} />} />
+      <Route path="/admin/products" component={(props) => <AdminRoute component={AdminProducts} {...props} />} />
+      <Route path="/admin/products/:id" component={(props) => <AdminRoute component={AdminProductForm} {...props} />} />
+      <Route path="/admin/categories" component={(props) => <AdminRoute component={AdminCategories} {...props} />} />
+      <Route path="/admin/orders" component={(props) => <AdminRoute component={AdminOrders} {...props} />} />
+      <Route path="/admin/users" component={(props) => <AdminRoute component={AdminUsers} {...props} />} />
+      <Route path="/admin/coupons" component={(props) => <AdminRoute component={AdminCoupons} {...props} />} />
+      <Route path="/admin/reviews" component={(props) => <AdminRoute component={AdminReviews} {...props} />} />
+      <Route path="/admin/articles" component={(props) => <AdminRoute component={AdminArticles} {...props} />} />
+      <Route path="/admin/articles/:id" component={(props) => <AdminRoute component={AdminArticleForm} {...props} />} />
+      <Route path="/admin/news" component={(props) => <AdminRoute component={AdminNews} {...props} />} />
+      <Route path="/admin/news/:id" component={(props) => <AdminRoute component={AdminNewsForm} {...props} />} />
+      <Route path="/admin/pages" component={(props) => <AdminRoute component={AdminPages} {...props} />} />
+      <Route path="/admin/pages/:id" component={(props) => <AdminRoute component={AdminPageForm} {...props} />} />
+      <Route path="/admin/brands" component={(props) => <AdminRoute component={AdminBrands} {...props} />} />
+      <Route path="/admin/brands/:id" component={(props) => <AdminRoute component={AdminBrandForm} {...props} />} />
+      <Route path="/admin/attributes" component={(props) => <AdminRoute component={AdminProductAttributes} {...props} />} />
+      <Route path="/admin/attributes/:id" component={(props) => <AdminRoute component={ProductAttributesForm} {...props} />} />
+      <Route path="/admin/shipping" component={(props) => <AdminRoute component={AdminShippingMethods} {...props} />} />
+      <Route path="/admin/shipping/:id" component={(props) => <AdminRoute component={ShippingMethodsForm} {...props} />} />
+      <Route path="/admin/credits" component={(props) => <AdminRoute component={AdminCreditPoints} {...props} />} />
+      <Route path="/admin/settings" component={(props) => <AdminRoute component={AdminSettings} {...props} />} />
+      <Route path="/admin/questions" component={(props) => <AdminRoute component={AdminQuestions} {...props} />} />
+      <Route path="/admin/answers" component={(props) => <AdminRoute component={AdminAnswers} {...props} />} />
+      <Route path="/admin/wallets" component={(props) => <AdminRoute component={AdminUserWallets} {...props} />} />
+      <Route path="/admin/reports" component={(props) => <AdminRoute component={AdminReports} {...props} />} />
+      <Route path="/admin/sliders" component={(props) => <AdminRoute component={AdminSliders} {...props} />} />
+      <Route path="/admin/sliders/:id" component={(props) => <AdminRoute component={AdminSliderForm} {...props} />} />
+      <Route path="/admin/landing" component={(props) => <AdminRoute component={AdminLanding} {...props} />} />
+      <Route path="/admin/banners" component={(props) => <AdminRoute component={AdminBanners} {...props} />} />
+      <Route path="/admin/requests" component={(props) => <AdminRoute component={AdminRequests} {...props} />} />
+      <Route path="/admin/analytics" component={(props) => <AdminRoute component={AdminAnalytics} {...props} />} />
+      <Route path="/admin/export" component={(props) => <AdminRoute component={AdminExport} {...props} />} />
 
       <Route component={NotFound} />
     </Switch>
