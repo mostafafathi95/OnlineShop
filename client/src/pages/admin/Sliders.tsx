@@ -8,14 +8,14 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Slider } from "@shared/schema";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+  Dialog,
+  DialogAction,
+  DialogCancel,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useState } from "react";
 
 export default function AdminSliders() {
@@ -137,25 +137,25 @@ export default function AdminSliders() {
       </div>
 
       {/* Delete Dialog */}
-      <AlertDialog open={deleteId !== null} onOpenChange={(open) => !open && setDeleteId(null)}>
-        <AlertDialogContent data-testid="dialog-delete-slider">
-          <AlertDialogHeader>
-            <AlertDialogTitle>حذف اسلایدر</AlertDialogTitle>
-            <AlertDialogDescription>
+      <Dialog open={deleteId !== null} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <DialogContent data-testid="dialog-delete-slider">
+          <DialogHeader>
+            <DialogTitle>حذف اسلایدر</DialogTitle>
+            <DialogDescription>
               آیا مطمئن هستید؟ این عمل قابل بازگشت نیست.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
+            </DialogDescription>
+          </DialogHeader>
           <div className="flex gap-3 justify-end">
-            <AlertDialogCancel>لغو</AlertDialogCancel>
-            <AlertDialogAction
+            <DialogCancel>لغو</DialogCancel>
+            <DialogAction
               onClick={() => deleteId && deleteMutation.mutate(deleteId)}
               data-testid="button-confirm-delete"
             >
               حذف
-            </AlertDialogAction>
+            </DialogAction>
           </div>
-        </AlertDialogContent>
-      </AlertDialog>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }

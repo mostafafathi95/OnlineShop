@@ -11,7 +11,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Dialog, DialogAction, DialogCancel, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/alert-dialog";
 import AdminLayout from "../AdminLayout";
 import { useToast } from "@/hooks/use-toast";
 import type { Coupon } from "@shared/schema";
