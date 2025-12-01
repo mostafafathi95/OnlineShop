@@ -122,7 +122,7 @@ export default function ProductDetail() {
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
           <ProductGallery
             images={images}
-            videoUrl={product.videoUrl}
+            videoUrl={product.videoUrl || undefined}
             productName={product.name}
             selectedImage={selectedImage}
             onImageSelect={setSelectedImage}
