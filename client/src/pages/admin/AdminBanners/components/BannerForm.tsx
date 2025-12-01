@@ -19,8 +19,10 @@ export function BannerForm({
 }: BannerFormProps) {
   const { toast } = useToast();
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
-    const file = e.target.files?.[0];
+  const handleImageUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ): Promise<void> => {
+    const file = e.currentTarget.files?.[0];
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
@@ -29,15 +31,15 @@ export function BannerForm({
     }
 
     setUploading(true);
-    const formDataUpload = new FormData();
-    formDataUpload.append("file", file);
+    const uploadFormData = new FormData();
+    uploadFormData.append("file", file);
 
     try {
       const response = await fetch("/api/upload", {
         method: "POST",
-        body: formDataUpload,
+        body: uploadFormData,
       });
-      const data = await response.json();
+      const data = (await response.json()) as { success: boolean; imageUrl: string };
       if (data.success) {
         setFormData({ ...formData, imageUrl: data.imageUrl });
         toast({ title: "تصویر با موفقیت آپلود شد ✓" });
