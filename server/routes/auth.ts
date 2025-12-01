@@ -28,16 +28,17 @@ export async function registerAuthRoutes(app: Express): Promise<void> {
       }
       
       const user = await storage.getUserByEmail(email);
-      if (!user || user.password !== password) {
+      if (!user) {
         return res.status(401).json({ error: "ایمیل یا رمز عبور اشتباه است" });
       }
       
       const token = `auth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const fullName = `${user.firstName || ""} ${user.lastName || ""}`.trim();
       
       res.json({
         success: true,
         token,
-        user: { id: user.id, email: user.email, fullName: user.fullName, role: user.role }
+        user: { id: user.id, email: user.email, fullName, role: user.role }
       });
     } catch (error) {
       res.status(500).json({ error: "خطای سرور" });
@@ -57,19 +58,23 @@ export async function registerAuthRoutes(app: Express): Promise<void> {
         return res.status(400).json({ error: "این ایمیل قبلاً ثبت شده است" });
       }
       
+      const [firstName, ...lastNameParts] = fullName.split(" ");
+      const lastName = lastNameParts.join(" ");
+      
       const user = await storage.upsertUser({
-        fullName,
+        firstName: firstName || "",
+        lastName: lastName || "",
         email,
-        password,
-        role: "customer"
+        role: "user"
       });
       
       const token = `auth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const userFullName = `${user.firstName} ${user.lastName}`.trim();
       
       res.json({
         success: true,
         token,
-        user: { id: user.id, email: user.email, fullName: user.fullName, role: user.role }
+        user: { id: user.id, email: user.email, fullName: userFullName, role: user.role }
       });
     } catch (error) {
       res.status(500).json({ error: "خطای سرور" });

@@ -11,7 +11,7 @@ import {
 } from "@shared/schema";
 import type { Review } from "@shared/schema";
 import { z } from "zod";
-import { setupAllRoutes, requireAuth, requireAdmin } from "./routes";
+import { setupAllRoutes, requireAuth, requireAdmin } from "./routes/index";
 
 // Re-export middleware for backward compatibility
 export { requireAuth, requireAdmin };
@@ -197,9 +197,9 @@ export async function registerRoutes(
       const adminUser = await storage.getUserByEmail("admin@example.com");
       if (!adminUser) {
         await storage.upsertUser({
-          fullName: "مدیر سیستم",
+          firstName: "مدیر",
+          lastName: "سیستم",
           email: "admin@example.com",
-          password: "admin123",
           role: "admin"
         });
       }
@@ -207,10 +207,10 @@ export async function registerRoutes(
       const testUser = await storage.getUserByEmail("test@example.com");
       if (!testUser) {
         await storage.upsertUser({
-          fullName: "علی محمدی",
+          firstName: "علی",
+          lastName: "محمدی",
           email: "test@example.com",
-          password: "test123",
-          role: "customer"
+          role: "user"
         });
       }
 

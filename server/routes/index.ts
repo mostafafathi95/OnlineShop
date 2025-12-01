@@ -22,6 +22,9 @@ import { registerAdminCouponRoutes } from "./admin/coupons";
 import { registerAdminReviewRoutes } from "./admin/reviews";
 import { registerComparisonRoutes } from "./features/comparisons";
 import { registerPaymentRoutes } from "./payment";
+import { registerArticleRoutes } from "./content/articles";
+import { registerNewsRoutes } from "./content/news";
+import { registerPageRoutes } from "./content/pages";
 
 export { requireAuth, requireAdmin } from "./middleware";
 export { generateOrderNumber, handleError, formatResponse } from "./utils";
@@ -48,6 +51,11 @@ export async function setupAllRoutes(app: Express): Promise<void> {
   await registerAdminUserRoutes(app);
   await registerAdminCouponRoutes(app);
   await registerAdminReviewRoutes(app);
+  
+  // Content routes
+  await registerArticleRoutes(app);
+  await registerNewsRoutes(app);
+  await registerPageRoutes(app);
   
   // Features
   await registerComparisonRoutes(app);
