@@ -11,8 +11,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import AdminLayout from "../AdminLayout";
-import { useToast } from "@/hooks/use-toast";
 import type { Coupon } from "@shared/schema";
 import { useCouponForm, useCoupons, formatPrice, parseCouponForEdit } from "./hooks";
 import { useCreateCouponMutation, useUpdateCouponMutation, useDeleteCouponMutation } from "./mutations";
@@ -187,16 +185,16 @@ export default function AdminCoupons() {
             <DialogTitle>حذف کوپن</DialogTitle>
             <DialogDescription>آیا مطمئن هستید؟ این عمل قابل بازگشت نیست.</DialogDescription>
           </DialogHeader>
-          <DialogFooter>
-            <DialogCancel data-testid="button-cancel-delete">انصراف</DialogCancel>
-            <DialogAction
+          <div>
+            <Button data-testid="button-cancel-delete">انصراف</Button>
+            <Button
               onClick={() => deleteId && deleteMutation.mutate(deleteId)}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               data-testid="button-confirm-delete"
             >
               حذف
-            </DialogAction>
-          </DialogFooter>
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </AdminLayout>

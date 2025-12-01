@@ -21,11 +21,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   Dialog,
-  DialogAction,
-  DialogCancel,
+  DialogTrigger,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -143,14 +141,14 @@ export default function AdminNews() {
                 آیا مطمئن هستید؟ این عملیات قابل برگشت نیست.
               </DialogDescription>
             </DialogHeader>
-            <DialogFooter>
-              <DialogCancel>انصراف</DialogCancel>
-              <DialogAction
+            <div className="flex justify-end gap-2">
+              <Button variant="outline">انصراف</Button>
+              <Button
                 onClick={() => deleteId && deleteMutation.mutate(deleteId)}
               >
                 حذف
-              </DialogAction>
-            </DialogFooter>
+              </>
+            </div>
           </DialogContent>
         </Dialog>
       </div>

@@ -9,8 +9,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Slider } from "@shared/schema";
 import {
   Dialog,
-  DialogAction,
-  DialogCancel,
+  DialogTrigger,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -146,13 +145,13 @@ export default function AdminSliders() {
             </DialogDescription>
           </DialogHeader>
           <div className="flex gap-3 justify-end">
-            <DialogCancel>لغو</DialogCancel>
-            <DialogAction
+            <Button variant="outline">لغو</Button>
+            <Button
               onClick={() => deleteId && deleteMutation.mutate(deleteId)}
               data-testid="button-confirm-delete"
             >
               حذف
-            </DialogAction>
+            </>
           </div>
         </DialogContent>
       </Dialog>
