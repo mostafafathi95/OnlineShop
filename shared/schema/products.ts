@@ -1,4 +1,5 @@
-import { index, pgTable, timestamp, varchar, text, integer, decimal, boolean } from "drizzle-orm/pg-core";
+import { index, pgTable, timestamp, varchar, text, integer, decimal, boolean as pgBoolean } from "drizzle-orm/pg-core";
+import type { boolean } from "drizzle-orm/pg-core";
 
 // Categories table
 export const categories = pgTable("categories", {
