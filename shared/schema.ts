@@ -562,32 +562,32 @@ export const orderItemsRelations = relations(orderItems, ({ one }) => ({
 }));
 
 // Insert schemas
-export const insertUserSchema = createInsertSchema(users).omit({ createdAt: true, updatedAt: true }).strict();
-export const insertCategorySchema = createInsertSchema(categories).omit({ id: true, createdAt: true }).strict();
-export const insertProductSchema = createInsertSchema(products).omit({ id: true, createdAt: true, updatedAt: true }).strict();
-export const insertProductImageSchema = createInsertSchema(productImages).omit({ id: true }).strict();
-export const insertReviewSchema = createInsertSchema(reviews).omit({ id: true, createdAt: true, updatedAt: true, helpful: true, unhelpful: true }).strict();
-export const insertAddressSchema = createInsertSchema(addresses).omit({ id: true, createdAt: true }).strict();
-export const insertCartItemSchema = createInsertSchema(cartItems).omit({ id: true, createdAt: true, updatedAt: true }).strict();
-export const insertCouponSchema = createInsertSchema(coupons).omit({ id: true, createdAt: true, currentUses: true }).strict();
-export const insertOrderSchema = createInsertSchema(orders).omit({ id: true, createdAt: true, updatedAt: true }).strict();
-export const insertOrderItemSchema = createInsertSchema(orderItems).omit({ id: true }).strict();
-export const insertArticleSchema = createInsertSchema(articles).omit({ id: true, createdAt: true, updatedAt: true, viewCount: true }).strict();
-export const insertNewsSchema = createInsertSchema(news).omit({ id: true, createdAt: true, updatedAt: true, viewCount: true }).strict();
-export const insertPageSchema = createInsertSchema(pages).omit({ id: true, createdAt: true, updatedAt: true }).strict();
-export const insertBrandSchema = createInsertSchema(brands).omit({ id: true, createdAt: true }).strict();
-export const insertProductAttributeSchema = createInsertSchema(productAttributes).omit({ id: true }).strict();
-export const insertShippingMethodSchema = createInsertSchema(shippingMethods).omit({ id: true, createdAt: true }).strict();
-export const insertCreditPointSchema = createInsertSchema(creditPoints).omit({ id: true, createdAt: true }).strict();
-export const insertUserWalletSchema = createInsertSchema(userWallets).omit({ id: true, createdAt: true, updatedAt: true }).strict();
-export const insertUserRequestSchema = createInsertSchema(userRequests).omit({ id: true, createdAt: true, updatedAt: true }).strict();
-export const insertSettingSchema = createInsertSchema(settings).omit({ id: true, createdAt: true, updatedAt: true }).strict();
-export const insertQuestionSchema = createInsertSchema(questions).omit({ id: true, createdAt: true }).strict();
-export const insertAnswerSchema = createInsertSchema(answers).omit({ id: true, createdAt: true }).strict();
-export const insertSliderSchema = createInsertSchema(sliders).omit({ id: true, createdAt: true, updatedAt: true }).strict();
-export const insertBannerSchema = createInsertSchema(banners).omit({ id: true, createdAt: true, updatedAt: true }).strict();
-export const insertLandingPageSectionSchema = createInsertSchema(landingPageSections).omit({ id: true, createdAt: true, updatedAt: true }).strict();
-export const insertSearchAnalyticsSchema = createInsertSchema(searchAnalytics).omit({ id: true, createdAt: true }).strict();
+export const insertUserSchema = createInsertSchema(users).omit({ createdAt: true, updatedAt: true });
+export const insertCategorySchema = createInsertSchema(categories).omit({ id: true, createdAt: true });
+export const insertProductSchema = createInsertSchema(products).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertProductImageSchema = createInsertSchema(productImages).omit({ id: true });
+export const insertReviewSchema = createInsertSchema(reviews).omit({ id: true, createdAt: true, updatedAt: true, helpful: true, unhelpful: true });
+export const insertAddressSchema = createInsertSchema(addresses).omit({ id: true, createdAt: true });
+export const insertCartItemSchema = createInsertSchema(cartItems).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertCouponSchema = createInsertSchema(coupons).omit({ id: true, createdAt: true, currentUses: true });
+export const insertOrderSchema = createInsertSchema(orders).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertOrderItemSchema = createInsertSchema(orderItems).omit({ id: true });
+export const insertArticleSchema = createInsertSchema(articles).omit({ id: true, createdAt: true, updatedAt: true, viewCount: true });
+export const insertNewsSchema = createInsertSchema(news).omit({ id: true, createdAt: true, updatedAt: true, viewCount: true });
+export const insertPageSchema = createInsertSchema(pages).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertBrandSchema = createInsertSchema(brands).omit({ id: true, createdAt: true });
+export const insertProductAttributeSchema = createInsertSchema(productAttributes).omit({ id: true });
+export const insertShippingMethodSchema = createInsertSchema(shippingMethods).omit({ id: true, createdAt: true });
+export const insertCreditPointSchema = createInsertSchema(creditPoints).omit({ id: true, createdAt: true });
+export const insertUserWalletSchema = createInsertSchema(userWallets).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertUserRequestSchema = createInsertSchema(userRequests).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertSettingSchema = createInsertSchema(settings).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertQuestionSchema = createInsertSchema(questions).omit({ id: true, createdAt: true });
+export const insertAnswerSchema = createInsertSchema(answers).omit({ id: true, createdAt: true });
+export const insertSliderSchema = createInsertSchema(sliders).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertBannerSchema = createInsertSchema(banners).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertLandingPageSectionSchema = createInsertSchema(landingPageSections).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertSearchAnalyticsSchema = createInsertSchema(searchAnalytics).omit({ id: true, createdAt: true });
 
 // Types
 export type UpsertUser = typeof users.$inferInsert;

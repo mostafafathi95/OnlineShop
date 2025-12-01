@@ -26,7 +26,7 @@ export class Articles {
   }
 
   async createArticle(article: InsertArticle): Promise<Article> {
-    const [newArticle] = await db.insert(articles).values(article).returning();
+    const [newArticle] = await db.insert(articles).values(article as any).returning();
     return newArticle;
   }
 
