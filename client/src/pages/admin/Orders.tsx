@@ -21,9 +21,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import AdminLayout from "./AdminLayout";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAdminOrders } from "@/hooks/useAdminData";
+import { formatPrice, formatOrderStatus } from "@/lib/formatters";
+import { STATUS_VARIANTS, ORDER_STATUS_OPTIONS } from "@/lib/admin-constants";
 import type { Order } from "@shared/schema";
 
 export default function AdminOrders() {
@@ -31,9 +34,7 @@ export default function AdminOrders() {
   const [statusFilter, setStatusFilter] = useState("all");
   const { toast } = useToast();
 
-  const { data: orders, isLoading } = useQuery<Order[]>({
-    queryKey: ["/api/admin/orders", { search: searchQuery, status: statusFilter }],
-  });
+  const { data: orders, isLoading } = useAdminOrders();
 
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
@@ -45,31 +46,8 @@ export default function AdminOrders() {
     },
   });
 
-  const formatPrice = (price: string | number) => {
-    return Number(price).toLocaleString("fa-IR");
-  };
-
-  const getStatusLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      pending: "در انتظار",
-      processing: "پردازش",
-      shipped: "ارسال شده",
-      delivered: "تحویل داده شده",
-      cancelled: "لغو شده",
-    };
-    return labels[status] || status;
-  };
-
-  const getStatusVariant = (status: string) => {
-    const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-      pending: "secondary",
-      processing: "default",
-      shipped: "default",
-      delivered: "default",
-      cancelled: "destructive",
-    };
-    return variants[status] || "secondary";
-  };
+  // Imported from centralized utilities
+  // Removed duplicate code
 
   return (
     <AdminLayout title="سفارشات">
@@ -90,12 +68,9 @@ export default function AdminOrders() {
                 <SelectValue placeholder="وضعیت" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">همه</SelectItem>
-                <SelectItem value="pending">در انتظار</SelectItem>
-                <SelectItem value="processing">پردازش</SelectItem>
-                <SelectItem value="shipped">ارسال شده</SelectItem>
-                <SelectItem value="delivered">تحویل داده شده</SelectItem>
-                <SelectItem value="cancelled">لغو شده</SelectItem>
+                {ORDER_STATUS_OPTIONS.map(opt => (
+                  <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
