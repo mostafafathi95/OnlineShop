@@ -85,7 +85,7 @@ export default function AdminProducts() {
             محصولی وجود ندارد
           </div>
         ) : (
-          products.map((product) => (
+          (products as Product[]).map((product) => (
             <Card key={product.id} className="p-4" data-testid={`card-product-admin-${product.id}`}>
               <div className="flex gap-4 items-start">
                 {product.image && (
