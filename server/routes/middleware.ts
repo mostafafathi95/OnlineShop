@@ -8,22 +8,18 @@
 import type { Request, Response, NextFunction } from "express";
 import { logger } from "../utils/logger";
 import { validateToken } from "../utils/auth/token-validator";
+import { storage } from "../storage";
 
 // In-memory fallback (for dev - persistence via storage.ts in production)
 const tokenStore = new Map<string, any>();
 
 export function setTokenData(token: string, data: any) {
   tokenStore.set(token, data);
-  // Also attempt database storage if available
-  try {
-    const { storage } = require("../storage");
-    if (storage && typeof storage.createSession === "function") {
-      storage.createSession(token, data).catch((e: any) => {
-        logger.debug("AUTH", "Session storage failed (non-critical)", { error: e.message });
-      });
-    }
-  } catch (e) {
-    // Fallback to memory only
+  // Also store in database for persistence
+  if (storage && typeof storage.createSession === "function") {
+    storage.createSession(token, data).catch((e: any) => {
+      logger.debug("AUTH", "Session storage failed (non-critical)", { error: e.message });
+    });
   }
 }
 
@@ -41,15 +37,12 @@ async function requireAuth(req: Request, res: Response, next: NextFunction) {
     let tokenData = tokenStore.get(token);
     
     // If not in memory, try database
-    if (!tokenData) {
+    if (!tokenData && storage && typeof storage.getSession === "function") {
       try {
-        const { storage } = require("../storage");
-        if (storage && typeof storage.getSession === "function") {
-          const session = await storage.getSession(token);
-          if (session) {
-            tokenData = session;
-            tokenStore.set(token, session); // Cache in memory
-          }
+        const session = await storage.getSession(token);
+        if (session) {
+          tokenData = session;
+          tokenStore.set(token, session); // Cache in memory
         }
       } catch (e) {
         logger.debug("AUTH", "Database session lookup failed", { error: String(e) });
@@ -87,15 +80,12 @@ async function requireAdmin(req: Request, res: Response, next: NextFunction) {
     let tokenData = tokenStore.get(token);
     
     // If not in memory, try database
-    if (!tokenData) {
+    if (!tokenData && storage && typeof storage.getSession === "function") {
       try {
-        const { storage } = require("../storage");
-        if (storage && typeof storage.getSession === "function") {
-          const session = await storage.getSession(token);
-          if (session) {
-            tokenData = session;
-            tokenStore.set(token, session); // Cache in memory
-          }
+        const session = await storage.getSession(token);
+        if (session) {
+          tokenData = session;
+          tokenStore.set(token, session); // Cache in memory
         }
       } catch (e) {
         logger.debug("AUTH", "Database session lookup failed", { error: String(e) });
