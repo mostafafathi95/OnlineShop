@@ -11,7 +11,8 @@
 
 import type { Express } from "express";
 import { storage } from "../storage";
-import { requireAuth } from "./middleware";
+import { requireAuth, setTokenData } from "./middleware";
+import { logger } from "../utils/logger";
 
 export async function registerAuthRoutes(app: Express): Promise<void> {
   // POST /api/logout - User logout
@@ -35,13 +36,14 @@ export async function registerAuthRoutes(app: Express): Promise<void> {
       const token = `auth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       const fullName = `${user.firstName || ""} ${user.lastName || ""}`.trim();
       
-      // Store token data for middleware
-      const { setTokenData } = await import("./middleware");
+      // Store token data in singleton tokenStore
       setTokenData(token, {
         userId: user.id,
         email: user.email,
         role: user.role
       });
+      
+      logger.info("AUTH", "Token stored in tokenStore", { token, userId: user.id, role: user.role });
       
       res.json({
         success: true,
@@ -79,13 +81,14 @@ export async function registerAuthRoutes(app: Express): Promise<void> {
       const token = `auth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       const userFullName = `${user.firstName} ${user.lastName}`.trim();
       
-      // Store token data for middleware
-      const { setTokenData } = await import("./middleware");
+      // Store token data in singleton tokenStore
       setTokenData(token, {
         userId: user.id,
         email: user.email,
         role: user.role
       });
+      
+      logger.info("AUTH", "Token stored in tokenStore (register)", { token, userId: user.id, role: user.role });
       
       res.json({
         success: true,

@@ -14,7 +14,10 @@ import { storage } from "../storage";
 const tokenStore = new Map<string, any>();
 
 export function setTokenData(token: string, data: any) {
+  logger.debug("AUTH", "setTokenData called - storing in tokenStore", { token, data });
   tokenStore.set(token, data);
+  logger.debug("AUTH", "tokenStore size after set", { size: tokenStore.size });
+  
   // Also store in database for persistence
   if (storage && typeof storage.createSession === "function") {
     storage.createSession(token, data).catch((e: any) => {
