@@ -113,18 +113,18 @@ export default function AdminOrders() {
                   </TableRow>
                 ))
               ) : orders && orders.length > 0 ? (
-                orders.map((order) => (
+                (orders as Order[]).map((order) => (
                   <TableRow key={order.id}>
                     <TableCell className="font-medium">
-                      #{order.orderNumber}
+                      #{order.id}
                     </TableCell>
                     <TableCell>
                       {new Date(order.createdAt!).toLocaleDateString("fa-IR")}
                     </TableCell>
-                    <TableCell>{formatPrice(order.total)} تومان</TableCell>
+                    <TableCell>{formatPrice(order.total || 0)} تومان</TableCell>
                     <TableCell>
-                      <Badge variant={getStatusVariant(order.status)}>
-                        {getStatusLabel(order.status)}
+                      <Badge variant={STATUS_VARIANTS[order.status] || "secondary"}>
+                        {formatOrderStatus(order.status)}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -138,11 +138,9 @@ export default function AdminOrders() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="pending">در انتظار</SelectItem>
-                          <SelectItem value="processing">پردازش</SelectItem>
-                          <SelectItem value="shipped">ارسال شده</SelectItem>
-                          <SelectItem value="delivered">تحویل داده شده</SelectItem>
-                          <SelectItem value="cancelled">لغو شده</SelectItem>
+                          {ORDER_STATUS_OPTIONS.slice(1).map(opt => (
+                            <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </TableCell>
