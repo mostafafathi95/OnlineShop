@@ -70,6 +70,28 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
   const { theme, toggleTheme } = useTheme();
   const { toast } = useToast();
 
+  // Check for auth token in localStorage - if it exists but API returns 401, token is invalid
+  useEffect(() => {
+    // If loading for too long with a token in localStorage, assume token is invalid
+    const checkAuthTimeout = setTimeout(() => {
+      if (isLoading) {
+        const authData = localStorage.getItem("auth");
+        if (authData) {
+          // Token exists but loading hasn't finished - likely a 401 error loop
+          localStorage.removeItem("auth");
+          toast({
+            title: "جلسه شما منقضی شده",
+            description: "لطفا دوباره وارد شوید.",
+            variant: "destructive",
+          });
+          window.location.href = "/login";
+        }
+      }
+    }, 5000); // 5 second timeout
+
+    return () => clearTimeout(checkAuthTimeout);
+  }, [isLoading, toast]);
+
   useEffect(() => {
     if (!isLoading && (!isAuthenticated || !isAdmin)) {
       toast({
