@@ -20,18 +20,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import AdminLayout from "./AdminLayout";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAdminUsers } from "@/hooks/useAdminData";
+import { formatDate } from "@/lib/formatters";
+import { STATUS_VARIANTS } from "@/lib/admin-constants";
 import type { User } from "@shared/schema";
 
 export default function AdminUsers() {
   const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
 
-  const { data: users, isLoading } = useQuery<User[]>({
-    queryKey: ["/api/admin/users", { search: searchQuery }],
-  });
+  const { data: users, isLoading } = useAdminUsers();
 
   const updateRoleMutation = useMutation({
     mutationFn: async ({ id, role }: { id: string; role: string }) => {
@@ -117,7 +118,7 @@ export default function AdminUsers() {
                     <TableCell>{user.email || "-"}</TableCell>
                     <TableCell>
                       <Badge
-                        variant={user.role === "admin" ? "default" : "secondary"}
+                        variant={STATUS_VARIANTS[user.role] || "secondary"}
                         className="gap-1"
                       >
                         {user.role === "admin" ? (
@@ -129,9 +130,7 @@ export default function AdminUsers() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {user.createdAt
-                        ? new Date(user.createdAt).toLocaleDateString("fa-IR")
-                        : "-"}
+                      {user.createdAt ? formatDate(user.createdAt) : "-"}
                     </TableCell>
                     <TableCell>
                       <Select

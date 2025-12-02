@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,33 +6,21 @@ import { useState } from "react";
 import { Plus, Trash2, Edit2 } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-
-interface Product {
-  id: number;
-  name: string;
-  slug: string;
-  price: number;
-  stock: number;
-  categoryId?: number;
-  image?: string;
-  isActive: boolean;
-}
+import { useAdminProducts, useAdminCategories } from "@/hooks/useAdminData";
+import { formatPrice, formatProductStatus } from "@/lib/formatters";
+import { STATUS_VARIANTS, PRODUCT_STATUS_OPTIONS } from "@/lib/admin-constants";
+import type { Product, Category } from "@shared/schema";
 
 export default function AdminProducts() {
   const { toast } = useToast();
   const [isAdding, setIsAdding] = useState(false);
 
-  const { data: products = [], isLoading } = useQuery<Product[]>({
-    queryKey: ["/api/admin/products"],
-  });
-
-  const { data: categories = [] } = useQuery({
-    queryKey: ["/api/admin/categories"],
-  });
+  const { data: products = [], isLoading } = useAdminProducts();
+  const { data: categories = [] } = useAdminCategories();
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) =>
-      apiRequest(`/api/admin/products/${id}`, { method: "DELETE" }),
+      apiRequest("DELETE", `/api/admin/products/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/products"] });
       toast({ title: "محصول حذف شد" });
@@ -73,7 +61,7 @@ export default function AdminProducts() {
             />
             <select className="border rounded px-3 py-2" data-testid="select-category">
               <option>انتخاب دسته‌بندی</option>
-              {categories.map((c: any) => (
+              {(categories as Category[]).map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
                 </option>
@@ -124,7 +112,7 @@ export default function AdminProducts() {
                     <div>
                       <p className="text-xs text-muted-foreground">قیمت</p>
                       <p className="font-bold" data-testid={`text-price-${product.id}`}>
-                        {Number(product.price).toLocaleString("fa-IR")} تومان
+                        {formatPrice(product.price)} تومان
                       </p>
                     </div>
                     <div>

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import AdminLayout from "./AdminLayout";
@@ -8,15 +8,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Trash2, Check, AlertCircle } from "lucide-react";
+import { useAdminData } from "@/hooks/useAdminData";
+import { formatDate } from "@/lib/formatters";
 import type { Review } from "@shared/schema";
 
 export default function ReviewsManagement() {
   const { toast } = useToast();
   const [filterStatus, setFilterStatus] = useState<"all" | "pending" | "approved">("all");
 
-  const { data: reviews = [] } = useQuery<Review[]>({
-    queryKey: ["/api/admin/reviews"],
-  });
+  const { data: reviews = [] } = useAdminData<Review>("/api/admin/reviews");
 
   const approveReviewMutation = useMutation({
     mutationFn: async (reviewId: number) => {
@@ -55,10 +55,6 @@ export default function ReviewsManagement() {
     if (filterStatus === "approved") return review.isApproved;
     return true;
   });
-
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString("fa-IR");
-  };
 
   return (
     <AdminLayout title="مدیریت نظرات">
