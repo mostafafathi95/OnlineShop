@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,27 +6,18 @@ import { useState } from "react";
 import { Plus, Trash2, Edit2 } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-
-interface Category {
-  id: number;
-  name: string;
-  slug: string;
-  description?: string;
-  image?: string;
-  isActive: boolean;
-}
+import { useAdminCategories } from "@/hooks/useAdminData";
+import type { Category } from "@shared/schema";
 
 export default function AdminCategories() {
   const { toast } = useToast();
   const [isAdding, setIsAdding] = useState(false);
 
-  const { data: categories = [], isLoading } = useQuery<Category[]>({
-    queryKey: ["/api/admin/categories"],
-  });
+  const { data: categories = [], isLoading } = useAdminCategories();
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) =>
-      apiRequest(`/api/admin/categories/${id}`, { method: "DELETE" }),
+      apiRequest("DELETE", `/api/admin/categories/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/categories"] });
       toast({ title: "دسته‌بندی حذف شد" });
@@ -82,7 +73,7 @@ export default function AdminCategories() {
             دسته‌بندی‌ای وجود ندارد
           </div>
         ) : (
-          categories.map((category) => (
+          (categories as Category[]).map((category) => (
             <Card key={category.id} className="overflow-hidden" data-testid={`card-category-${category.id}`}>
               {category.image && (
                 <img

@@ -28,23 +28,19 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import AdminLayout from "./AdminLayout";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAdminData } from "@/hooks/useAdminData";
+import { formatDate, formatArticleStatus } from "@/lib/formatters";
 import type { Article } from "@shared/schema";
-
-interface ArticleWithType extends Article {
-  type: string;
-}
 
 export default function AdminArticles() {
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const { toast } = useToast();
 
-  const { data: articles, isLoading } = useQuery<ArticleWithType[]>({
-    queryKey: ["/api/articles"],
-  });
+  const { data: articles, isLoading } = useAdminData<Article>("/api/articles");
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -100,16 +96,16 @@ export default function AdminArticles() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((article) => (
+                {((articles || []).filter(a => a.title?.includes(searchQuery) || a.slug?.includes(searchQuery))).map((article) => (
                   <TableRow key={article.id}>
                     <TableCell>{article.title}</TableCell>
-                    <TableCell>{article.author}</TableCell>
+                    <TableCell>{(article as any).author}</TableCell>
                     <TableCell>
-                      <Badge variant={article.published ? "default" : "secondary"}>
-                        {article.published ? "منتشر شده" : "پیش‌نویس"}
+                      <Badge variant={(article as any).published ? "default" : "secondary"}>
+                        {formatArticleStatus((article as any).published)}
                       </Badge>
                     </TableCell>
-                    <TableCell>{new Date(article.createdAt || "").toLocaleDateString("fa-IR")}</TableCell>
+                    <TableCell>{formatDate(article.createdAt || new Date())}</TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>

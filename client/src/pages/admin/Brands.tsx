@@ -28,9 +28,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import AdminLayout from "./AdminLayout";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAdminData } from "@/hooks/useAdminData";
 import type { Brand } from "@shared/schema";
 
 export default function AdminBrands() {
@@ -38,9 +39,7 @@ export default function AdminBrands() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const { toast } = useToast();
 
-  const { data: brands, isLoading } = useQuery<Brand[]>({
-    queryKey: ["/api/brands"],
-  });
+  const { data: brands, isLoading } = useAdminData<Brand>("/api/brands");
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -93,7 +92,7 @@ export default function AdminBrands() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((brand) => (
+                {(brands || []).map((brand) => (
                   <TableRow key={brand.id}>
                     <TableCell>{brand.name}</TableCell>
                     <TableCell>
