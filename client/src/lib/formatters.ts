@@ -59,3 +59,15 @@ export const formatPaymentStatus = (status: string): string => {
   };
   return statuses[status] || status;
 };
+
+export const formatArticleStatus = (published: boolean | null): string => {
+  return published ? "منتشر شده" : "پیش‌نویس";
+};
+
+export const formatPageStatus = (published: boolean | null): string => {
+  return published ? "منتشر شده" : "پیش‌نویس";
+};
+
+export const formatNewsStatus = (published: boolean | null): string => {
+  return published ? "منتشر شده" : "پیش‌نویس";
+};

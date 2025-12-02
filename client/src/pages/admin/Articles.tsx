@@ -32,7 +32,7 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAdminData } from "@/hooks/useAdminData";
-import { formatDate, formatArticleStatus } from "@/lib/formatters";
+import { formatDate } from "@/lib/formatters";
 import type { Article } from "@shared/schema";
 
 export default function AdminArticles() {
@@ -102,7 +102,7 @@ export default function AdminArticles() {
                     <TableCell>{(article as any).author}</TableCell>
                     <TableCell>
                       <Badge variant={(article as any).published ? "default" : "secondary"}>
-                        {formatArticleStatus((article as any).published)}
+                        {(article as any).published ? "منتشر شده" : "پیش‌نویس"}
                       </Badge>
                     </TableCell>
                     <TableCell>{formatDate(article.createdAt || new Date())}</TableCell>

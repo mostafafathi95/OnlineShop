@@ -101,8 +101,8 @@ export default function AdminBrands() {
                       )}
                     </TableCell>
                     <TableCell>
-                      <Badge variant={brand.active ? "default" : "secondary"}>
-                        {brand.active ? "فعال" : "غیرفعال"}
+                      <Badge variant={brand.isActive ? "default" : "secondary"}>
+                        {brand.isActive ? "فعال" : "غیرفعال"}
                       </Badge>
                     </TableCell>
                     <TableCell>

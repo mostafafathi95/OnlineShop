@@ -28,9 +28,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import AdminLayout from "./AdminLayout";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAdminData } from "@/hooks/useAdminData";
 import type { Page } from "@shared/schema";
 
 export default function AdminPages() {
@@ -38,9 +39,7 @@ export default function AdminPages() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const { toast } = useToast();
 
-  const { data: pages, isLoading } = useQuery<Page[]>({
-    queryKey: ["/api/pages"],
-  });
+  const { data: pages, isLoading } = useAdminData<Page>("/api/pages");
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -93,13 +92,13 @@ export default function AdminPages() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((page) => (
+                {((pages || []).filter(p => p.title?.includes(searchQuery))).map((page) => (
                   <TableRow key={page.id}>
                     <TableCell>{page.title}</TableCell>
                     <TableCell>{page.slug}</TableCell>
                     <TableCell>
-                      <Badge variant={page.published ? "default" : "secondary"}>
-                        {page.published ? "منتشر شده" : "پیش‌نویس"}
+                      <Badge variant={page.isPublished ? "default" : "secondary"}>
+                        {page.isPublished ? "منتشر شده" : "پیش‌نویس"}
                       </Badge>
                     </TableCell>
                     <TableCell>

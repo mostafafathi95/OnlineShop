@@ -8,9 +8,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import AdminLayout from "./AdminLayout";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAdminData } from "@/hooks/useAdminData";
+import { formatPrice } from "@/lib/formatters";
 import type { ShippingMethod } from "@shared/schema";
 
 export default function AdminShippingMethods() {
@@ -18,9 +20,7 @@ export default function AdminShippingMethods() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const { toast } = useToast();
 
-  const { data: methods, isLoading } = useQuery<ShippingMethod[]>({
-    queryKey: ["/api/shipping-methods"],
-  });
+  const { data: methods, isLoading } = useAdminData<ShippingMethod>("/api/shipping-methods");
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -61,14 +61,14 @@ export default function AdminShippingMethods() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((method) => (
+                {((methods || []).filter(m => m.name?.includes(searchQuery))).map((method) => (
                   <TableRow key={method.id}>
                     <TableCell>{method.name}</TableCell>
-                    <TableCell>{Number(method.cost).toLocaleString("fa-IR")} تومان</TableCell>
+                    <TableCell>{formatPrice(method.price)} تومان</TableCell>
                     <TableCell>{method.estimatedDays} روز</TableCell>
                     <TableCell>
-                      <Badge variant={method.active ? "default" : "secondary"}>
-                        {method.active ? "فعال" : "غیرفعال"}
+                      <Badge variant={method.isActive ? "default" : "secondary"}>
+                        {method.isActive ? "فعال" : "غیرفعال"}
                       </Badge>
                     </TableCell>
                     <TableCell>

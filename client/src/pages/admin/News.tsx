@@ -28,9 +28,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import AdminLayout from "./AdminLayout";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAdminData } from "@/hooks/useAdminData";
+import { formatDate } from "@/lib/formatters";
 import type { News } from "@shared/schema";
 
 export default function AdminNews() {
@@ -38,9 +40,7 @@ export default function AdminNews() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const { toast } = useToast();
 
-  const { data: news, isLoading } = useQuery<News[]>({
-    queryKey: ["/api/news"],
-  });
+  const { data: news, isLoading } = useAdminData<News>("/api/news");
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -93,15 +93,15 @@ export default function AdminNews() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((newsItem) => (
+                {((news || []).filter(n => n.title?.includes(searchQuery))).map((newsItem) => (
                   <TableRow key={newsItem.id}>
                     <TableCell>{newsItem.title}</TableCell>
                     <TableCell>
-                      <Badge variant={newsItem.published ? "default" : "secondary"}>
-                        {newsItem.published ? "منتشر شده" : "پیش‌نویس"}
+                      <Badge variant={newsItem.isPublished ? "default" : "secondary"}>
+                        {newsItem.isPublished ? "منتشر شده" : "پیش‌نویس"}
                       </Badge>
                     </TableCell>
-                    <TableCell>{new Date(newsItem.createdAt || "").toLocaleDateString("fa-IR")}</TableCell>
+                    <TableCell>{formatDate(newsItem.createdAt || new Date())}</TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
