@@ -7,9 +7,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import AdminLayout from "./AdminLayout";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAdminProductAttributes } from "@/hooks/useAdminData";
 import type { ProductAttribute } from "@shared/schema";
 
 export default function AdminProductAttributes() {
@@ -17,9 +18,7 @@ export default function AdminProductAttributes() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const { toast } = useToast();
 
-  const { data: attributes, isLoading } = useQuery<ProductAttribute[]>({
-    queryKey: ["/api/product-attributes"],
-  });
+  const { data: attributes, isLoading } = useAdminProductAttributes();
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -58,10 +57,10 @@ export default function AdminProductAttributes() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((attr) => (
+                {((attributes || []).filter(a => a.name?.includes(searchQuery))).map((attr) => (
                   <TableRow key={attr.id}>
                     <TableCell>{attr.name}</TableCell>
-                    <TableCell>{attr.type}</TableCell>
+                    <TableCell>{(attr as any).type}</TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>

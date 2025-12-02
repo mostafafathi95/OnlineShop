@@ -1,17 +1,16 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Trash2, Edit2, Plus } from "lucide-react";
 import AdminLayout from "./AdminLayout";
+import { useAdminRequests } from "@/hooks/useAdminData";
+import { formatDate } from "@/lib/formatters";
 
 const AdminRequests = () => {
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
-  const { data: requests = [] } = useQuery({
-    queryKey: ["/api/admin/requests"],
-  });
+  const { data: requests = [] } = useAdminRequests();
 
   return (
     <AdminLayout title="درخواست‌های کاربران">
@@ -59,10 +58,7 @@ const AdminRequests = () => {
                             : "رد شده"}
                       </Badge>
                       <span className="text-xs text-muted-foreground">
-                        {request.createdAt &&
-                          new Date(request.createdAt).toLocaleDateString(
-                            "fa-IR"
-                          )}
+                        {request.createdAt && formatDate(request.createdAt)}
                       </span>
                     </div>
                   </div>

@@ -7,9 +7,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import AdminLayout from "./AdminLayout";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAdminQuestions } from "@/hooks/useAdminData";
 import type { Question } from "@shared/schema";
 
 export default function AdminQuestions() {
@@ -17,9 +18,7 @@ export default function AdminQuestions() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const { toast } = useToast();
 
-  const { data: questions, isLoading } = useQuery<Question[]>({
-    queryKey: ["/api/questions"],
-  });
+  const { data: questions, isLoading } = useAdminQuestions();
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -56,13 +55,13 @@ export default function AdminQuestions() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((q) => (
+                {((questions || []).filter(q => q.title?.includes(searchQuery))).map((q) => (
                   <TableRow key={q.id}>
                     <TableCell className="max-w-xs truncate">{q.title}</TableCell>
                     <TableCell>{q.productId}</TableCell>
                     <TableCell>
                       <Badge variant="outline">
-                        {q.answered ? "جواب داده شده" : "منتظر جواب"}
+                        {(q as any).answered ? "جواب داده شده" : "منتظر جواب"}
                       </Badge>
                     </TableCell>
                     <TableCell>

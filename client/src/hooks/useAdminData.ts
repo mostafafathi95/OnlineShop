@@ -72,3 +72,18 @@ export const useAdminCategories = (options?: UseAdminDataOptions) =>
 
 export const useAdminCoupons = (options?: UseAdminDataOptions) =>
   useAdminData("/api/admin/coupons", options);
+
+export const useAdminProductAttributes = (options?: UseAdminDataOptions) =>
+  useAdminData("/api/product-attributes", options);
+
+export const useAdminSliders = (options?: UseAdminDataOptions) =>
+  useAdminData("/api/admin/sliders", options);
+
+export const useAdminQuestions = (options?: UseAdminDataOptions) =>
+  useAdminData("/api/questions", options);
+
+export const useAdminAnswers = (options?: UseAdminDataOptions) =>
+  useAdminData("/api/answers", options);
+
+export const useAdminRequests = (options?: UseAdminDataOptions) =>
+  useAdminData("/api/admin/requests", options);

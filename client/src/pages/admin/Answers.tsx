@@ -7,9 +7,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import AdminLayout from "./AdminLayout";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAdminAnswers } from "@/hooks/useAdminData";
 import type { Answer } from "@shared/schema";
 
 export default function AdminAnswers() {
@@ -17,9 +18,7 @@ export default function AdminAnswers() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const { toast } = useToast();
 
-  const { data: answers, isLoading } = useQuery<Answer[]>({
-    queryKey: ["/api/answers"],
-  });
+  const { data: answers, isLoading } = useAdminAnswers();
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -73,13 +72,13 @@ export default function AdminAnswers() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((answer) => (
+                {((answers || []).filter(a => a.content?.includes(searchQuery) || (a.questionId || "").toString().includes(searchQuery))).map((answer) => (
                   <TableRow key={answer.id}>
                     <TableCell className="max-w-xs truncate">{answer.content}</TableCell>
                     <TableCell>{answer.questionId}</TableCell>
                     <TableCell>
-                      <Badge variant={answer.approved ? "default" : "secondary"}>
-                        {answer.approved ? "تایید شده" : "منتظر تایید"}
+                      <Badge variant={(answer as any).approved ? "default" : "secondary"}>
+                        {(answer as any).approved ? "تایید شده" : "منتظر تایید"}
                       </Badge>
                     </TableCell>
                     <TableCell>

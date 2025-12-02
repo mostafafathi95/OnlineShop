@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import AdminLayout from "./AdminLayout";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useAdminSliders } from "@/hooks/useAdminData";
+import { formatDate } from "@/lib/formatters";
 import type { Slider } from "@shared/schema";
 import {
   Dialog,
@@ -21,9 +23,7 @@ export default function AdminSliders() {
   const [, setLocation] = useLocation();
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
-  const { data: sliders, isLoading } = useQuery<Slider[]>({
-    queryKey: ["/api/admin/sliders"],
-  });
+  const { data: sliders, isLoading } = useAdminSliders();
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => apiRequest("DELETE", `/api/admin/sliders/${id}`),
@@ -65,7 +65,7 @@ export default function AdminSliders() {
           </div>
         ) : sliders && sliders.length > 0 ? (
           <div className="space-y-3">
-            {sliders.map((slider) => (
+            {(sliders || []).map((slider) => (
               <Card key={slider.id} data-testid={`card-slider-${slider.id}`}>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between gap-4">
@@ -82,8 +82,8 @@ export default function AdminSliders() {
                         <h3 className="font-bold text-lg">{slider.title}</h3>
                         <p className="text-sm text-muted-foreground">{slider.slug}</p>
                         <div className="flex gap-4 text-xs text-muted-foreground mt-1">
-                          <span>شروع: {new Date(slider.startDate).toLocaleDateString("fa-IR")}</span>
-                          <span>پایان: {new Date(slider.endDate).toLocaleDateString("fa-IR")}</span>
+                          <span>شروع: {formatDate(slider.startDate)}</span>
+                          <span>پایان: {formatDate(slider.endDate)}</span>
                         </div>
                       </div>
                     </div>
