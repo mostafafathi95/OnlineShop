@@ -1,6 +1,6 @@
 import { db } from "../db";
-import { eq, desc, and, ilike } from "drizzle-orm";
-import { orders, orderItems } from "@shared/schema";
+import { eq, desc, and, ilike, gte, sql } from "drizzle-orm";
+import { orders, orderItems, products } from "@shared/schema";
 import type { Order, InsertOrder, OrderItem, InsertOrderItem } from "@shared/schema";
 
 export class Orders {
@@ -51,13 +51,37 @@ export class Orders {
   }
 
   async createOrder(order: InsertOrder, items: InsertOrderItem[]): Promise<Order> {
-    const [newOrder] = await db.insert(orders).values(order).returning();
+    return db.transaction(async (tx) => {
+      // 1. Create the main order record
+      const [newOrder] = await tx.insert(orders).values(order).returning();
 
-    for (const item of items) {
-      await db.insert(orderItems).values({ ...item, orderId: newOrder.id });
-    }
+      // 2. Process each item in the order
+      for (const item of items) {
+        // 2a. Decrease the stock for the corresponding product
+        const [updatedProduct] = await tx
+          .update(products)
+          .set({
+            stock: sql`${products.stock} - ${item.quantity}`,
+          })
+          .where(and(
+            eq(products.id, item.productId),
+            gte(products.stock, item.quantity) // Ensure stock is sufficient
+          ))
+          .returning();
 
-    return newOrder;
+        // If the update returned nothing, it means the stock was insufficient.
+        // The transaction will be rolled back.
+        if (!updatedProduct) {
+          throw new Error(`Insufficient stock for product ID: ${item.productId}`);
+        }
+
+        // 2b. Create the order item record
+        await tx.insert(orderItems).values({ ...item, orderId: newOrder.id });
+      }
+
+      // 3. Return the newly created order
+      return newOrder;
+    });
   }
 
   async updateOrderStatus(id: number, status: string): Promise<Order | undefined> {
@@ -67,5 +91,15 @@ export class Orders {
       .where(eq(orders.id, id))
       .returning();
     return order;
+  }
+
+  // Generic update method for an order
+  async updateOrder(id: number, data: Partial<Order>): Promise<Order | undefined> {
+    const [updatedOrder] = await db
+      .update(orders)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(orders.id, id))
+      .returning();
+    return updatedOrder;
   }
 }

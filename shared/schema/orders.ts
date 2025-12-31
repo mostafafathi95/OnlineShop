@@ -32,15 +32,23 @@ export const orders = pgTable("orders", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   orderNumber: varchar("order_number", { length: 20 }).notNull().unique(),
   userId: varchar("user_id").references(() => users.id).notNull(),
-  status: varchar("status").default("pending").notNull(),
+  status: varchar("status").default("pending").notNull(), // e.g., pending, processing, shipped, delivered, cancelled
+
+  // Payment related fields
+  paymentStatus: varchar("payment_status").default("pending").notNull(), // e.g., pending, completed, failed
+  paymentGateway: varchar("payment_gateway", { length: 50 }),
+  paymentAuthority: varchar("payment_authority", { length: 100 }), // To store the transaction ID from the gateway
+
   subtotal: decimal("subtotal", { precision: 12, scale: 0 }).notNull(),
   shippingCost: decimal("shipping_cost", { precision: 12, scale: 0 }).default("0"),
   discount: decimal("discount", { precision: 12, scale: 0 }).default("0"),
   total: decimal("total", { precision: 12, scale: 0 }).notNull(),
+
   addressId: integer("address_id"),
   shippingAddress: jsonb("shipping_address"),
   couponCode: varchar("coupon_code", { length: 50 }),
   notes: text("notes"),
+
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
