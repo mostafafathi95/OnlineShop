@@ -1,20 +1,32 @@
 import React from "react";
 import { Check, X } from "lucide-react";
+import { useFormContext, FieldValues, Path } from "react-hook-form";
+import { t } from "@/lib/i18n";
 
-interface PasswordStrengthIndicatorProps {
-  password: string;
+interface PasswordStrengthIndicatorProps<T extends FieldValues> {
+  name: Path<T>;
 }
 
-export function PasswordStrengthIndicator({ password }: PasswordStrengthIndicatorProps) {
+export function PasswordStrengthIndicator<T extends FieldValues>({ name }: PasswordStrengthIndicatorProps<T>) {
+  const { watch } = useFormContext<T>();
+  const password = watch(name) || "";
+
   const requirements = [
-    { label: "حداقل 8 کاراکتر", met: password.length >= 8 },
-    { label: "حروف بزرگ (A-Z)", met: /[A-Z]/.test(password) },
-    { label: "عدد (0-9)", met: /[0-9]/.test(password) },
-    { label: "نشانه خاص (!@#$%)", met: /[!@#$%^&*]/.test(password) },
+    { label: t('forms.passwordStrength.requirements.length'), met: password.length >= 8 },
+    { label: t('forms.passwordStrength.requirements.uppercase'), met: /[A-Z]/.test(password) },
+    { label: t('forms.passwordStrength.requirements.number'), met: /[0-9]/.test(password) },
+    { label: t('forms.passwordStrength.requirements.specialChar'), met: /[!@#$%^&*]/.test(password) },
   ];
 
   const strength = requirements.filter((req) => req.met).length;
-  const strengthText = ["ضعیف", "متوسط", "خوب", "قوی", "بسیار قوی"][strength];
+  const strengthText = [
+    t('forms.passwordStrength.strength.weak'),
+    t('forms.passwordStrength.strength.medium'),
+    t('forms.passwordStrength.strength.good'),
+    t('forms.passwordStrength.strength.strong'),
+    t('forms.passwordStrength.strength.veryStrong')
+  ][strength];
+
   const strengthColor =
     strength <= 1
       ? "bg-red-500"
@@ -27,7 +39,7 @@ export function PasswordStrengthIndicator({ password }: PasswordStrengthIndicato
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium">قوت رمز:</span>
+        <span className="text-sm font-medium">{t('forms.passwordStrength.title')}</span>
         <span className={`text-sm font-medium ${strengthColor.replace("bg-", "text-")}`}>
           {strengthText}
         </span>
