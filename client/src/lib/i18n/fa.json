@@ -18,6 +18,11 @@
         "strong": "قوی",
         "veryStrong": "بسیار قوی"
       }
+    },
+    "register": {
+      "errors": {
+        "registrationFailed": "ثبت‌نام ناموفق بود"
+      }
     }
   }
 }

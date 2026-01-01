@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, Link } from "wouter";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -72,7 +72,7 @@ export default function Register() {
         body: JSON.stringify(data),
       });
       const responseData = await res.json();
-      if (!res.ok) throw new Error(responseData.error || "Registration failed");
+      if (!res.ok) throw new Error(responseData.error || t('forms.register.errors.registrationFailed'));
       return responseData;
     },
     onSuccess: (data: any) => {
@@ -110,6 +110,7 @@ export default function Register() {
                     name="fullName"
                     label="نام کامل"
                     placeholder="نام و نام خانوادگی"
+                    startAdornment={<User className="h-5 w-5 text-muted-foreground" />}
                   />
                   <FormFieldWithValidation<RegisterFormData>
                     name="email"
@@ -117,6 +118,7 @@ export default function Register() {
                     type="email"
                     placeholder="your@email.com"
                     dir="ltr"
+                    startAdornment={<Mail className="h-5 w-5 text-muted-foreground" />}
                   />
                   <div>
                     <FormFieldWithValidation<RegisterFormData>
@@ -124,6 +126,16 @@ export default function Register() {
                       label="رمز عبور"
                       type={showPassword ? "text" : "password"}
                       placeholder="رمز قوی انتخاب کنید"
+                      startAdornment={<Lock className="h-5 w-5 text-muted-foreground" />}
+                      endAdornment={
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="text-muted-foreground hover:text-foreground"
+                        >
+                          {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        </button>
+                      }
                     />
                     <PasswordStrengthIndicator<RegisterFormData> name="password" />
                   </div>
@@ -132,6 +144,7 @@ export default function Register() {
                     label="تأیید رمز عبور"
                     type={showPassword ? "text" : "password"}
                     placeholder="رمز را مجدد وارد کنید"
+                    startAdornment={<Lock className="h-5 w-5 text-muted-foreground" />}
                   />
                   <div className="flex items-start gap-2">
                     <Controller

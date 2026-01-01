@@ -4,19 +4,21 @@ import {
   FormProvider,
   FieldValues,
   SubmitHandler,
+  Path,
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { FormFieldWithValidation } from "./FormFieldWithValidation";
 import { Button } from "@/components/ui/button";
 
-// Define the types for the form field configurations
-type FormFieldConfig<T extends FieldValues> = {
-  name: keyof T;
+// Define the types for the form field configurations, now with a component property
+export type FormFieldConfig<T extends FieldValues> = {
+  name: Path<T>;
   label: string;
   type?: string;
   placeholder?: string;
   required?: boolean;
+  component?: React.ElementType; // Optional custom component for the field
 };
 
 // Define the props for the FormBuilder component
@@ -35,28 +37,26 @@ export function FormBuilder<T extends FieldValues>({
   defaultValues,
   children,
 }: FormBuilderProps<T>) {
-  // Initialize React Hook Form with the Zod schema resolver
   const methods = useForm<T>({
     resolver: zodResolver(schema),
-    defaultValues,
+    defaultValues: defaultValues || ({} as T),
   });
 
   return (
-    // Use FormProvider to pass the form context to nested components
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-4">
-        {fields.map((field) => (
-          <FormFieldWithValidation
-            key={String(field.name)}
-            name={String(field.name)}
-            label={field.label}
-            type={field.type}
-            placeholder={field.placeholder}
-            required={field.required}
-          />
-        ))}
-        <Button type="submit">Submit</Button>
+        {fields.map((field) => {
+          // Use the custom component if provided, otherwise default to FormFieldWithValidation
+          const ComponentToRender = field.component || FormFieldWithValidation;
+
+          // Pass all field properties to the component
+          return <ComponentToRender key={field.name} {...field} />;
+        })}
+
+        {/* Render any additional children, like suggestion components */}
         {children}
+
+        <Button type="submit">Submit</Button>
       </form>
     </FormProvider>
   );

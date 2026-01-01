@@ -1,14 +1,10 @@
 import React from "react";
 import { Check, AlertCircle } from "lucide-react";
-import {
-  useFormContext,
-  FieldValues,
-  Path,
-} from "react-hook-form";
+import { useFormContext, FieldValues, Path } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
-// Define a generic type for the props to ensure type safety with React Hook Form
 interface FormFieldWithValidationProps<T extends FieldValues> {
   name: Path<T>;
   label: string;
@@ -16,6 +12,8 @@ interface FormFieldWithValidationProps<T extends FieldValues> {
   type?: string;
   required?: boolean;
   dir?: "rtl" | "ltr";
+  startAdornment?: React.ReactNode;
+  endAdornment?: React.ReactNode;
 }
 
 export function FormFieldWithValidation<T extends FieldValues>({
@@ -25,22 +23,20 @@ export function FormFieldWithValidation<T extends FieldValues>({
   type = "text",
   required = false,
   dir = "rtl",
+  startAdornment,
+  endAdornment,
 }: FormFieldWithValidationProps<T>) {
-  // Get the form context, which includes register, formState, and getFieldState
   const {
     register,
     formState: { errors, touchedFields },
     getValues,
   } = useFormContext<T>();
 
-  // Determine the error state and message for the current field
   const error = errors[name];
   const errorMessage = typeof error?.message === 'string' ? error.message : undefined;
 
-  // Determine if the field has been touched
   const isTouched = touchedFields[name];
 
-  // Determine if the field is valid (touched, no errors, and has a value)
   const fieldValue = getValues(name);
   const isValid = isTouched && !error && fieldValue && String(fieldValue).length > 0;
 
@@ -51,29 +47,35 @@ export function FormFieldWithValidation<T extends FieldValues>({
         {required && <span className="text-destructive">*</span>}
       </Label>
       <div className="relative">
+        {startAdornment && (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+            {startAdornment}
+          </div>
+        )}
         <Input
           id={name}
           type={type}
-          // Register the input with React Hook Form
           {...register(name)}
           placeholder={placeholder}
-          className={`transition-all duration-200 ${
-            errorMessage ? "border-destructive bg-destructive/5 animate-shake" : ""
-          } ${isValid ? "border-green-500 bg-green-50/50" : ""}`}
+          className={cn(
+            "transition-all duration-200",
+            { "border-destructive bg-destructive/5 animate-shake": errorMessage },
+            { "border-green-500 bg-green-50/50": isValid },
+            { "pr-10": startAdornment },
+            { "pl-10": endAdornment || isValid || errorMessage }
+          )}
           dir={dir}
-          // Use aria-invalid to improve accessibility
           aria-invalid={!!errorMessage}
         />
-        {isValid && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 animate-fade-scale">
-            <Check className="h-5 w-5 text-green-500" />
-          </div>
-        )}
-        {errorMessage && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 animate-fade-scale">
-            <AlertCircle className="h-5 w-5 text-destructive" />
-          </div>
-        )}
+        <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center space-x-2">
+          {isValid && !endAdornment && (
+            <Check className="h-5 w-5 text-green-500 animate-fade-scale" />
+          )}
+          {errorMessage && !endAdornment && (
+             <AlertCircle className="h-5 w-5 text-destructive animate-fade-scale" />
+          )}
+          {endAdornment}
+        </div>
       </div>
       {errorMessage && (
         <p className="text-sm text-destructive animate-slide-in-error" role="alert">
