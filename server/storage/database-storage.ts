@@ -281,6 +281,10 @@ export class DatabaseStorage implements IStorage {
     return this.orders.updateOrderStatus(id, status);
   }
 
+  async updateOrder(id: number, data: Partial<Order>): Promise<Order | undefined> {
+    return this.orders.updateOrder(id, data);
+  }
+
   // Articles
   async getAllArticles(options?: { published?: boolean; limit?: number }): Promise<Article[]> {
     return this.content.getAllArticles(options);

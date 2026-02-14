@@ -85,4 +85,8 @@ export class OrderStorageAdapter {
   async updateOrderStatus(id: number, status: string): Promise<Order | undefined> {
     return this.orders.updateOrderStatus(id, status);
   }
+
+  async updateOrder(id: number, data: Partial<Order>): Promise<Order | undefined> {
+    return this.orders.updateOrder(id, data);
+  }
 }
