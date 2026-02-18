@@ -1,0 +1,28 @@
+{
+  "forms": {
+    "emailSuggestions": {
+      "suggestion": "آیا منظورتان این است؟"
+    },
+    "passwordStrength": {
+      "title": "قوت رمز:",
+      "requirements": {
+        "length": "حداقل 8 کاراکتر",
+        "uppercase": "حروف بزرگ (A-Z)",
+        "number": "عدد (0-9)",
+        "specialChar": "نشانه خاص (!@#$%)"
+      },
+      "strength": {
+        "weak": "ضعیف",
+        "medium": "متوسط",
+        "good": "خوب",
+        "strong": "قوی",
+        "veryStrong": "بسیار قوی"
+      }
+    },
+    "register": {
+      "errors": {
+        "registrationFailed": "ثبت‌نام ناموفق بود"
+      }
+    }
+  }
+}

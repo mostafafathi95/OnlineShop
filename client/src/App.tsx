@@ -73,6 +73,7 @@ const AdminRequests = lazy(() => import("@/pages/admin/Requests"));
 const AdminAnalytics = lazy(() => import("@/pages/admin/Analytics"));
 const AdminExport = lazy(() => import("@/pages/admin/Export"));
 const SearchResults = lazy(() => import("@/pages/SearchResults"));
+const FormDemo = lazy(() => import("@/pages/FormDemo"));
 
 function LoadingFallback() {
   return (
@@ -101,6 +102,7 @@ function Router() {
       <Route path="/news/:slug" component={NewsDetail} />
       <Route path="/page/:slug" component={StaticPage} />
       <Route path="/search" component={SearchResults} />
+      <Route path="/form-demo" component={FormDemo} />
 
       {/* Auth routes */}
       <Route path="/login" component={Login} />

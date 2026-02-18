@@ -27,3 +27,4 @@ build/
 # Others
 *.zip
 *.tar.gz
+package-lock.json
